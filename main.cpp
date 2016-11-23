@@ -33,6 +33,9 @@ static PyMethodDef EmbMethods[] = {
 int main(int argc, char** argv)
 {
 	QApplication app(argc, argv);
+	app.setStyle(new Qtitan::RibbonStyle());
+	app.setApplicationName("Fatigue Project");
+	app.setOrganizationName("Demx");
 
 	MainWindow widget;
 	widget.resize(800, 600);

@@ -1,0 +1,16 @@
+<RCC>
+    <qresource prefix="/res">
+        <file>largeOpenFile.png</file>
+        <file>smallOpen.png</file>
+        <file>file.png</file>
+        <file>qtitanlogo32x32.png</file>
+        <file>clipboardToolTip.png</file>
+        <file>largepaste.png</file>
+        <file>smallcopy.png</file>
+        <file>smallcut.png</file>
+        <file>smallformatpainter.png</file>
+        <file>smallpaste.png</file>
+        <file>ribbonMinimize.png</file>
+        <file>ribbonMaximize.png</file>
+    </qresource>
+</RCC>

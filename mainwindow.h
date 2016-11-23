@@ -5,7 +5,7 @@
 #include <QDebug>
 #include <QTimer>
 
-#include <QtitanRibbon.h>
+#include "ribbonwindow.h"
 
 #include "vtkUnstructuredGrid.h"
 #include "vtkCellData.h"
@@ -51,17 +51,45 @@
 
 #include "Python.h"
 
-class MainWindow :public Qtitan::RibbonMainWindow
+class MainWindow :public RibbonWindow
 {
     Q_OBJECT
 public:
-	MainWindow(QWidget *parent = 0) :Qtitan::RibbonMainWindow(parent)
+	MainWindow(QWidget *parent = 0) ;
+
+
+	~MainWindow()
 	{
 	}
 
-	~MainWindow(){}
-	
+private:
+	void createAction();
+	void createMenuFile();
+	void createQuickAccessBar();
+	void createRibbon();
 
+	void createGroup(Qtitan::RibbonPage* page);
+
+protected Q_SLOTS:
+	void fileOpen();
+	void closeFile();
+	virtual void options(QAction* action);
+
+	void showFatigueDialog();
+protected:
+	QAction* m_actionOpenFile;
+	QAction* m_actionCloseFile;
+
+	QAction* m_showFatigueDialog;
+
+	
+	QAction* m_actionCopy;
+	QAction* m_actionPaste1;
+	QAction* m_actionPaste2;
+	QAction* m_actionFormatPointerAction;
+	QAction* m_actionSelectAll;
+	QAction* m_actionFullScreen;
+	QAction* m_actionPrintLayout;
 };
 
 #endif
