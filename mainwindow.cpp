@@ -1,7 +1,14 @@
 #include <QApplication>
 #include <QFileDialog>
 
+#include "stdio.h"
+
+#include <Python.h>
+
 #include "mainwindow.h"
+
+
+int numargs;
 
 MainWindow::MainWindow(QWidget *parent ) :RibbonWindow(parent)
 {
@@ -53,8 +60,7 @@ void MainWindow::closeFile()
 
 void MainWindow::showFatigueDialog()
 {
-	QString fn = QFileDialog::getOpenFileName(this, tr("Open File..."),
-		QString(), tr("HTML-Files (*.htm *.html);;All Files (*)"));
+	runPython();
 
 }
 
@@ -122,5 +128,14 @@ void MainWindow::createGroup(Qtitan::RibbonPage* page)
 
 		m_actionFormatPointerAction = group->addAction(QIcon(":/res/smallformatpainter.png"),tr("F&ormat Pointer"), Qt::ToolButtonTextBesideIcon);
 	}
+
+}
+
+void MainWindow::runPython()
+{
+
+	numargs = 1111;
+
+	PyRun_SimpleString("execfile('E:/workspace/fatigueProject/lib/fatigue.py')");
 
 }

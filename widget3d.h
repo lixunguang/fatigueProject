@@ -50,7 +50,7 @@
 #include "Python.h"
 
 
-extern  int numargs;
+
 
 
 

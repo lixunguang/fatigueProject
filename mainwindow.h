@@ -76,6 +76,8 @@ protected Q_SLOTS:
 	virtual void options(QAction* action);
 
 	void showFatigueDialog();
+
+	void runPython();
 protected:
 	QAction* m_actionOpenFile;
 	QAction* m_actionCloseFile;

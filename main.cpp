@@ -12,9 +12,9 @@
 #include "mainwindow.h"
 //#include "HighlightInteractorStyle.h"
 
-extern  int numargs;
 
-/* Return the number of arguments of the application command line */
+extern int numargs;
+
 static PyObject* emb_numargs(PyObject *self, PyObject *args)
 {
 	if (!PyArg_ParseTuple(args, ":numargs"))
@@ -39,15 +39,13 @@ int main(int argc, char** argv)
 
 	MainWindow widget;
 	widget.resize(800, 600);
-	//p = &widget;
 	
 	Py_SetProgramName(argv[0]);  /* optional but recommended */
 	Py_Initialize();
 
 	Py_InitModule("emb", EmbMethods);
 	//numargs = this->getPolyData()->GetCellData()->GetNumberOfArrays();
-	numargs = 1111;
-	PyRun_SimpleString("import emb\nprint \"Number of arguments\", emb.numargs()\n");
+
 
 
 	widget.show();
