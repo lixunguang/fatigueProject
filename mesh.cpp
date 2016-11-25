@@ -53,9 +53,7 @@ Mesh::Mesh()
 
 void Mesh::setFileName(char *fileName)
 {
-	dpFileName = fileName;
-	int pos = dpFileName.find_first_of(".");
-	dpFileName = dpFileName.substr(0,pos);
+
 	datafun = vdm_DataFunBegin();
 	ReadVKISupportFile(fileName,datafun);
 

@@ -50,11 +50,11 @@ void MainWindow::createAction()
 
 void MainWindow::fileOpen()
 {
-	QString fn = QFileDialog::getOpenFileName(this, tr("Open File..."),
-		QString(), tr("HTML-Files (*.htm *.html);;All Files (*)"));
+	QString fileName = QFileDialog::getOpenFileName(this, tr("Open File..."),
+		QString(), tr("Ansys result (*.fil *.odb);;All Files (*)"));
 
 	// read mesh
-
+	meshViewer->loadMeshData(fileName.toLatin1().data());
 }
 
 void MainWindow::closeFile()
