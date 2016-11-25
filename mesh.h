@@ -1,20 +1,25 @@
 
 #ifndef MESH_H_
 #define MESH_H_
+#include <QObject>
 
 #include "base/base.h"
 #include "vis/visdata.h"
 #include "vdm/vdm.h"
 #include "vis/vis.h"
 
-#include <list>
+#include <vtkSmartPointer.h>
+#include <vtkPoints.h>
+#include <vtkUnstructuredGrid.h>
+
+#include <list>//use qt instead
 #include <set>
 #include <string>
 using namespace std;
 
 
 /*
-datapicker类用主要用来对仿真文件(输入文件,结果文件)的查看,转换. 如:
+Mesh类用主要用来对仿真文件(输入文件,结果文件)的查看,转换. 如:
 1 获取结果数据中的mises力,最大主应力等;
 2 获取结果文件或者输入文件的数据;
 
@@ -27,14 +32,21 @@ enum SETTYPE
 	SETTYPE_FACE,
 };
 
-class Mesh
+class Mesh :public QObject
 {
+	Q_OBJECT
 public:
-	Mesh(char *fileName);
+	Mesh();
 	~Mesh();
+public:
+	void loadData(char *fileName);
+	
+signals:
+	void finishDataLoaded();
+
 
 public:
-//datapicker interface
+	void setFileName(char *fileName);
 
 	void getDisplacementMinMax(vis_State *state);
 
@@ -50,27 +62,16 @@ public:
 	long getMaxNode();
 
 public:
-	//lman:输出dataset信息到 文件 屏幕 
-	void printLManDatasetToFile(char *fileName);
-	void printLManDataset();
-
-	//lib
-	void printLibDataset();
-
-
 	SETTYPE getDatasetType(char *datasetName);
 	vdm_Dataset *getDataset(char *attrVal,SETTYPE setType);
 
-
 protected:
-//utils func
-
-	//read file to datafun
 	Vint suftst(Vchar inputfile[], Vchar suffix[]);
 	void GetFileType(Vchar* inputfile);
 	void ReadVKISupportFile(Vchar *fileName,vdm_DataFun *datafun);
 	void CloseVKISupportFile(vdm_DataFun *datafun);
 
+	void readMesh();
 public:
 	//get dataset from datafun
 
@@ -78,9 +79,7 @@ public:
 	int getDatasetIndexFromName(char *datasetName);
 	void getDatasetFromName(char *datasetName,vdm_Dataset** dataset);
 	void printDatasetint(char *datesetName);
-	void printDatasetint(vdm_Dataset *dateset);
 
-	void printDatasetfloat(char *datesetName);
 
 	//get state from dataset
 	void getStateFromDatasetIndex(int index,vis_State *state,int type);
@@ -95,9 +94,7 @@ public:
 	vdm_DataFun *datafun;
 	vdm_LMan *lman;
 	vis_Model *model;
-
 	vdm_Library *lib;
-
 
 	vis_Connect *connect;
 	vis_GridFun *gridfun;
@@ -107,6 +104,14 @@ public:
 
 	Vint filetype;//读取的文件类型
 
+	int n_nodes;
+	int n_elements;
+	int n_faces;
+
+	std::map<int, int> nid_map;
+	std::map<int, int> eid_map;
+
+	vtkSmartPointer<vtkUnstructuredGrid> ugrid;
 };
 
 #endif

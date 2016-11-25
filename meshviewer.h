@@ -41,6 +41,7 @@
 #include <vtkLogLookupTable.h>
 #include <vtkPolyDataNormals.h>
 
+#include "mesh.h"
 
 struct struct_tensor 
 {
@@ -75,7 +76,7 @@ public:
 	~MeshViewer();
 
 public:
-	void createToolBar();
+	void loadMeshData(char* fileName);
 
 public slots:
 	void setBackground(const QColor color);
@@ -90,24 +91,22 @@ private slots:
 	void viewReset();
 
 	void reprsentationComboBoxIndexChanged(int index);
+	void renderWindow();
 
 private:
-	void display(QString theName);
 
-	void renderWindow();
+
 	void showOrientationMarkerWidget(bool isShow);
 	void addOrientationMarkerWidget();
 
+	void createToolBar();
 
 private:
  	vtkOrientationMarkerWidget * OMwidget;
  	vtkSmartPointer<vtkRenderer>		renderer;
  	vtkSmartPointer<vtkActor>			mainActor;
  	vtkSmartPointer<vtkDataSetMapper>	mapper;
- 	vtkSmartPointer<vtkLookupTable>		lut;
-	vtkSmartPointer<vtkScalarBarActor>	scalarBar;
- 	vtkSmartPointer<vtkUnstructuredGrid> geometryData;
- 	vtkSmartPointer<vtkActor> warpActor;
+
 
  	QAction *action_reset;
  	QAction *action_viewTop;
@@ -119,6 +118,6 @@ private:
  	QAction *action_viewMore;
  	QComboBox *reprsentationComboBox; 
 
-
+	Mesh *mesh;
 };
 #endif

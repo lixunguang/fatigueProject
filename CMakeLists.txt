@@ -44,7 +44,7 @@ if(${VTK_VERSION} VERSION_GREATER "6")
   ${QRC_SOURCES} 
   main.cpp 
   mainwindow.cpp 
-  widget3d.cpp 
+  #widget3d.cpp 
   ribbonwindow.cpp
   mesh.cpp
   meshviewer.cpp

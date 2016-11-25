@@ -4,9 +4,7 @@
 
 #include <Python.h>
 
-#include <base/base.h>
-#include <vis/visdata.h>
-#include <vdm/vdm.h>
+
 
 #include "widget3d.h"
 #include "mainwindow.h"

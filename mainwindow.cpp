@@ -6,7 +6,7 @@
 #include <Python.h>
 
 #include "mainwindow.h"
-#include "meshviewer.h"
+
 
 int numargs;
 
@@ -20,8 +20,9 @@ MainWindow::MainWindow(QWidget *parent ) :RibbonWindow(parent)
 
 	ribbonBar()->setFrameThemeEnabled();
 
-	MeshViewer *meshViewer = new MeshViewer(this);
+	meshViewer = new MeshViewer(this);
 	setCentralWidget(meshViewer);
+
 }
 
 void MainWindow::createAction()
@@ -51,6 +52,8 @@ void MainWindow::fileOpen()
 {
 	QString fn = QFileDialog::getOpenFileName(this, tr("Open File..."),
 		QString(), tr("HTML-Files (*.htm *.html);;All Files (*)"));
+
+	// read mesh
 
 }
 

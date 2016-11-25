@@ -51,6 +51,9 @@
 
 #include "Python.h"
 
+#include "meshviewer.h"
+
+
 class MainWindow :public RibbonWindow
 {
     Q_OBJECT
@@ -92,6 +95,11 @@ protected:
 	QAction* m_actionSelectAll;
 	QAction* m_actionFullScreen;
 	QAction* m_actionPrintLayout;
+
+private:
+	MeshViewer *meshViewer;
+
+	
 };
 
 #endif

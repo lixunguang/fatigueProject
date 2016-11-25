@@ -16,11 +16,10 @@
 #include <vtkCell.h>
 #include <vtkIdList.h>
 
-// #include "EMTSign.h"
-// #include "EMTSignActor.h"
-// #include "EMTFileReader.h"
-//#include "vtkMeshReader.h"
+/*
+MeshView类用用来可视化mesh
 
+*/
 
 MeshViewer::MeshViewer(QWidget *parent)
 	:QVTKWidget(parent)
@@ -28,12 +27,21 @@ MeshViewer::MeshViewer(QWidget *parent)
 	createToolBar();
 	
 	renderer = vtkSmartPointer<vtkRenderer>::New();
-	GetRenderWindow()->AddRenderer(renderer);
-	mapper = vtkSmartPointer<vtkDataSetMapper>::New();
 	renderer->SetGradientBackground(true);
+	GetRenderWindow()->AddRenderer(renderer);
+
+	mapper = vtkSmartPointer<vtkDataSetMapper>::New();
+
+	mainActor = vtkSmartPointer<vtkActor>::New();
+	mainActor->SetMapper(mapper);
+
+	renderer->AddActor(mainActor);
 
 	addOrientationMarkerWidget();
 	showOrientationMarkerWidget(true);
+
+	mesh = new Mesh();
+	connect(mesh, SIGNAL(finishDataLoaded()), this, SLOT(renderWindow()));
 
 }
 
@@ -163,7 +171,7 @@ void MeshViewer::addOrientationMarkerWidget()
 void MeshViewer::showOrientationMarkerWidget(bool isShow)
 {
 	OMwidget->SetEnabled(isShow);
-	renderWindow();
+
 }
 
 void MeshViewer::setBackground(const QColor color)
@@ -179,109 +187,46 @@ void MeshViewer::setBackground(const QColor color)
 
 void MeshViewer::renderWindow()
 {
+	mapper->SetInputData(mesh->ugrid);
 	renderer->GetRenderWindow()->Render();
 }
 
-
-void MeshViewer::display(QString theName)
-{
-	Q_UNUSED(theName)
-	mapper->ScalarVisibilityOn();
-	//mapper->SetScalarModeToUsePointData();
-	mapper->SetScalarModeToUseCellData();
-	mapper->SetColorModeToMapScalars();
-	mapper->SetUseLookupTableScalarRange(1);
-	mapper->SetInputData(geometryData);
-	mapper->SetInterpolateScalarsBeforeMapping(1);
-
-
-	lut = vtkSmartPointer<vtkLookupTable>::New();
-	lut->SetHueRange(0.667,0);
-	lut->SetValueRange(1,1);
-	lut->SetNumberOfColors(16);
-	lut->SetSaturationRange (1, 1);
-	lut->Build();
-
-	scalarBar = vtkSmartPointer<vtkScalarBarActor>::New();
-	scalarBar->SetLookupTable(mapper->GetLookupTable());
-	scalarBar->SetWidth(0.1);
-	scalarBar->SetHeight(0.5);
-	scalarBar->SetPosition(0.05,0.4);
-	scalarBar->SetLabelFormat("%.4e");
-	scalarBar->SetNumberOfLabels(6);
-	scalarBar->SetTitle("Scalar");
-
-	mapper->SetLookupTable(lut);
-	scalarBar->SetLookupTable(lut);
-	mapper->Update();
-	mainActor = vtkSmartPointer<vtkActor>::New();
-	mainActor->SetMapper(mapper);
-	mainActor->GetProperty()->SetLineWidth(10);
-	renderer->AddActor(mainActor);
-	renderer->AddActor2D(scalarBar);
-	renderer->ResetCamera();
-	renderer->GetRenderWindow()->Render();
-
-
-}
 
 
 void MeshViewer::reprsentationComboBoxIndexChanged(int index)
 {
 	mainActor->GetProperty()->EdgeVisibilityOff();
 	mainActor->GetProperty()->SetLineWidth(10);
-	if (warpActor)
-	{
-		warpActor->GetProperty()->EdgeVisibilityOff();
-		warpActor->GetProperty()->SetLineWidth(10);
-	}
-	
+
 	switch(index)
 	{
 	case 0:
 		mainActor->GetProperty()->SetRepresentationToPoints();
-		
-		if (warpActor)
-		{
-			warpActor->GetProperty()->SetRepresentationToPoints();
-		}
+
 		break;
 	case 1:
 		mainActor->GetProperty()->SetRepresentationToSurface();
 		
-		if (warpActor)
-		{
-			warpActor->GetProperty()->SetRepresentationToSurface();
-		}
 		break;
 	case 2:
-		if(mainActor->GetMapper()->GetInput()->GetCellType(1) == VTK_LINE)
-		{
-			break;
-		}
+
 		mainActor->GetProperty()->SetLineWidth(1);
 		mainActor->GetProperty()->SetRepresentationToSurface();
 		mainActor->GetProperty()->EdgeVisibilityOn();
 		
-		if (warpActor)
-		{
-			warpActor->GetProperty()->SetLineWidth(1);
-			warpActor->GetProperty()->SetRepresentationToSurface();
-			warpActor->GetProperty()->EdgeVisibilityOn();
-		}
 		break;
 	case 3:
 		mainActor->GetProperty()->SetLineWidth(1);
 		mainActor->GetProperty()->SetRepresentationToWireframe();
 		
-		if (warpActor)
-		{
-			warpActor->GetProperty()->SetRepresentationToWireframe();
-			warpActor->GetProperty()->SetLineWidth(1);
-		}
 		break;
 	default:
 		;
 	}
 }
 
+void MeshViewer::loadMeshData(char* fileName)
+{
+	mesh->loadData(fileName);
+
+}
