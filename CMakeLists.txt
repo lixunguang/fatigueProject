@@ -40,7 +40,21 @@ if(${VTK_VERSION} VERSION_GREATER "6")
   QT5_ADD_RESOURCES(QRC_SOURCES   res/fatigueRc.qrc)
   qt5_wrap_ui(UISrcs ${UI_FILES} )
   # CMAKE_AUTOMOC in ON so the MOC headers will be automatically wrapped.
-  add_executable(fatigueProject ${QRC_SOURCES} main.cpp mainwindow.cpp widget3d.cpp ribbonwindow.cpp )
+  add_executable(fatigueProject 
+  ${QRC_SOURCES} 
+  main.cpp 
+  mainwindow.cpp 
+  widget3d.cpp 
+  ribbonwindow.cpp
+  mesh.cpp
+  meshviewer.cpp
+  )
+
+ 
+  SOURCE_GROUP("Resources" FILES
+  ${UI_FILES}
+  ${QRC_SOURCES}
+  )
   qt5_use_modules(fatigueProject Core Gui Widgets)
   target_link_libraries(fatigueProject ${VTK_LIBRARIES})
 

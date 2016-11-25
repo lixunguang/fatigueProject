@@ -6,7 +6,7 @@
 #include <Python.h>
 
 #include "mainwindow.h"
-
+#include "meshviewer.h"
 
 int numargs;
 
@@ -19,14 +19,17 @@ MainWindow::MainWindow(QWidget *parent ) :RibbonWindow(parent)
 	connect(m_showFatigueDialog, SIGNAL(triggered()), this, SLOT(showFatigueDialog()));
 
 	ribbonBar()->setFrameThemeEnabled();
+
+	MeshViewer *meshViewer = new MeshViewer(this);
+	setCentralWidget(meshViewer);
 }
 
 void MainWindow::createAction()
 {
 
 	QIcon iconOpen;
-	iconOpen.addPixmap(QPixmap(":/res/largeOpenFile.png"));
-	iconOpen.addPixmap(QPixmap(":/res/smallOpen.png"));
+	iconOpen.addPixmap(QPixmap(":/res/mainwin_mainwin_largeOpenFile.png"));
+	iconOpen.addPixmap(QPixmap(":/res/mainwin_smallOpen.png"));
 	m_actionOpenFile = new QAction(iconOpen, tr("&Open..."), this);
 	m_actionOpenFile->setShortcut(QKeySequence::Open);
 	m_actionOpenFile->setToolTip(tr("Open"));
@@ -34,8 +37,8 @@ void MainWindow::createAction()
 	connect(m_actionOpenFile, SIGNAL(triggered()), this, SLOT(fileOpen()));
 
 	QIcon iconClose;
-	iconClose.addPixmap(QPixmap(":/res/largeOpenFile.png"));
-	iconClose.addPixmap(QPixmap(":/res/smallOpen.png"));
+	iconClose.addPixmap(QPixmap(":/res/mainwin_largeOpenFile.png"));
+	iconClose.addPixmap(QPixmap(":/res/mainwin_smallOpen.png"));
 	m_actionCloseFile = new QAction(iconClose, tr("&Close"), this);
 	m_actionCloseFile->setShortcut(QKeySequence::Save);
 	m_actionCloseFile->setToolTip(tr("Save"));
@@ -73,8 +76,8 @@ void MainWindow::options(QAction* action)
 void MainWindow::createMenuFile()
 {
 	QIcon iconLogo;
-	iconLogo.addPixmap(QPixmap(":/res/file.png"));
-	iconLogo.addPixmap(QPixmap(":/res/qtitanlogo32x32.png"));
+	iconLogo.addPixmap(QPixmap(":/res/mainwin_file.png"));
+	iconLogo.addPixmap(QPixmap(":/res/mainwin_qtitanlogo32x32.png"));
 	if (QAction* actionFile = ribbonBar()->addSystemButton(iconLogo, tr("&File")))
 	{
 		actionFile->setToolTip(tr("Click here to see everything you can do with your document"));
@@ -108,25 +111,25 @@ void MainWindow::createRibbon()
 
 void MainWindow::createGroup(Qtitan::RibbonPage* page)
 {
-	if (Qtitan::RibbonGroup* group = page->addGroup(QIcon(":/res/smallpaste.png"), tr("Clipboard")))
+	if (Qtitan::RibbonGroup* group = page->addGroup(QIcon(":/res/mainwin_smallpaste.png"), tr("Clipboard")))
 	{
 		group->setOptionButtonVisible();
 		QAction* act = group->optionButtonAction();
 		act->setText(tr("Pyqt"));
-		act->setIcon(QIcon(":/res/clipboardToolTip.png"));
+		act->setIcon(QIcon(":/res/mainwin_clipboardToolTip.png"));
 		act->setToolTip(tr("generate input file"));
 		act->setStatusTip(tr("gen input file"));
 		//connect(act, SIGNAL(triggered()), this, SLOT(optionClipboard()));
 
 
 
-		m_showFatigueDialog = group->addAction(QIcon(":/res/smallcut.png"), tr("&Fatigue"), Qt::ToolButtonTextBesideIcon);
+		m_showFatigueDialog = group->addAction(QIcon(":/res/mainwin_smallcut.png"), tr("&Fatigue"), Qt::ToolButtonTextBesideIcon);
 		m_showFatigueDialog->setToolTip(tr("generate fatigue dialog"));
 
-		m_actionCopy = group->addAction(QIcon(":/res/smallcopy.png"),tr("&Copy"), Qt::ToolButtonTextBesideIcon);
+		m_actionCopy = group->addAction(QIcon(":/res/mainwin_smallcopy.png"),tr("&Copy"), Qt::ToolButtonTextBesideIcon);
 		m_actionCopy->setShortcut(QKeySequence::Copy);
 
-		m_actionFormatPointerAction = group->addAction(QIcon(":/res/smallformatpainter.png"),tr("F&ormat Pointer"), Qt::ToolButtonTextBesideIcon);
+		m_actionFormatPointerAction = group->addAction(QIcon(":/res/mainwin_smallformatpainter.png"),tr("F&ormat Pointer"), Qt::ToolButtonTextBesideIcon);
 	}
 
 }
