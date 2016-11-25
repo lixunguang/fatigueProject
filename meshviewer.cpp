@@ -2,6 +2,7 @@
 
 #include <QDebug>
 #include <QLabel>
+#include <QToolBar>
 
 #include <vtkGenericOpenGLRenderWindow.h>
 #include <vtkRenderWindowInteractor.h>
@@ -82,6 +83,19 @@ void MeshViewer::createToolBar()
 	connect(action_viewMaxMin, SIGNAL(triggered(bool)), this, SLOT(setViewMaxMin(bool)));
 	connect(reprsentationComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(reprsentationComboBoxIndexChanged(int)));
 
+
+	QToolBar *toolBar = new QToolBar(this);
+
+	toolBar->addAction(action_reset);
+	toolBar->addAction(action_viewLeft);
+	toolBar->addAction(action_viewRight);
+	toolBar->addAction(action_viewTop);
+	toolBar->addAction(action_viewBottom);
+	toolBar->addAction(action_viewFront);
+	toolBar->addAction(action_viewBack);
+	toolBar->addWidget(reprsentationComboBox);
+	toolBar->addSeparator();
+
 }
 
 void MeshViewer::viewReset()
@@ -104,6 +118,10 @@ void MeshViewer::viewLeft()
 	renderer->GetRenderWindow()->Render();
 }
 
+void MeshViewer::wheelEvent(QWheelEvent *e)
+{
+	QVTKWidget::wheelEvent(e);
+}
 void MeshViewer::viewRight()
 {
 	renderer->GetActiveCamera()->SetPosition(0, 0, 1);

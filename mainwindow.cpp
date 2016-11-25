@@ -53,6 +53,10 @@ void MainWindow::fileOpen()
 	QString fileName = QFileDialog::getOpenFileName(this, tr("Open File..."),
 		QString(), tr("Ansys result (*.fil *.odb);;All Files (*)"));
 
+	if (fileName.isEmpty())
+	{
+		return;
+	}
 	// read mesh
 	meshViewer->loadMeshData(fileName.toLatin1().data());
 }
@@ -114,7 +118,7 @@ void MainWindow::createRibbon()
 
 void MainWindow::createGroup(Qtitan::RibbonPage* page)
 {
-	if (Qtitan::RibbonGroup* group = page->addGroup(QIcon(":/res/mainwin_smallpaste.png"), tr("Clipboard")))
+	if (Qtitan::RibbonGroup* group = page->addGroup(QIcon(":/res/mainwin_smallpaste.png"), tr("Tools")))
 	{
 		group->setOptionButtonVisible();
 		QAction* act = group->optionButtonAction();
@@ -129,10 +133,10 @@ void MainWindow::createGroup(Qtitan::RibbonPage* page)
 		m_showFatigueDialog = group->addAction(QIcon(":/res/mainwin_smallcut.png"), tr("&Fatigue"), Qt::ToolButtonTextBesideIcon);
 		m_showFatigueDialog->setToolTip(tr("generate fatigue dialog"));
 
-		m_actionCopy = group->addAction(QIcon(":/res/mainwin_smallcopy.png"),tr("&Copy"), Qt::ToolButtonTextBesideIcon);
+		m_actionCopy = group->addAction(QIcon(":/res/mainwin_smallcopy.png"),tr("&Tool2"), Qt::ToolButtonTextBesideIcon);
 		m_actionCopy->setShortcut(QKeySequence::Copy);
 
-		m_actionFormatPointerAction = group->addAction(QIcon(":/res/mainwin_smallformatpainter.png"),tr("F&ormat Pointer"), Qt::ToolButtonTextBesideIcon);
+		m_actionFormatPointerAction = group->addAction(QIcon(":/res/mainwin_smallformatpainter.png"),tr("Tool3"), Qt::ToolButtonTextBesideIcon);
 	}
 
 }

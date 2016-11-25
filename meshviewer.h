@@ -94,12 +94,12 @@ private slots:
 	void renderWindow();
 
 private:
-
-
 	void showOrientationMarkerWidget(bool isShow);
 	void addOrientationMarkerWidget();
 
 	void createToolBar();
+protected:
+	void wheelEvent(QWheelEvent *e);
 
 private:
  	vtkOrientationMarkerWidget * OMwidget;
