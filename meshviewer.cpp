@@ -1,4 +1,4 @@
-#include "MeshViewer.h"
+#include "meshviewer.h"
 
 #include <QDebug>
 #include <QLabel>
@@ -122,6 +122,7 @@ void MeshViewer::wheelEvent(QWheelEvent *e)
 {
 	QVTKWidget::wheelEvent(e);
 }
+
 void MeshViewer::viewRight()
 {
 	renderer->GetActiveCamera()->SetPosition(0, 0, 1);

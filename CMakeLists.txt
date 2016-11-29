@@ -48,6 +48,8 @@ if(${VTK_VERSION} VERSION_GREATER "6")
   ribbonwindow.cpp
   mesh.cpp
   meshviewer.cpp
+  treeviewer.cpp
+  propertyviewer.cpp
   )
 
  

@@ -23,6 +23,21 @@ MainWindow::MainWindow(QWidget *parent ) :RibbonWindow(parent)
 	meshViewer = new MeshViewer(this);
 	setCentralWidget(meshViewer);
 
+	treeViewer = new TreeViewer(this);
+	propViewer = new PropertyViewer(this);
+
+	this->addDockWidget(Qt::LeftDockWidgetArea, treeViewer);
+	this->addDockWidget(Qt::LeftDockWidgetArea, propViewer);
+
+	treeViewer->setWindowTitle("Label Browser");
+	treeViewer->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
+	treeViewer->setMinimumWidth(150);
+
+	propViewer->setWindowTitle("Properties");
+	propViewer->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
+	propViewer->setMinimumWidth(150);
+
+
 }
 
 void MainWindow::createAction()

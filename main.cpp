@@ -6,7 +6,6 @@
 
 
 
-#include "widget3d.h"
 #include "mainwindow.h"
 //#include "HighlightInteractorStyle.h"
 

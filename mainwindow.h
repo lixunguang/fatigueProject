@@ -52,6 +52,8 @@
 #include "Python.h"
 
 #include "meshviewer.h"
+#include "propertyviewer.h"
+#include "treeviewer.h"
 
 
 class MainWindow :public RibbonWindow
@@ -98,6 +100,8 @@ protected:
 
 private:
 	MeshViewer *meshViewer;
+	TreeViewer *treeViewer;
+	PropertyViewer *propViewer;
 
 	
 };
