@@ -36,18 +36,34 @@ MeshViewer::MeshViewer(QWidget *parent)
 	mainActor = vtkSmartPointer<vtkActor>::New();
 	mainActor->SetMapper(mapper);
 
+
 	renderer->AddActor(mainActor);
 
 	addOrientationMarkerWidget();
 	showOrientationMarkerWidget(true);
 
 	mesh = new Mesh();
+	qDebug() << mesh->ugrid->GetReferenceCount();
 	connect(mesh, SIGNAL(finishDataLoaded()), this, SLOT(renderWindow()));
+
+	vtkRenderWindowInteractor* renderWindowInteractor = this->GetRenderWindow()->GetInteractor();
+
+	vtkSmartPointer<vtkAreaPicker> areaPicker = vtkSmartPointer<vtkAreaPicker>::New();
+	renderWindowInteractor->SetPicker(areaPicker);
+
+	style = vtkSmartPointer<HighlightInteractorStyle>::New();
+	style->SetData(mesh->ugrid);
+
+	renderWindowInteractor->SetInteractorStyle(style);
+
+	tooltip = vtkSmartPointer<vtkTooltipItem>::New();
 
 }
 
 MeshViewer::~MeshViewer()
-{
+{	
+	qDebug() << mesh->ugrid->GetReferenceCount();
+	delete mesh;
 
 }
 
@@ -206,7 +222,9 @@ void MeshViewer::setBackground(const QColor color)
 
 void MeshViewer::renderWindow()
 {
+	qDebug()<<mesh->ugrid->GetReferenceCount();
 	mapper->SetInputData(mesh->ugrid);
+	qDebug() << mesh->ugrid->GetReferenceCount();
 	renderer->GetRenderWindow()->Render();
 }
 
@@ -221,23 +239,25 @@ void MeshViewer::reprsentationComboBoxIndexChanged(int index)
 	{
 	case 0:
 		mainActor->GetProperty()->SetRepresentationToPoints();
-
+		style->SelectedActor->GetProperty()->SetRepresentationToPoints();
 		break;
 	case 1:
 		mainActor->GetProperty()->SetRepresentationToSurface();
-		
+		style->SelectedActor->GetProperty()->SetRepresentationToSurface();
 		break;
 	case 2:
 
 		mainActor->GetProperty()->SetLineWidth(1);
 		mainActor->GetProperty()->SetRepresentationToSurface();
 		mainActor->GetProperty()->EdgeVisibilityOn();
-		
+
+		style->SelectedActor->GetProperty()->SetRepresentationToSurface();
 		break;
 	case 3:
 		mainActor->GetProperty()->SetLineWidth(1);
 		mainActor->GetProperty()->SetRepresentationToWireframe();
-		
+
+		style->SelectedActor->GetProperty()->SetRepresentationToWireframe();
 		break;
 	default:
 		;

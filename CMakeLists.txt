@@ -50,6 +50,7 @@ if(${VTK_VERSION} VERSION_GREATER "6")
   meshviewer.cpp
   treeviewer.cpp
   propertyviewer.cpp
+  HighlightInteractorStyle.cpp
   )
 
  

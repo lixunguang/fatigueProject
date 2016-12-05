@@ -46,9 +46,14 @@
 #include <vtkTransform.h>
 #include <vtkTransformPolyDataFilter.h>
 
+#include <QDebug>
 Mesh::Mesh()
 {
 	ugrid = vtkSmartPointer<vtkUnstructuredGrid>::New();
+	qDebug() << ugrid->GetReferenceCount();
+
+	vtkSmartPointer<vtkUnstructuredGrid> x = ugrid;
+	qDebug() << ugrid->GetReferenceCount();
 }
 
 void Mesh::setFileName(char *fileName)
@@ -363,10 +368,12 @@ void Mesh::loadData(char *fileName)
 
 Mesh::~Mesh()
 {
+	qDebug() << ugrid->GetReferenceCount();
 	vis_GridFunEnd(gridfun);
 	vis_ModelEnd(model);
 	vdm_LManEnd(lman);
 	CloseVKISupportFile(datafun);
+	qDebug() << ugrid->GetReferenceCount();
 }
 
 

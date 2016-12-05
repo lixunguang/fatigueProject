@@ -40,8 +40,10 @@
 #include <vtkWarpScalar.h>
 #include <vtkLogLookupTable.h>
 #include <vtkPolyDataNormals.h>
+#include <vtkTooltipItem.h>
 
 #include "mesh.h"
+#include "HighlightInteractorStyle.h"
 
 struct struct_tensor 
 {
@@ -106,7 +108,7 @@ private:
  	vtkSmartPointer<vtkRenderer>		renderer;
  	vtkSmartPointer<vtkActor>			mainActor;
  	vtkSmartPointer<vtkDataSetMapper>	mapper;
-
+	vtkSmartPointer<HighlightInteractorStyle> style;
 
  	QAction *action_reset;
  	QAction *action_viewTop;
@@ -118,6 +120,7 @@ private:
  	QAction *action_viewMore;
  	QComboBox *reprsentationComboBox; 
 
+	vtkSmartPointer<vtkTooltipItem> tooltip;
 	Mesh *mesh;
 };
 #endif
