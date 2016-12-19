@@ -54,25 +54,30 @@ Mesh::Mesh()
 
 	vtkSmartPointer<vtkUnstructuredGrid> x = ugrid;
 	qDebug() << ugrid->GetReferenceCount();
+
+	datafun = vdm_DataFunBegin();
+	lman = vdm_LManBegin();
+	model = vis_ModelBegin();
+	gridfun = vis_GridFunBegin();
 }
 
 void Mesh::setFileName(char *fileName)
 {
 
-	datafun = vdm_DataFunBegin();
+
 	ReadVKISupportFile(fileName,datafun);
 
 	vdm_DataFunGetLibrary(datafun,&lib);
 
-	lman = vdm_LManBegin();
+	
 	vdm_LManSetObject(lman,VDM_DATAFUN,datafun);
 
-	model = vis_ModelBegin();
+
 	vdm_LManLoadModel (lman,model);
 
 	vis_ModelGetObject (model,VIS_CONNECT,(Vobject**)&connect);
 
-	gridfun = vis_GridFunBegin ();
+	
 	vis_ConnectGridFun (connect,gridfun);
 
 	// Get number of points
@@ -368,12 +373,15 @@ void Mesh::loadData(char *fileName)
 
 Mesh::~Mesh()
 {
-	qDebug() << ugrid->GetReferenceCount();
+
 	vis_GridFunEnd(gridfun);
 	vis_ModelEnd(model);
 	vdm_LManEnd(lman);
-	CloseVKISupportFile(datafun);
-	qDebug() << ugrid->GetReferenceCount();
+	if (datafun->obj)
+	{
+		CloseVKISupportFile(datafun);
+	}
+
 }
 
 
@@ -876,7 +884,7 @@ long Mesh::getMaxNode()
 	vdm_Dataset *ds;
 	getDatasetFromName("NID.N",&ds);
 	Vlong a;
-	Vint aa,b,c,d;
+	Vint b,c,d;
 	Vchar name[42];
 	vdm_DatasetInq(ds,name,&a,&b,&c,&d);
 	return a;
