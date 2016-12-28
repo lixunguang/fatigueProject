@@ -27,4 +27,8 @@
         <file>viewer_right36t.png</file>
         <file>viewer_top36t.png</file>
     </qresource>
+    <qresource prefix="/res/label">
+        <file>add.png</file>
+        <file>remove.png</file>
+    </qresource>
 </RCC>

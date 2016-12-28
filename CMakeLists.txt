@@ -44,13 +44,22 @@ if(${VTK_VERSION} VERSION_GREATER "6")
   ${QRC_SOURCES} 
   main.cpp 
   mainwindow.cpp 
-  #widget3d.cpp 
   ribbonwindow.cpp
   mesh.cpp
   meshviewer.cpp
-  treeviewer.cpp
+  highlightinteractorstyle.cpp
+  labelviewer.cpp
   propertyviewer.cpp
-  HighlightInteractorStyle.cpp
+  operationviewer.cpp
+  fatiguewidget.cpp
+  analysiswidget.cpp
+  loadwidget.cpp
+  loadeventdialog.cpp
+  influencefactordialog.cpp
+  table.cpp
+  model.cpp
+  delegate.cpp
+
   )
 
  
