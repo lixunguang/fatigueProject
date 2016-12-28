@@ -56,6 +56,8 @@ MeshViewer::MeshViewer(QWidget *parent)
 
 	renderWindowInteractor->SetInteractorStyle(style);
 
+	mapper->SetInputData(mesh->ugrid);
+
 	tooltip = vtkSmartPointer<vtkTooltipItem>::New();
 
 }
@@ -94,9 +96,9 @@ void MeshViewer::createToolBar()
 	connect(action_viewBottom, SIGNAL(triggered()), this, SLOT(viewBottom()));
 	connect(action_viewFront, SIGNAL(triggered()), this, SLOT(viewFront()));
 	connect(action_viewBack, SIGNAL(triggered()), this, SLOT(viewBack()));
-	connect(action_viewMore, SIGNAL(triggered(bool)), this, SLOT(viewMoreInf(bool)));
-	connect(action_viewMaxMin, SIGNAL(triggered(bool)), this, SLOT(viewMaxMinSign(bool)));
-	connect(action_viewMaxMin, SIGNAL(triggered(bool)), this, SLOT(setViewMaxMin(bool)));
+// 	connect(action_viewMore, SIGNAL(triggered(bool)), this, SLOT(viewMoreInf(bool)));
+// 	connect(action_viewMaxMin, SIGNAL(triggered(bool)), this, SLOT(viewMaxMinSign(bool)));
+// 	connect(action_viewMaxMin, SIGNAL(triggered(bool)), this, SLOT(setViewMaxMin(bool)));
 	connect(reprsentationComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(reprsentationComboBoxIndexChanged(int)));
 
 
@@ -223,7 +225,7 @@ void MeshViewer::setBackground(const QColor color)
 void MeshViewer::renderWindow()
 {
 	qDebug()<<mesh->ugrid->GetReferenceCount();
-	mapper->SetInputData(mesh->ugrid);
+//	mapper->SetInputData(mesh->ugrid);
 	qDebug() << mesh->ugrid->GetReferenceCount();
 	renderer->GetRenderWindow()->Render();
 }

@@ -1135,7 +1135,7 @@ void Mesh::getDatasetNameFromDatasetAttrName(char *datasetAttrVal,list<string> &
 		{
 
 			vdm_DatasetGetAttribute(ds,j,&attr);
-			Vfloat val;
+
 			vdm_AttributeInq(attr,attrName,&len,&type);
 			if (strcmp(attrName,"Name") == 0)
 			{

@@ -82,7 +82,7 @@ public:
 
 public slots:
 	void setBackground(const QColor color);
-	
+	void renderWindow();
 private slots:
 	void viewTop();
 	void viewBottom();
@@ -93,7 +93,7 @@ private slots:
 	void viewReset();
 
 	void reprsentationComboBoxIndexChanged(int index);
-	void renderWindow();
+
 
 private:
 	void showOrientationMarkerWidget(bool isShow);

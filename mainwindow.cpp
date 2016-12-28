@@ -23,20 +23,25 @@ MainWindow::MainWindow(QWidget *parent ) :RibbonWindow(parent)
 	meshViewer = new MeshViewer(this);
 	setCentralWidget(meshViewer);
 
-	treeViewer = new TreeViewer(this);
+	labelViewer = new LabelViewer(this);
 	propViewer = new PropertyViewer(this);
+	opViewer = new OperationViewer(this);
 
-	this->addDockWidget(Qt::LeftDockWidgetArea, treeViewer);
+	this->addDockWidget(Qt::LeftDockWidgetArea, labelViewer);
 	this->addDockWidget(Qt::LeftDockWidgetArea, propViewer);
+	this->addDockWidget(Qt::RightDockWidgetArea, opViewer);
 
-	treeViewer->setWindowTitle("Label Browser");
-	treeViewer->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
-	treeViewer->setMinimumWidth(150);
+	labelViewer->setWindowTitle("Label Browser");
+	labelViewer->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
+	labelViewer->setMinimumWidth(80);
 
 	propViewer->setWindowTitle("Properties");
 	propViewer->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
-	propViewer->setMinimumWidth(150);
+	propViewer->setMinimumWidth(80);
 
+	opViewer->setWindowTitle("operation");
+	opViewer->setAllowedAreas(Qt::RightDockWidgetArea);
+	opViewer->setMinimumWidth(250);
 
 }
 
@@ -50,7 +55,7 @@ void MainWindow::createAction()
 	m_actionOpenFile->setShortcut(QKeySequence::Open);
 	m_actionOpenFile->setToolTip(tr("Open"));
 	m_actionOpenFile->setStatusTip(tr("Open an existing document"));
-	connect(m_actionOpenFile, SIGNAL(triggered()), this, SLOT(fileOpen()));
+	connect(m_actionOpenFile, SIGNAL(triggered()), this, SLOT(openFile()));
 
 	QIcon iconClose;
 	iconClose.addPixmap(QPixmap(":/res/mainwin_largeOpenFile.png"));
@@ -63,7 +68,7 @@ void MainWindow::createAction()
 
 }
 
-void MainWindow::fileOpen()
+void MainWindow::openFile()
 {
 	QString fileName = QFileDialog::getOpenFileName(this, tr("Open File..."),
 		QString(), tr("Ansys result (*.fil *.odb);;All Files (*)"));
@@ -74,6 +79,19 @@ void MainWindow::fileOpen()
 	}
 	// read mesh
 	meshViewer->loadMeshData(fileName.toLatin1().data());
+}
+
+void MainWindow::openProject()
+{//todo:
+	//1 parase xml ,get model file path
+
+	//2 get the label that has been added
+
+}
+
+void MainWindow::closeProject()
+{
+
 }
 
 void MainWindow::closeFile()
@@ -153,6 +171,11 @@ void MainWindow::createGroup(Qtitan::RibbonPage* page)
 
 		m_actionFormatPointerAction = group->addAction(QIcon(":/res/mainwin_smallformatpainter.png"),tr("Tool3"), Qt::ToolButtonTextBesideIcon);
 	}
+
+}
+void MainWindow::paintEvent(QPaintEvent * event)
+{
+	meshViewer->renderWindow();
 
 }
 

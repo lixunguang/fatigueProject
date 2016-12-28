@@ -53,8 +53,8 @@
 
 #include "meshviewer.h"
 #include "propertyviewer.h"
-#include "treeviewer.h"
-
+#include "labelviewer.h"
+#include "operationviewer.h"
 
 class MainWindow :public RibbonWindow
 {
@@ -76,13 +76,21 @@ private:
 	void createGroup(Qtitan::RibbonPage* page);
 
 protected Q_SLOTS:
-	void fileOpen();
+	void openFile();
 	void closeFile();
+
+	void openProject();
+	void closeProject();
+
 	virtual void options(QAction* action);
 
 	void showFatigueDialog();
 
 	void runPython();
+
+protected:
+	void paintEvent(QPaintEvent * event);
+
 protected:
 	QAction* m_actionOpenFile;
 	QAction* m_actionCloseFile;
@@ -100,9 +108,9 @@ protected:
 
 private:
 	MeshViewer *meshViewer;
-	TreeViewer *treeViewer;
+	LabelViewer *labelViewer;
 	PropertyViewer *propViewer;
-
+	OperationViewer *opViewer;
 	
 };
 

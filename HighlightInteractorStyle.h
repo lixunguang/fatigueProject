@@ -36,6 +36,9 @@
 #include <vtkCellPicker.h>
 #include <vtkPointPicker.h>
 #include <QDebug>
+
+#include <deque>  
+
 #define VTKISRBP_ORIENT 0
 #define VTKISRBP_SELECT 1
 
@@ -48,10 +51,11 @@ public:
 
 	HighlightInteractorStyle() : vtkInteractorStyleRubberBandPick()
 	{
-		this->SelectedMapper = vtkSmartPointer<vtkDataSetMapper>::New();
+		this->SelectedMapper = vtkSmartPointer<vtkPolyDataMapper>::New();
 		this->SelectedActor = vtkSmartPointer<vtkActor>::New();
 		this->SelectedActor->SetMapper(SelectedMapper);
 
+		circleR = 12;
 	}
 
 	virtual void OnLeftButtonUp();
@@ -64,16 +68,21 @@ public:
 	vtkUnstructuredGrid* GetData() { return this->ugrid; }
 
 private:
+	void selectArea(int* pos, int *prepos);
 	void selectCell();
 	void selectPoint();
 	void selectTest();
+	void selectCircle(int* pos, int *prepos);
 
 public:
 	vtkSmartPointer<vtkUnstructuredGrid> ugrid;
 
 	vtkSmartPointer<vtkActor> SelectedActor;
-	vtkSmartPointer<vtkDataSetMapper> SelectedMapper;
+	vtkSmartPointer<vtkPolyDataMapper> SelectedMapper;
 
+
+	float circleR;
+	std::deque<int> d;
 };
 
 
