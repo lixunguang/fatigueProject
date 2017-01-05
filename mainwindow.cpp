@@ -1,5 +1,6 @@
 #include <QApplication>
 #include <QFileDialog>
+#include <QCheckBox>
 
 #include "stdio.h"
 
@@ -10,7 +11,7 @@
 
 int numargs;
 
-MainWindow::MainWindow(QWidget *parent ) :RibbonWindow(parent)
+MainWindow::MainWindow(QWidget *parent) :RibbonWindow(parent)
 {
 	createAction();
 	createMenuFile();
@@ -124,7 +125,7 @@ void MainWindow::createMenuFile()
 		Qtitan::RibbonSystemPopupBar* popupBar = qobject_cast<Qtitan::RibbonSystemPopupBar*>(actionFile->menu());
 
 		popupBar->addAction(m_actionOpenFile);
-	
+
 		popupBar->addSeparator();
 		popupBar->addAction(m_actionCloseFile);
 
@@ -133,46 +134,124 @@ void MainWindow::createMenuFile()
 
 void MainWindow::createRibbon()
 {
-	if (Qtitan::RibbonPage* pageHome = ribbonBar()->addPage(tr("&Tools")))
+	if (Qtitan::RibbonPage* pageTools = ribbonBar()->addPage(tr("&Tools")))
 	{
-		createGroup(pageHome);
-// 		createGroupFont(pageHome);
-// 		createGroupParagraph(pageHome);
-// 		createGroupEditing(pageHome);
+		createGroupTools(pageTools);
+		// 		createGroupFont(pageHome);
+		// 		createGroupParagraph(pageHome);
+		// 		createGroupEditing(pageHome);
 	}
 
-	if (Qtitan::RibbonPage* pageLayout = ribbonBar()->addPage(tr("&View")))
+	if (Qtitan::RibbonPage* pageView = ribbonBar()->addPage(tr("&View")))
 	{
-
+		createGroupView(pageView);
 	}
 
-
+	if (Qtitan::RibbonPage* about = ribbonBar()->addPage(tr("&About")))
+	{
+		createGroupAbout(about);
+	}
 }
 
-void MainWindow::createGroup(Qtitan::RibbonPage* page)
+void MainWindow::createGroupTools(Qtitan::RibbonPage* page)
 {
-	if (Qtitan::RibbonGroup* group = page->addGroup(QIcon(":/res/mainwin_smallpaste.png"), tr("Tools")))
+
+	//材料
+	if (Qtitan::RibbonGroup* materialGroup = page->addGroup(tr("&material Tools")))
 	{
-		group->setOptionButtonVisible();
-		QAction* act = group->optionButtonAction();
-		act->setText(tr("Pyqt"));
-		act->setIcon(QIcon(":/res/mainwin_clipboardToolTip.png"));
-		act->setToolTip(tr("generate input file"));
-		act->setStatusTip(tr("gen input file"));
-		//connect(act, SIGNAL(triggered()), this, SLOT(optionClipboard()));
+
+		if (materialGroup)
+		{
+			QAction* action = materialGroup->addAction(QIcon(":/res/tool_largeButton1.png"), tr("Material add"), Qt::ToolButtonTextUnderIcon);
+			//connect(action, SIGNAL(triggered()), this, SLOT(pressButton()));
+
+			action = materialGroup->addAction(QIcon(":/res/tool_largebutton2.png"), tr("Material edit"), Qt::ToolButtonTextUnderIcon);
+
+			action = materialGroup->addAction(QIcon(":/res/tool_largebutton2.png"), tr("Material"), Qt::ToolButtonTextUnderIcon);
+			//connect(action, SIGNAL(triggered()), this, SLOT(pressButton()));
+		}
+	}
+	if (Qtitan::RibbonGroup* group = page->addGroup(QIcon(":/res/tool_smallpaste.png"), tr("Tools")))
+	{
+		if (group)
+		{
+			//其他工具
+			group->setOptionButtonVisible();
+			QAction* act = group->optionButtonAction();
+			act->setText(tr("Pyqt"));
+			act->setIcon(QIcon(":/res/mainwin_clipboardToolTip.png"));
+			act->setToolTip(tr("generate input file"));
+			act->setStatusTip(tr("gen input file"));
 
 
+			m_showFatigueDialog = group->addAction(QIcon(":/res/tool_smallcut.png"), tr("&Fatigue"), Qt::ToolButtonTextBesideIcon);
+			m_showFatigueDialog->setToolTip(tr("generate fatigue dialog"));
 
-		m_showFatigueDialog = group->addAction(QIcon(":/res/mainwin_smallcut.png"), tr("&Fatigue"), Qt::ToolButtonTextBesideIcon);
-		m_showFatigueDialog->setToolTip(tr("generate fatigue dialog"));
+			m_actionCopy = group->addAction(QIcon(":/res/tool_smallcopy.png"), tr("&Tool2"), Qt::ToolButtonTextBesideIcon);
+			m_actionCopy->setShortcut(QKeySequence::Copy);
 
-		m_actionCopy = group->addAction(QIcon(":/res/mainwin_smallcopy.png"),tr("&Tool2"), Qt::ToolButtonTextBesideIcon);
-		m_actionCopy->setShortcut(QKeySequence::Copy);
-
-		m_actionFormatPointerAction = group->addAction(QIcon(":/res/mainwin_smallformatpainter.png"),tr("Tool3"), Qt::ToolButtonTextBesideIcon);
+			m_actionFormatPointerAction = group->addAction(QIcon(":/res/mainwin_smallformatpainter.png"), tr("Tool3"), Qt::ToolButtonTextBesideIcon);
+		}
 	}
 
 }
+
+void MainWindow::createGroupView(Qtitan::RibbonPage* page)
+{
+	Qtitan::RibbonGroup* viewButtons = page->addGroup(tr("View"));
+	if (viewButtons)
+	{
+		// 		viewButtons->setOptionButtonVisible();
+		// 		QAction* act = viewButtons->optionButtonAction();
+		// 		act->setToolTip(tr("Checkboxes && Radio Buttons"));
+		// 		connect(act, SIGNAL(triggered()), this, SLOT(pressButton()));
+
+		viewButtons->setControlsCentering(true);
+		QCheckBox* labelBrowserCheck = new QCheckBox(tr("LabelBrowser"));
+		labelBrowserCheck->setToolTip(tr("Show Label Browser"));
+		labelBrowserCheck->setCheckState(Qt::Checked);
+		viewButtons->addWidget(labelBrowserCheck);
+
+		QCheckBox* propertyCheck = new QCheckBox(tr("Property"));
+		propertyCheck->setToolTip(tr("Show Property"));
+		propertyCheck->setCheckState(Qt::Checked);
+		viewButtons->addWidget(propertyCheck);
+
+		QCheckBox* fatigueCheck = new QCheckBox(tr("Fatigue Operation"));
+		fatigueCheck->setToolTip(tr("Show Fatigue Operation"));
+		fatigueCheck->setCheckState(Qt::Checked);
+		viewButtons->addWidget(fatigueCheck);
+
+
+	}
+}
+
+void MainWindow::createGroupAbout(Qtitan::RibbonPage* aboutPage)
+{
+	Qtitan::RibbonGroup* viewButtons = aboutPage->addGroup(tr("View"));
+	if (viewButtons)
+	{
+		QAction  *helpButton = viewButtons->addAction(QIcon(":/about/about_help.png"), tr("Help"), Qt::ToolButtonIconOnly);
+		helpButton->setToolTip(tr("Show Help"));
+		connect(helpButton, SIGNAL(triggered()), this, SLOT(help()));
+
+		QAction  *aboutButton = viewButtons->addAction(QIcon(":/about/about_about.png"), tr("About"), Qt::ToolButtonIconOnly);
+		aboutButton->setToolTip(tr("Show about fatigue"));
+		connect(aboutButton, SIGNAL(triggered()), this, SLOT(about()));
+	}
+}
+
+void MainWindow::help()
+{
+	qDebug() << "MainWindow::help()";
+}
+
+void MainWindow::about()
+{
+
+	qDebug() << "MainWindow::about()";
+}
+
 void MainWindow::paintEvent(QPaintEvent * event)
 {
 	meshViewer->renderWindow();

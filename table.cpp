@@ -9,6 +9,7 @@
 #include <QPushButton>
 #include <QDebug>
 #include <QSpacerItem>
+#include <QModelIndex>
 
 #include <model.h>
 #include <delegate.h>
@@ -18,7 +19,7 @@ Table::Table(QString type, QWidget *parent)
 {
 	QVBoxLayout *layout = new QVBoxLayout();
 
-	QGroupBox *grp = new QGroupBox();
+	grp = new QGroupBox();
 	QVBoxLayout *grpLayout = new QVBoxLayout(grp);
 
 	QPushButton *toolAddBtn = new QPushButton("add");
@@ -35,8 +36,8 @@ Table::Table(QString type, QWidget *parent)
 	QSpacerItem *spacer = new QSpacerItem(100, 5, QSizePolicy::Minimum);
 	toolLayout->addSpacerItem(spacer);
 
-	QTableView *table = new QTableView();
-	Model *model = new Model(type);
+	table = new QTableView();
+	model = new Model(type);
 
 	table->setModel(model);
 
@@ -45,6 +46,8 @@ Table::Table(QString type, QWidget *parent)
 
 	table->setItemDelegate(new Delegate(this));
 	layout->addWidget(grp);
+
+	this->setLayout(layout);
 
 	//#tool button  clicked
 	//self.connect(self._toolAddBtn, qtc.SIGNAL('clicked()'), self.onAddClicked);
@@ -58,3 +61,97 @@ Table::~Table()
 
 }
 
+void Table::setText(QString text)
+{
+	grp->setTitle(text);
+}
+
+
+QString Table::text()
+{
+	return grp->title();
+}
+
+
+void Table::onAddClicked()
+{
+	int cnt = model->modelData().size();
+	model->insertColumns(cnt, 1, QModelIndex());
+
+}
+
+
+void Table::onRemove(int idx)
+{
+	model->removeRows(idx, 1, QModelIndex());
+
+}
+
+
+void Table::onUpClicked()
+{
+	QModelIndex midx = table->currentIndex();
+	int r = midx.row();
+
+	int r1 = 0;
+	if( r - 1 >= 0)
+	{
+		r1 = r - 1;
+	}
+	else
+	{
+		r1 = 0;
+	}
+
+	if (r > 0 && r1 != r)
+		model->moveRows(QModelIndex(), r,1, QModelIndex(),r1 );
+}
+
+
+
+
+void Table::onDownClicked()
+{
+	/*QModelIndex midx = table->currentIndex();
+	int r = midx.row();
+
+	int r1 = r + 1;
+
+	if (r1 <= model->modelData().size()) - 1)
+	{
+	}
+	else
+	{
+		r1 = r;
+	}
+
+
+	if (r1 <= model->modelData().size() - 1 && r1 != r)
+	{
+		model->beginMoveRows(qtc.QModelIndex(), r1, r1, qtc.QModelIndex(), r);
+		//#change
+		first = model->modelData()[r];
+		second = model->modelData()[r1];
+		model->modelData()[r] = second;
+		model->modelData()[r1] = first;
+
+		model->endMoveRows();
+	}
+	*/
+
+	QModelIndex midx = table->currentIndex();
+	int r = midx.row();
+
+	int r1 = 0;
+	if (r - 1 >= 0)
+	{
+		r1 = r - 1;
+	}
+	else
+	{
+		r1 = 0;
+	}
+
+	if (r > 0 && r1 != r)
+		model->moveRows(QModelIndex(), r, 1, QModelIndex(), r1);
+}

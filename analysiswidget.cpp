@@ -21,8 +21,8 @@ AnalysisWidget::AnalysisWidget(QWidget *parent)
 
 	//##Algorithm
 	QHBoxLayout *algorithmHBox = new QHBoxLayout();
-	QLabel * algorithmLabel = new QLabel("Algorithm:");
-	QComboBox *algorithmCombo = new QComboBox();
+	algorithmLabel = new QLabel("Algorithm:");
+	algorithmCombo = new QComboBox();
 	QStringList items;
 	items << "Stress Life(Manson-Coffin)" << "Stress Life(Morrow)" << "Stress Life(BWI Weld)" <<
 		"Strain Life(Manson-Coffin)" << "Strain Life(Morrow)" << "Strain Life(S-W-T)" <<
@@ -35,32 +35,32 @@ AnalysisWidget::AnalysisWidget(QWidget *parent)
 	layout->addLayout(algorithmHBox, 1);
 
 	//##Analysis Definition
-	QGroupBox *grpAnalysis = new QGroupBox("Analysis Definition");
+	grpAnalysis = new QGroupBox("Analysis Definition");
 	QVBoxLayout* grpAnalysisVBox = new QVBoxLayout();
 
 
-	QLabel *pathLabel = new QLabel("Path of material:             ");
-	QLineEdit *pathEdit = new QLineEdit();
+	pathLabel = new QLabel("Path of material:             ");
+	pathEdit = new QLineEdit();
 	pathEdit->setReadOnly(true);
-	QPushButton *pathBtn = new QPushButton("...");
+	pathBtn = new QPushButton("...");
 	QHBoxLayout *pathHBox = new QHBoxLayout();
 
 
-	QLabel *meanStressLabel = new QLabel("Mean Stress Correction        ");
-	QComboBox *meanStressCombo = new QComboBox();
+	meanStressLabel = new QLabel("Mean Stress Correction        ");
+	meanStressCombo = new QComboBox();
 	items.clear();
 	items << "None" << "Goodman" << "Gerber" << "Sodeberg";
 	meanStressCombo->addItems(items);
 	QHBoxLayout *meanStressHBox = new QHBoxLayout();
 
-	QLabel *inFluenceFactorsLabel = new QLabel("influence factors             ");
-	QLineEdit *inFluenceFactorsEdit = new QLineEdit("1.0,1.0,1.0,1.0,1.0");
+	inFluenceFactorsLabel = new QLabel("influence factors             ");
+	inFluenceFactorsEdit = new QLineEdit("1.0,1.0,1.0,1.0,1.0");
 	inFluenceFactorsEdit->setReadOnly(true);
-	QPushButton *inFluenceFactorsBtn = new QPushButton("...");
+	inFluenceFactorsBtn = new QPushButton("...");
 	QHBoxLayout *inFluenceFactorsHBox = new QHBoxLayout();
 
-	QLabel *weldLabel = new QLabel("Weld Class               ");
-	QComboBox *weldCombo = new QComboBox();
+	weldLabel = new QLabel("Weld Class               ");
+	weldCombo = new QComboBox();
 	items.clear();
 	items << "B" << "C" << "D" << "E" << "F" << "G";
 	weldCombo->addItems(items);
@@ -68,8 +68,8 @@ AnalysisWidget::AnalysisWidget(QWidget *parent)
 	weldHBox->addWidget(weldLabel);
 	weldHBox->addWidget(weldCombo);
 
-	QLabel *sdNumLabel = new QLabel("Num of SD             ");
-	QComboBox *sdNumCombo = new QComboBox();
+	sdNumLabel = new QLabel("Num of SD             ");
+	sdNumCombo = new QComboBox();
 	items.clear();
 	items << "2" << "3" << "4" << "5";
 	sdNumCombo->addItems(items);
@@ -94,12 +94,12 @@ AnalysisWidget::AnalysisWidget(QWidget *parent)
 	layout->addWidget(grpAnalysis, 3);
 
 	//##RainFlow Parameters
-	QGroupBox* grpRainFlow = new QGroupBox("RainFlow Parameters");
+	grpRainFlow = new QGroupBox("RainFlow Parameters");
 	QVBoxLayout* grpRainFlowVBox = new QVBoxLayout();
 
 	QHBoxLayout* peakValleyHBox = new QHBoxLayout();
-	QLabel* peakValleyLabel = new QLabel("Peak-Valley Reduction Factor (Between 0 to 1)");
-	QComboBox *peakValleyCombo = new QComboBox();
+	peakValleyLabel = new QLabel("Peak-Valley Reduction Factor (Between 0 to 1)");
+	peakValleyCombo = new QComboBox();
 	items.clear();
 	items << "0.1" << "0.2" << "0.3" << "0.4" << "0.5" << "0.6" << "0.7" << "0.8" << "0.9" << "1.0";
 	peakValleyCombo->addItems(items); //#todo
@@ -107,8 +107,8 @@ AnalysisWidget::AnalysisWidget(QWidget *parent)
 	peakValleyHBox->addWidget(peakValleyCombo);
 
 	QHBoxLayout* countHBox = new QHBoxLayout();
-	QLabel* countLabel = new QLabel("Number of RAnges for counting(>0)");
-	QComboBox* countCombo = new QComboBox();
+	countLabel = new QLabel("Number of RAnges for counting(>0)");
+	countCombo = new QComboBox();
 	items.clear();
 	items << "10" << "20";
 	countCombo->addItems(items);// #todo
@@ -124,8 +124,8 @@ AnalysisWidget::AnalysisWidget(QWidget *parent)
 	QGroupBox* grpEntitySelection = new QGroupBox("Entity Selection");
 	QVBoxLayout* grpEntitySelectionVBox = new QVBoxLayout();
 
-	QLabel* entityTypeLabel = new QLabel("Entity Type                   ");
-	QComboBox* entityTypeCombo = new QComboBox();
+	entityTypeLabel = new QLabel("Entity Type                   ");
+	entityTypeCombo = new QComboBox();
 	items.clear();
 	items << "Node" << "Element";
 	entityTypeCombo->addItems(items);
@@ -133,11 +133,11 @@ AnalysisWidget::AnalysisWidget(QWidget *parent)
 	entityTypeHBox->addWidget(entityTypeLabel);
 	entityTypeHBox->addWidget(entityTypeCombo);
 
-	QLabel* entityNumLabel = new QLabel("Selected Entities             ");
-	QLineEdit* entityNumEdit = new QLineEdit();
+	entityNumLabel = new QLabel("Selected Entities             ");
+	entityNumEdit = new QLineEdit();
 	entityNumEdit->setReadOnly(true);
 
-	QPushButton*entityNumBtn = new QPushButton("update");
+	entityNumBtn = new QPushButton("update");
 	QHBoxLayout*entityNumHBox = new QHBoxLayout();
 	entityNumHBox->addWidget(entityNumLabel);
 	entityNumHBox->addWidget(entityNumEdit);
@@ -150,25 +150,25 @@ AnalysisWidget::AnalysisWidget(QWidget *parent)
 
 	this->setLayout(layout);
 
-	/*
+	
 //#componet
-self._InfluenceFactorDialog = InfluenceFactorDialog(self)
-self._fileDialog = qt.QFileDialog(self, "select material file")
+	influenceFactorDialog = new InfluenceFactorDialog(this);
+	fileDialog = new QFileDialog(this, "select material file");
 
 
-//signals
-//1 algorthm clicked, change ui
-self.connect(self._algorithmCombo, qtc.SIGNAL('currentIndexChanged(QString)'), self.algorithmChanged)
+		//signals
+		//1 algorithm clicked, change ui
+		connect(algorithmCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(algorithmChanged(int)));
 //2 path selector dialog
-qtc.QObject.connect(self._inFluenceFactorsBtn, qtc.SIGNAL('clicked()'), self, qtc.SLOT('showInfuenceFactor()'))
+	connect(inFluenceFactorsBtn, SIGNAL(clicked()), this, SLOT(showInfuenceFactor()));
 //3 influence ui
-qtc.QObject.connect(self._pathBtn, qtc.SIGNAL('clicked()'), self, qtc.SLOT('showFileDialog()'))
+	connect(pathBtn, SIGNAL(clicked()), this, SLOT(showFileDialog()));
 //4 entity type
-#x = qtc.QObject.connect(self._entityTypeCombo, qtc.SIGNAL('currentIndexChanged(str)'), self, qtc.SLOT('entityTypeChanged(str)'))
-self.connect(self._entityTypeCombo, qtc.SIGNAL('currentIndexChanged(QString)'), self.entityTypeChanged)
+	connect(entityTypeCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(entityTypeChanged(int)));
+	
 //5 entity Selection clicked
-self._mesh = GLOBAL_MH
-qtc.QObject.connect(self._entityNumBtn, qtc.SIGNAL('clicked()'), self._mesh, qtc.SLOT('getSecletion()'))*/
+	//mesh = GLOBAL_MH
+	//connect(entityNumBtn, SIGNAL(clicked()), mesh, SLOT(getSecletion()));
 }
 
 AnalysisWidget::~AnalysisWidget()
@@ -176,3 +176,121 @@ AnalysisWidget::~AnalysisWidget()
 
 }
 
+void AnalysisWidget::showInfuenceFactor()
+{
+	QString resStr;
+	if (QDialog::Accepted == influenceFactorDialog->exec())
+	{
+		resStr = QString("%1,%2,%3,%4,%5").arg(influenceFactorDialog->NotchEdit->text())
+			.arg(influenceFactorDialog->SurfaceEdit->text())
+			.arg(influenceFactorDialog->SizeEdit->text())
+			.arg(influenceFactorDialog->LoadEdit->text())
+			.arg(influenceFactorDialog->OtherhEdit->text());
+
+			inFluenceFactorsEdit->setText(resStr);
+	}
+
+}
+
+
+
+void AnalysisWidget::showFileDialog()
+{
+	qDebug() << "AnalysisWidget::showFileDialog";
+	QString fileName = fileDialog->getOpenFileName(NULL, "select material file", "c:/");
+ 
+	if (!fileName.isEmpty())
+	{
+		pathEdit->setText(fileName);
+	}
+	
+}
+
+
+
+void AnalysisWidget::entityTypeChanged(int index)
+{
+	//mesh._meshType = entityTypeCombo.currentText()
+}
+
+
+
+//#when algorithm Changed, change ui
+
+void AnalysisWidget::algorithmChanged(int index)
+{
+	if (algorithmCombo->currentIndex() == 0 ||
+		algorithmCombo->currentIndex() == 1 ||
+		algorithmCombo->currentIndex() == 6 || 
+		algorithmCombo->currentIndex() == 7)
+	{
+		showStressUi();
+	}
+	else if (algorithmCombo->currentIndex() == 2 )
+	{
+		showBwiUi();
+	}
+	else if(algorithmCombo->currentIndex() == 3 ||
+		algorithmCombo->currentIndex() == 4 ||
+		algorithmCombo->currentIndex() == 5 )
+	{
+		showStrainUi();
+	}
+	else
+	{
+	}
+
+}
+
+
+void AnalysisWidget::showStressUi()
+{
+	pathLabel->show();
+	pathEdit->show();
+	pathBtn->show();
+
+	meanStressLabel->show();
+	meanStressCombo->show();
+
+	weldLabel->hide();
+	weldCombo->hide();
+	sdNumLabel->hide();
+		sdNumCombo->hide();
+}
+
+void AnalysisWidget::showBwiUi()
+{
+	pathLabel->hide();
+	pathEdit->hide();
+	pathBtn->hide();
+
+	meanStressLabel->hide();
+	meanStressCombo->hide();
+
+	weldLabel->show();
+	weldCombo->show();
+	sdNumLabel->show();
+	sdNumCombo->show();
+}
+
+void AnalysisWidget::showStrainUi()
+{
+	pathLabel->show();
+	pathEdit->show();
+	pathBtn->show();
+
+	meanStressLabel->hide();
+	meanStressCombo->hide();
+
+	weldLabel->hide();
+	weldCombo->hide();
+	sdNumLabel->hide();
+	sdNumCombo->hide();
+}
+
+
+void AnalysisWidget::writeToFile(QString fileName)
+{
+	//fw = InputFileWriter()
+//#todo :
+}

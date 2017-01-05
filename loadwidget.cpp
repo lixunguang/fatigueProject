@@ -1,14 +1,7 @@
 #include "loadwidget.h"
 
-#include <QLabel>
-#include <QTextEdit>
-#include <QGroupBox>
-#include <QHBoxLayout>
-#include <QVBoxLayout>
-#include <QComboBox>
-#include <QLineEdit>
-#include <QPushButton>
-#include <QDebug>
+
+
 
 
 LoadWidget::LoadWidget(QWidget *parent)
@@ -20,7 +13,7 @@ LoadWidget::LoadWidget(QWidget *parent)
 
 	QHBoxLayout* loadTypeHBox = new QHBoxLayout();
 	QLabel* loadTypeLabel = new QLabel("Loading Type:    ");
-	QComboBox* loadTypeCombo = new QComboBox();
+	loadTypeCombo = new QComboBox();
 	QStringList items;
 	items << "Duty Cycle" << "Loading Hidstory" << "Superimposed";
 	loadTypeCombo->addItems(items);// #todo
@@ -29,7 +22,7 @@ LoadWidget::LoadWidget(QWidget *parent)
 
 	QHBoxLayout* loadEventHBox = new QHBoxLayout();
 	QLabel* loadEventLabel = new QLabel("Loading Events:      ");
-	QLineEdit* loadEventEdit = new QLineEdit();
+	loadEventEdit = new QLineEdit();
 	QPushButton* loadEventBtn = new QPushButton("...");
 	loadEventHBox->addWidget(loadEventLabel);
 	loadEventHBox->addWidget(loadEventEdit);
@@ -46,13 +39,13 @@ LoadWidget::LoadWidget(QWidget *parent)
 
 	this->setLayout(layout);
 
-// 	loadEventDialog = None
-// 		loadEventDialog_duty = LoadEventDialog("Duty Cycle");
-// 	loadEventDialog_history = LoadEventDialog("Loading Hidstory");
-// 	loadEventDialog_super = LoadEventDialog("Superimposed");
+	loadEventDialog = NULL;
+ 	loadEventDialog_duty = new LoadEventDialog("Duty Cycle", this);
+	loadEventDialog_history = new LoadEventDialog("Loading History", this);
+	loadEventDialog_super = new LoadEventDialog("Superimposed", this);
 //#
-	//qtc.QObject.connect(loadEventBtn, qtc.SIGNAL('clicked()'), self, qtc.SLOT('showLoadEventWidget()'));
-	//qtc.QObject.connect(loadTypeCombo, qtc.SIGNAL('currentIndexChanged(QString)'), self.typeChanged);
+	connect(loadEventBtn, SIGNAL(clicked()), this, SLOT(showLoadEventWidget()));
+	//connect(loadTypeCombo, SIGNAL("currentIndexChanged(QString)"),this, typeChanged);
 
 }
 
@@ -61,4 +54,28 @@ LoadWidget::~LoadWidget()
 
 }
 
- 
+void LoadWidget::showLoadEventWidget()
+{
+	if (loadTypeCombo->currentText() == "Duty Cycle")
+	{
+		loadEventDialog = loadEventDialog_duty;
+	}
+	else if (loadTypeCombo->currentText() == "Loading History")
+	{
+		loadEventDialog = loadEventDialog_history;
+	}
+	else if (loadTypeCombo->currentText() == "Superimposed")
+	{
+		loadEventDialog = loadEventDialog_super;
+	}
+
+
+	if (QDialog::Accepted == loadEventDialog->exec())
+	{
+		QStringList l = loadEventDialog->tabwidget->model->modelData_();
+		l.append(" events");
+		loadEventEdit->setText(l.join(""));
+	}
+
+
+}

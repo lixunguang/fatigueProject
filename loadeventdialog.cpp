@@ -10,7 +10,7 @@
 #include <QPushButton>
 #include <QDebug>
 
-#include <table.h>
+
 
 LoadEventDialog::LoadEventDialog(QString type, QWidget *parent)
 :QDialog(parent)
@@ -22,19 +22,25 @@ LoadEventDialog::LoadEventDialog(QString type, QWidget *parent)
 	buttonLayout->addWidget(okBtn);
 
 	QVBoxLayout *layout = new QVBoxLayout();
-	Table *tabwidget = new Table(type,this );
+	tabwidget = new Table(type,this );
 	layout->addWidget(tabwidget);
 	layout->addLayout(buttonLayout);
 
 	this->setLayout(layout);
 
-	//	qtc.QObject.connect(self.okBtn, qtc.SIGNAL('clicked()'), self.accept)
-	//	qtc.QObject.connect(self.cancelBtn, qtc.SIGNAL('clicked()'), self.reject)
+	connect(okBtn, SIGNAL(clicked()), this, SLOT(accept()));
+	connect(cancelBtn, SIGNAL(clicked()), SLOT(reject()));
 }
 
 LoadEventDialog::~LoadEventDialog()
 {
 
 }
+
+void LoadEventDialog::setText(QString text)
+{
+	tabwidget->setText(text);
+}
+
 
  

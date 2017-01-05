@@ -19,7 +19,8 @@ Model::Model(QString type, QObject *parent)
 	else if (type == "Superimposed")
 		headers << h[0] << h[1] << h[3];
 
-	int eventID = 1;
+	
+	_eventID = 0;
 }
 
 Model::~Model()
@@ -33,13 +34,24 @@ const QStringList& Model::modelData()const
 	if (_type == "Duty Cycle")
 		return modelData_duty;
 	else if (_type == "Loading History")
-		return modelData_Hidstory;
+		return modelData_History;
 	else if (_type == "Superimposed")
 		return modelData_Super;
 	else
 		return modelData_duty;//todo
 }
 
+QStringList& Model::modelData_()
+{
+	if (_type == "Duty Cycle")
+		return modelData_duty;
+	else if (_type == "Loading History")
+		return modelData_History;
+	else if (_type == "Superimposed")
+		return modelData_Super;
+	else
+		return modelData_duty;//todo
+}
 
 int	Model::rowCount(const QModelIndex & parent) const
 {
@@ -104,3 +116,50 @@ Qt::ItemFlags Model::flags(const QModelIndex & index)
 //#readonly
 	return Qt::ItemIsEditable | Qt::ItemIsEnabled;
  }
+
+bool Model::removeRows(int row, int count, const QModelIndex &parent)
+{
+	beginRemoveRows(QModelIndex(), row, count);
+	modelData_().removeAt(row);
+	endRemoveRows();
+	return true;
+}
+
+bool Model::insertRows(int row, int count, const QModelIndex & parent)
+{
+	int cnt = this->modelData().size();
+	beginInsertRows(QModelIndex(), cnt, cnt);
+
+	if (_type == "Duty Cycle")
+	{
+		modelData_().append(QString("Event%d## ## ## ## ").arg(_eventID));
+	}
+	else if (_type == "Loading History")
+	{
+		modelData_().append(QString("Event%d## ## ").arg(_eventID));
+	}
+	else if (_type == "Superimposed")
+	{
+		modelData_().append(QString("Event%1## ## ").arg(_eventID));
+	}
+
+
+
+	_eventID += 1;
+	endInsertRows();
+	return true;
+}
+
+bool Model::moveRows(const QModelIndex & sourceParent, int sourceRow, int count, const QModelIndex & destinationParent, int destinationChild)
+{
+	beginMoveRows(sourceParent, sourceRow, sourceRow + count, destinationParent, destinationChild);
+	//#change
+// 	first = model->modelData()[r];
+// 	second = model->modelData()[r1];
+// 	model->modelData()[r] = second;
+// 	model->modelData()[r1] = first;
+
+	endMoveRows();
+	return true;
+}
+ 

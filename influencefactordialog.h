@@ -2,6 +2,8 @@
 #define InfluenceFactorDialog_H_
 
 #include "QDialog.h"
+#include "QLineEdit.h"
+
 
 class  InfluenceFactorDialog : public QDialog
 {
@@ -10,8 +12,15 @@ public:
 	InfluenceFactorDialog(QWidget *parent = 0);
 	~InfluenceFactorDialog();
 
-public slots:
+//public slots:
 
+
+public:
+	QLineEdit *NotchEdit;
+	QLineEdit *SurfaceEdit;
+	QLineEdit *SizeEdit;
+	QLineEdit *LoadEdit;
+	QLineEdit *OtherhEdit;
 };
 
 #endif

@@ -73,7 +73,9 @@ private:
 	void createQuickAccessBar();
 	void createRibbon();
 
-	void createGroup(Qtitan::RibbonPage* page);
+	void createGroupTools(Qtitan::RibbonPage* page);
+	void createGroupView(Qtitan::RibbonPage* page);
+	void createGroupAbout(Qtitan::RibbonPage* aboutPage);
 
 protected Q_SLOTS:
 	void openFile();
@@ -87,6 +89,9 @@ protected Q_SLOTS:
 	void showFatigueDialog();
 
 	void runPython();
+
+	void help();
+	void about();
 
 protected:
 	void paintEvent(QPaintEvent * event);

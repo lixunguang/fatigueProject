@@ -7,8 +7,6 @@
         <file>mainwin_qtitanlogo32x32.png</file>
         <file>mainwin_ribbonMaximize.png</file>
         <file>mainwin_ribbonMinimize.png</file>
-        <file>mainwin_smallcopy.png</file>
-        <file>mainwin_smallcut.png</file>
         <file>mainwin_smallformatpainter.png</file>
         <file>mainwin_smallOpen.png</file>
         <file>mainwin_smallpaste.png</file>
@@ -26,9 +24,17 @@
         <file>viewer_pqEyeballd16.png</file>
         <file>viewer_right36t.png</file>
         <file>viewer_top36t.png</file>
+        <file>tool_smallcopy.png</file>
+        <file>tool_smallcut.png</file>
+        <file>tool_largeButton1.png</file>
+        <file>tool_largebutton2.png</file>
     </qresource>
     <qresource prefix="/res/label">
         <file>add.png</file>
         <file>remove.png</file>
+    </qresource>
+    <qresource prefix="/about">
+        <file>about_about.png</file>
+        <file>about_help.png</file>
     </qresource>
 </RCC>
