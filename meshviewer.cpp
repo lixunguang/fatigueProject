@@ -23,12 +23,17 @@ MeshView类用用来可视化mesh
 */
 
 MeshViewer::MeshViewer(QWidget *parent)
-	:QVTKWidget(parent)
+	:QVTKWidget2(parent)
 {
+	
 	createToolBar();
 	
 	renderer = vtkSmartPointer<vtkRenderer>::New();
 	renderer->SetGradientBackground(true);
+
+ 	vtkRenderWindow * renw = GetRenderWindow();
+// 	renw->Print(std::cout);
+
 	GetRenderWindow()->AddRenderer(renderer);
 
 	mapper = vtkSmartPointer<vtkDataSetMapper>::New();
@@ -36,30 +41,29 @@ MeshViewer::MeshViewer(QWidget *parent)
 	mainActor = vtkSmartPointer<vtkActor>::New();
 	mainActor->SetMapper(mapper);
 
-
 	renderer->AddActor(mainActor);
 
-	addOrientationMarkerWidget();
-	showOrientationMarkerWidget(true);
+	tooltip = vtkSmartPointer<vtkTooltipItem>::New();
 
+	 vtkRenderWindowInteractor* renderWindowInteractor = GetRenderWindow()->GetInteractor();
+	 
+	 vtkSmartPointer<vtkAreaPicker> areaPicker = vtkSmartPointer<vtkAreaPicker>::New();
+	 renderWindowInteractor->SetPicker(areaPicker);
+		
 	mesh = new Mesh();
-	qDebug() << mesh->ugrid->GetReferenceCount();
-	connect(mesh, SIGNAL(finishDataLoaded()), this, SLOT(renderWindow()));
-
-	vtkRenderWindowInteractor* renderWindowInteractor = this->GetRenderWindow()->GetInteractor();
-
-	vtkSmartPointer<vtkAreaPicker> areaPicker = vtkSmartPointer<vtkAreaPicker>::New();
-	renderWindowInteractor->SetPicker(areaPicker);
-
+	connect(mesh, SIGNAL(finishDataLoaded()), this, SLOT(renderWindowEx()));
 	style = vtkSmartPointer<HighlightInteractorStyle>::New();
 	style->SetData(mesh->ugrid);
 
 	renderWindowInteractor->SetInteractorStyle(style);
 
+	addOrientationMarkerWidget();
+	showOrientationMarkerWidget(true);
+
 	mapper->SetInputData(mesh->ugrid);
 
-	tooltip = vtkSmartPointer<vtkTooltipItem>::New();
-
+	 
+ 
 }
 
 MeshViewer::~MeshViewer()
@@ -71,19 +75,15 @@ MeshViewer::~MeshViewer()
 
 void MeshViewer::createToolBar()
 {
+	action_reset = new QAction(QIcon(":/res/viewer_Iso.png"), "viewReset", 0);
+	action_viewLeft = new QAction(QIcon(":/res/viewer_left36t.png"), "viewLeft", 0);
+	action_viewRight = new QAction(QIcon(":/res/viewer_right36t.png"), "viewRight", 0);
+	action_viewTop = new QAction(QIcon(":/res/viewer_top36t.png"), "viewTop", 0);
+	action_viewBottom = new QAction(QIcon(":/res/viewer_bottom36t.png"), "viewBottom", 0);
+	action_viewFront = new QAction(QIcon(":/res/viewer_front36t.png"), "viewFront", 0);
+	action_viewBack = new QAction(QIcon(":/res/viewer_back36t.png"), "viewBack", 0);
+	reprsentationComboBox = new QComboBox(0);
 
-	action_reset = new QAction(QIcon(":/res/viewer_Iso.png"), "viewReset", this);
-	action_viewLeft = new QAction(QIcon(":/res/viewer_left36t.png"), "viewLeft", this);
-	action_viewRight = new QAction(QIcon(":/res/viewer_right36t.png"), "viewRight", this);
-	action_viewTop = new QAction(QIcon(":/res/viewer_top36t.png"), "viewTop", this);
-	action_viewBottom = new QAction(QIcon(":/res/viewer_bottom36t.png"), "viewBottom", this);
-	action_viewFront = new QAction(QIcon(":/res/viewer_front36t.png"), "viewFront", this);
-	action_viewBack = new QAction(QIcon(":/res/viewer_back36t.png"), "viewBack", this);
-	action_viewMore = new QAction(QIcon(":/res/viewer_book_28.png"), "viewMore", this);
-	QAction * action_viewMaxMin = new QAction(QIcon(""), "viewMaxMin", this);
-	action_viewMaxMin->setCheckable(true);
-	action_viewMore->setCheckable(true);
-	reprsentationComboBox = new QComboBox(this);
 	QStringList items;
 	items << "Point" << "Surface" << "Surface with Edge" << "Wireframe";
 	reprsentationComboBox->addItems(items);
@@ -95,25 +95,11 @@ void MeshViewer::createToolBar()
 	connect(action_viewTop, SIGNAL(triggered()), this, SLOT(viewTop()));
 	connect(action_viewBottom, SIGNAL(triggered()), this, SLOT(viewBottom()));
 	connect(action_viewFront, SIGNAL(triggered()), this, SLOT(viewFront()));
-	connect(action_viewBack, SIGNAL(triggered()), this, SLOT(viewBack()));
-// 	connect(action_viewMore, SIGNAL(triggered(bool)), this, SLOT(viewMoreInf(bool)));
-// 	connect(action_viewMaxMin, SIGNAL(triggered(bool)), this, SLOT(viewMaxMinSign(bool)));
-// 	connect(action_viewMaxMin, SIGNAL(triggered(bool)), this, SLOT(setViewMaxMin(bool)));
 	connect(reprsentationComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(reprsentationComboBoxIndexChanged(int)));
-
-
-	QToolBar *toolBar = new QToolBar(this);
-
-	toolBar->addAction(action_reset);
-	toolBar->addAction(action_viewLeft);
-	toolBar->addAction(action_viewRight);
-	toolBar->addAction(action_viewTop);
-	toolBar->addAction(action_viewBottom);
-	toolBar->addAction(action_viewFront);
-	toolBar->addAction(action_viewBack);
-	toolBar->addWidget(reprsentationComboBox);
-	toolBar->addSeparator();
-
+}
+void MeshViewer::wheelEvent(QWheelEvent *e)
+{
+	QVTKWidget2::wheelEvent(e);
 }
 
 void MeshViewer::viewReset()
@@ -123,7 +109,8 @@ void MeshViewer::viewReset()
 	renderer->GetActiveCamera()->SetFocalPoint(0, 0, 0);
 	renderer->ResetCamera();
 	mainActor->GetProperty()->SetLineWidth(10);
-	renderer->GetRenderWindow()->Render();
+
+	renderWindowEx();
 }
 
 void MeshViewer::viewLeft()
@@ -133,12 +120,8 @@ void MeshViewer::viewLeft()
 	renderer->GetActiveCamera()->SetFocalPoint(0, 0, 0);
 	renderer->ResetCamera();
 	mainActor->GetProperty()->SetLineWidth(10);
-	renderer->GetRenderWindow()->Render();
-}
 
-void MeshViewer::wheelEvent(QWheelEvent *e)
-{
-	QVTKWidget::wheelEvent(e);
+	renderWindowEx();
 }
 
 void MeshViewer::viewRight()
@@ -148,18 +131,19 @@ void MeshViewer::viewRight()
 	renderer->GetActiveCamera()->SetFocalPoint(0, 0, 0);
 	renderer->ResetCamera();
 	mainActor->GetProperty()->SetLineWidth(10);
-	renderer->GetRenderWindow()->Render();
+
+	renderWindowEx();
 }
 
 void MeshViewer::viewTop()
 {
-
 	renderer->GetActiveCamera()->SetPosition(0, 1, 0);
 	renderer->GetActiveCamera()->SetViewUp(0, 0, 1);
 	renderer->GetActiveCamera()->SetFocalPoint(0, 0, 0);
 	renderer->ResetCamera();
 	mainActor->GetProperty()->SetLineWidth(10);
-	renderer->GetRenderWindow()->Render();
+
+	renderWindowEx();
 }
 
 void MeshViewer::viewBottom()
@@ -169,7 +153,8 @@ void MeshViewer::viewBottom()
 	renderer->GetActiveCamera()->SetFocalPoint(0, 0, 0);
 	renderer->ResetCamera();
 	mainActor->GetProperty()->SetLineWidth(10);
-	renderer->GetRenderWindow()->Render();
+
+	renderWindowEx();
 }
 
 void MeshViewer::viewFront()
@@ -179,7 +164,8 @@ void MeshViewer::viewFront()
 	renderer->GetActiveCamera()->SetFocalPoint(0, 0, 0);
 	renderer->ResetCamera();
 	mainActor->GetProperty()->SetLineWidth(10);
-	renderer->GetRenderWindow()->Render();
+
+	renderWindowEx();
 }
 
 void MeshViewer::viewBack()
@@ -189,20 +175,20 @@ void MeshViewer::viewBack()
 	renderer->GetActiveCamera()->SetFocalPoint(0, 0, 0);
 	renderer->ResetCamera();
 	mainActor->GetProperty()->SetLineWidth(10);
-	renderer->GetRenderWindow()->Render();
+
+	renderWindowEx();
 }
 
 void MeshViewer::addOrientationMarkerWidget()
 {
-	vtkSmartPointer<vtkAxesActor> axes =
-		vtkSmartPointer<vtkAxesActor>::New();
+	vtkSmartPointer<vtkAxesActor> axes = vtkSmartPointer<vtkAxesActor>::New();
 	OMwidget = vtkOrientationMarkerWidget::New();
 	OMwidget->SetOutlineColor(0.9300, 0.5700, 0.1300);
 	OMwidget->SetOrientationMarker(axes);
 	OMwidget->SetViewport(0.0, 0.0, 0.2, 0.2);
 	OMwidget->SetInteractor((vtkRenderWindowInteractor*)(GetInteractor()));
 	OMwidget->SetEnabled(1);
-	OMwidget->InteractiveOff();
+	//OMwidget->InteractiveOff();
 }
 
 void MeshViewer::showOrientationMarkerWidget(bool isShow)
@@ -222,16 +208,28 @@ void MeshViewer::setBackground(const QColor color)
 	renderer->SetBackground(r / 255.0, g / 255.0, b / 255.0);
 }
 
-void MeshViewer::renderWindow()
+void MeshViewer::renderWindowEx()
 {
-	qDebug()<<mesh->ugrid->GetReferenceCount();
-//	mapper->SetInputData(mesh->ugrid);
-	qDebug() << mesh->ugrid->GetReferenceCount();
+	//qDebug()<<"renderWindowEx--";
+
 	renderer->GetRenderWindow()->Render();
 }
+/*
+void MeshViewer::paintEvent(QPaintEvent * event)
+{
+	
+	qDebug() << "--paintEvent--";
+	QWidget::paintEvent(event);
+	renderWindowEx();
+}
 
-
-
+void MeshViewer::paintGL()
+{
+	 
+	qDebug() << "--paintGL--";
+	QVTKWidget2::paintGL();
+}
+*/
 void MeshViewer::reprsentationComboBoxIndexChanged(int index)
 {
 	mainActor->GetProperty()->EdgeVisibilityOff();
@@ -264,10 +262,11 @@ void MeshViewer::reprsentationComboBoxIndexChanged(int index)
 	default:
 		;
 	}
+	renderWindowEx();
 }
 
 void MeshViewer::loadMeshData(char* fileName)
 {
 	mesh->loadData(fileName);
-
+	viewReset();
 }

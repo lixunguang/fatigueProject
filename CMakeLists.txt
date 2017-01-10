@@ -21,6 +21,7 @@ if(${VTK_VERSION} VERSION_GREATER "6" )
   MESSAGE("VERSION_GREATER 6")
   set(CMAKE_AUTOMOC ON)
   find_package(Qt5Widgets REQUIRED QUIET)
+  find_package(Qt5OpenGL REQUIRED)
 else()
   MESSAGE("VERSION_GREATER 4")
   find_package(Qt4 REQUIRED)
@@ -59,7 +60,8 @@ if(${VTK_VERSION} VERSION_GREATER "6")
   table.cpp
   model.cpp
   delegate.cpp
-
+  about.cpp
+  
   )
 
  

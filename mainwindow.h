@@ -93,6 +93,9 @@ protected Q_SLOTS:
 	void help();
 	void about();
 
+	void onLabelBrowserStateChanged(int state);
+	void onPropertyCheckStateChanged(int state);
+	void onFatigueCheckStateChanged(int state);
 protected:
 	void paintEvent(QPaintEvent * event);
 
@@ -116,7 +119,7 @@ private:
 	LabelViewer *labelViewer;
 	PropertyViewer *propViewer;
 	OperationViewer *opViewer;
-	
+		
 };
 
 #endif

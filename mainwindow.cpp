@@ -1,13 +1,14 @@
 #include <QApplication>
 #include <QFileDialog>
 #include <QCheckBox>
+#include <QMessageBox>
 
 #include "stdio.h"
 
 #include <Python.h>
 
 #include "mainwindow.h"
-
+#include "about.h"
 
 int numargs;
 
@@ -15,23 +16,20 @@ MainWindow::MainWindow(QWidget *parent) :RibbonWindow(parent)
 {
 	createAction();
 	createMenuFile();
+
+	meshViewer = new MeshViewer(this);
+	setCentralWidget(meshViewer);
+
 	createRibbon();
 
 	connect(m_showFatigueDialog, SIGNAL(triggered()), this, SLOT(showFatigueDialog()));
 
 	ribbonBar()->setFrameThemeEnabled();
 
-	meshViewer = new MeshViewer(this);
-	setCentralWidget(meshViewer);
-
 	labelViewer = new LabelViewer(this);
 	propViewer = new PropertyViewer(this);
 	opViewer = new OperationViewer(this);
-
-	this->addDockWidget(Qt::LeftDockWidgetArea, labelViewer);
-	this->addDockWidget(Qt::LeftDockWidgetArea, propViewer);
-	this->addDockWidget(Qt::RightDockWidgetArea, opViewer);
-
+	
 	labelViewer->setWindowTitle("Label Browser");
 	labelViewer->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
 	labelViewer->setMinimumWidth(80);
@@ -39,10 +37,17 @@ MainWindow::MainWindow(QWidget *parent) :RibbonWindow(parent)
 	propViewer->setWindowTitle("Properties");
 	propViewer->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
 	propViewer->setMinimumWidth(80);
+	propViewer->setMaximumHeight(150);
 
 	opViewer->setWindowTitle("operation");
 	opViewer->setAllowedAreas(Qt::RightDockWidgetArea);
 	opViewer->setMinimumWidth(250);
+
+	this->addDockWidget(Qt::LeftDockWidgetArea, labelViewer);
+	this->addDockWidget(Qt::LeftDockWidgetArea, propViewer);
+	this->addDockWidget(Qt::RightDockWidgetArea, opViewer);
+
+	this->setOptions(OfficeStyle::Windows7Scenic);
 
 }
 
@@ -111,7 +116,6 @@ void MainWindow::showFatigueDialog()
 void MainWindow::options(QAction* action)
 {
 	RibbonWindow::options(action);
-
 }
 
 void MainWindow::createMenuFile()
@@ -128,23 +132,19 @@ void MainWindow::createMenuFile()
 
 		popupBar->addSeparator();
 		popupBar->addAction(m_actionCloseFile);
-
 	}
 }
 
 void MainWindow::createRibbon()
 {
-	if (Qtitan::RibbonPage* pageTools = ribbonBar()->addPage(tr("&Tools")))
-	{
-		createGroupTools(pageTools);
-		// 		createGroupFont(pageHome);
-		// 		createGroupParagraph(pageHome);
-		// 		createGroupEditing(pageHome);
-	}
-
 	if (Qtitan::RibbonPage* pageView = ribbonBar()->addPage(tr("&View")))
 	{
 		createGroupView(pageView);
+	}
+
+	if (Qtitan::RibbonPage* pageTools = ribbonBar()->addPage(tr("&Tools")))
+	{
+		createGroupTools(pageTools);
 	}
 
 	if (Qtitan::RibbonPage* about = ribbonBar()->addPage(tr("&About")))
@@ -198,31 +198,42 @@ void MainWindow::createGroupTools(Qtitan::RibbonPage* page)
 
 void MainWindow::createGroupView(Qtitan::RibbonPage* page)
 {
-	Qtitan::RibbonGroup* viewButtons = page->addGroup(tr("View"));
-	if (viewButtons)
+	Qtitan::RibbonGroup* mainViewButtons = page->addGroup(tr("Main View"));
+	if (mainViewButtons)
 	{
-		// 		viewButtons->setOptionButtonVisible();
-		// 		QAction* act = viewButtons->optionButtonAction();
-		// 		act->setToolTip(tr("Checkboxes && Radio Buttons"));
-		// 		connect(act, SIGNAL(triggered()), this, SLOT(pressButton()));
+		mainViewButtons->setControlsCentering(true);
 
-		viewButtons->setControlsCentering(true);
 		QCheckBox* labelBrowserCheck = new QCheckBox(tr("LabelBrowser"));
 		labelBrowserCheck->setToolTip(tr("Show Label Browser"));
 		labelBrowserCheck->setCheckState(Qt::Checked);
-		viewButtons->addWidget(labelBrowserCheck);
+		mainViewButtons->addWidget(labelBrowserCheck);
+		connect(labelBrowserCheck, SIGNAL(stateChanged(int)), this, SLOT(onLabelBrowserStateChanged(int)));
 
 		QCheckBox* propertyCheck = new QCheckBox(tr("Property"));
 		propertyCheck->setToolTip(tr("Show Property"));
 		propertyCheck->setCheckState(Qt::Checked);
-		viewButtons->addWidget(propertyCheck);
+		mainViewButtons->addWidget(propertyCheck);
+		connect(propertyCheck, SIGNAL(stateChanged(int)), this, SLOT(onPropertyCheckStateChanged(int)));
 
 		QCheckBox* fatigueCheck = new QCheckBox(tr("Fatigue Operation"));
 		fatigueCheck->setToolTip(tr("Show Fatigue Operation"));
 		fatigueCheck->setCheckState(Qt::Checked);
-		viewButtons->addWidget(fatigueCheck);
+		mainViewButtons->addWidget(fatigueCheck);
+		connect(fatigueCheck, SIGNAL(stateChanged(int)), this, SLOT(onFatigueCheckStateChanged(int)));
+	}
 
-
+	Qtitan::RibbonGroup* viewButtons = page->addGroup(tr("3D View"));
+	if (viewButtons)
+	{
+		viewButtons->setControlsCentering(true);
+		
+	    viewButtons->addAction(meshViewer->action_reset);
+		viewButtons->addAction(meshViewer->action_viewLeft);
+		viewButtons->addAction(meshViewer->action_viewRight);
+		viewButtons->addAction(meshViewer->action_viewTop);
+		viewButtons->addAction(meshViewer->action_viewBottom);
+		viewButtons->addAction(meshViewer->action_viewFront);
+		viewButtons->addWidget(meshViewer->reprsentationComboBox);
 	}
 }
 
@@ -244,17 +255,17 @@ void MainWindow::createGroupAbout(Qtitan::RibbonPage* aboutPage)
 void MainWindow::help()
 {
 	qDebug() << "MainWindow::help()";
+    
 }
 
 void MainWindow::about()
 {
-
-	qDebug() << "MainWindow::about()";
+	QMessageBox::about(this,"fatigue","asfddddddddddddddddddddddddddd\nasdfsdfsdkf");
 }
 
 void MainWindow::paintEvent(QPaintEvent * event)
 {
-	meshViewer->renderWindow();
+	//meshViewer->renderWindow();
 
 }
 
@@ -265,4 +276,47 @@ void MainWindow::runPython()
 
 	PyRun_SimpleString("execfile('E:/workspace/fatigueProject/lib/fatigue.py')");
 
+}
+
+void MainWindow::onLabelBrowserStateChanged(int state)
+{
+	if (state == Qt::Unchecked)
+	{
+		this->removeDockWidget(labelViewer);
+		this->update();
+	}
+	else
+	{
+		this->addDockWidget(Qt::LeftDockWidgetArea, labelViewer);
+		labelViewer->setVisible(true);
+	}
+}
+
+void MainWindow::onPropertyCheckStateChanged(int state)
+{
+	if (state == Qt::Unchecked)
+	{
+		this->removeDockWidget(propViewer);
+		this->update();
+		 
+	}
+	else
+	{
+		this->addDockWidget(Qt::LeftDockWidgetArea, propViewer);
+		propViewer->setVisible(true);
+	}
+
+ 
+}
+
+void MainWindow::onFatigueCheckStateChanged(int state)
+{
+	if (state == Qt::Unchecked)
+	{
+		opViewer->setVisible(false);
+	}
+	else
+	{
+		opViewer->setVisible(true);
+	}
 }

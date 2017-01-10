@@ -55,7 +55,7 @@ RibbonWindow::RibbonWindow(QWidget* parent)
 
     QAction* actionAbout = ribbonBar()->addAction(QIcon(":/res/about.png"), tr("About"), Qt::ToolButtonIconOnly);
     actionAbout->setToolTip(tr("Display program<br />information, version number and copyright"));
-    connect(actionAbout, SIGNAL(triggered()), this, SLOT(about()));
+    //connect(actionAbout, SIGNAL(triggered()), this, SLOT(about()));
 
     m_actionRibbonMinimize = ribbonBar()->addAction(QIcon(":/res/ribbonMinimize.png"), tr("Minimize the Ribbon"), Qt::ToolButtonIconOnly);
     m_actionRibbonMinimize->setStatusTip(tr("Show only the tab names on the Ribbon"));

@@ -12,7 +12,7 @@
 #include <QComboBox>
 
 #include <vtkDataSetMapper.h>
-#include <QVTKWidget.h>
+#include <QVTKWidget2.h>
 #include <vtkActor.h>
 #include <vtkActor2D.h>
 #include <vtkScalarBarActor.h>
@@ -70,7 +70,7 @@ struct struct_tensor
 	double zz;
 };
 
-class  MeshViewer : public QVTKWidget
+class  MeshViewer : public QVTKWidget2
 {
 	Q_OBJECT
 public:
@@ -82,7 +82,7 @@ public:
 
 public slots:
 	void setBackground(const QColor color);
-	void renderWindow();
+	void renderWindowEx();
 private slots:
 	void viewTop();
 	void viewBottom();
@@ -94,7 +94,6 @@ private slots:
 
 	void reprsentationComboBoxIndexChanged(int index);
 
-
 private:
 	void showOrientationMarkerWidget(bool isShow);
 	void addOrientationMarkerWidget();
@@ -102,8 +101,10 @@ private:
 	void createToolBar();
 protected:
 	void wheelEvent(QWheelEvent *e);
+//	virtual void paintGL();
+//	virtual void paintEvent(QPaintEvent * event);
 
-private:
+public:
  	vtkOrientationMarkerWidget * OMwidget;
  	vtkSmartPointer<vtkRenderer>		renderer;
  	vtkSmartPointer<vtkActor>			mainActor;

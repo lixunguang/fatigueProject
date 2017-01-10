@@ -7,7 +7,7 @@
 #include <QDebug>
 
 LabelViewer::LabelViewer(QWidget *parent)
-	:QDockWidget(parent)
+:QDockWidget(parent)
 {
 	QVBoxLayout *vLayout = new QVBoxLayout();
 	QWidget *labelBrowser = new QWidget();
@@ -31,6 +31,8 @@ LabelViewer::LabelViewer(QWidget *parent)
 	vLayout->addLayout(hLayout);
 
 	this->setWidget(labelBrowser);
+
+	this->setFeatures(QDockWidget::NoDockWidgetFeatures);
 }
 
 LabelViewer::~LabelViewer()
