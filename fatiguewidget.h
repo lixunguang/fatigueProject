@@ -1,7 +1,7 @@
-#ifndef fatiguewidget_H_
-#define fatiguewidget_H_
+#ifndef FATIGUEWIDGET_H_
+#define FATIGUEWIDGET_H_
 
-#include "QWidget.h"
+#include <QWidget>
 
 class  FatigueWidget : public QWidget
 {

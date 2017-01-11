@@ -1,10 +1,4 @@
 
-#include <QLabel>
-#include <QTextEdit>
-#include <QGroupBox>
-#include <QHBoxLayout>
-#include <QVBoxLayout>
-#include <QFrame>
 #include <QDebug>
 
 #include "operationviewer.h"

@@ -1,20 +1,12 @@
-#ifndef Table_H_
-#define Table_H_
+#ifndef TABLE_H_
+#define TABLE_H_
 
 #include <QWidget>
-#include <QLabel>
-#include <QTextEdit>
 #include <QGroupBox>
-#include <QTableView>
-#include <QHBoxLayout>
-#include <QVBoxLayout>
-#include <QPushButton>
-#include <QDebug>
-#include <QSpacerItem>
-#include <QModelIndex>
 #include <QTableView>
 
 #include "model.h"
+
 class  Table : public QWidget
 {
 	Q_OBJECT

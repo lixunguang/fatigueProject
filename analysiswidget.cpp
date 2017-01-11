@@ -1,4 +1,3 @@
-#include "analysiswidget.h"
 
 #include <QLabel>
 #include <QHBoxLayout>
@@ -8,10 +7,9 @@
 #include <QGroupBox>
 #include <QLineEdit>
 #include <QComboBox>
-
-
 #include <QDebug>
 
+#include "analysiswidget.h"
 
 AnalysisWidget::AnalysisWidget(QWidget *parent)
 :QWidget(parent)

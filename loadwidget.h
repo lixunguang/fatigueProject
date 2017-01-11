@@ -1,15 +1,11 @@
-#ifndef loadwidget_H_
-#define loadwidget_H_
+#ifndef LOADWIDGET_H_
+#define LOADWIDGET_H_
 
-#include <QLabel>
-#include <QTextEdit>
-#include <QGroupBox>
-#include <QHBoxLayout>
-#include <QVBoxLayout>
 #include <QComboBox>
 #include <QLineEdit>
-#include <QPushButton>
+
 #include <QDebug>
+
 #include "loadeventdialog.h"
 
 class  LoadWidget : public QWidget

@@ -1,8 +1,9 @@
+#include <QVBoxLayout>
+#include <QLabel>
+#include <QStringList>
+#include <QPushButton>
+
 #include "loadwidget.h"
-
-
-
-
 
 LoadWidget::LoadWidget(QWidget *parent)
 	:QWidget(parent)

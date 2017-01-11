@@ -1,5 +1,5 @@
-#ifndef Delegate_H_
-#define Delegate_H_
+#ifndef DELEGATE_H_
+#define DELEGATE_H_
 
 #include <QObject>
 #include <QStyledItemDelegate>

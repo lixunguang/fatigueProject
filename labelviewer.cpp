@@ -1,10 +1,12 @@
-#include "labelviewer.h"
+
 #include <QHBoxLayout>
 #include <QVBoxLayout>
 #include <QPushButton>
 #include <QInputDialog>
 #include <QMessageBox>
 #include <QDebug>
+
+#include "labelviewer.h"
 
 LabelViewer::LabelViewer(QWidget *parent)
 :QDockWidget(parent)

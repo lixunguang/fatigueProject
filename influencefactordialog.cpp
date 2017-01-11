@@ -1,15 +1,13 @@
-#include "influencefactordialog.h"
 
 #include <QLabel>
-#include <QTextEdit>
 #include <QLineEdit>
 #include <QHBoxLayout>
 #include <QVBoxLayout>
-#include <QDialog>
 #include <QDialogButtonBox>
 #include <QPushButton>
 #include <QDebug>
 
+#include "influencefactordialog.h"
 
 InfluenceFactorDialog::InfluenceFactorDialog(QWidget *parent)
 :QDialog(parent)

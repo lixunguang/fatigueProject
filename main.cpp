@@ -1,10 +1,7 @@
 #include <QApplication>
 #include <QDebug>
-#include <qwidget>
 
 #include <Python.h>
-
-
 
 #include "mainwindow.h"
 //#include "HighlightInteractorStyle.h"

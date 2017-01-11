@@ -1,5 +1,5 @@
-#ifndef Model_H_
-#define Model_H_
+#ifndef MODEL_H_
+#define MODEL_H_
 
 #include <QAbstractTableModel>
 

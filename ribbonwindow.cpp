@@ -1,8 +1,7 @@
 #include <QApplication>
 #include <QDesktopWidget>
 
-#include <QtnOfficeDefines.h>
-
+#include "QtnOfficeDefines.h"
 
 #include "ribbonwindow.h"
 

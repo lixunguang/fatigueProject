@@ -1,7 +1,7 @@
 #ifndef RIBBONWINDOW_H
 #define RIBBONWINDOW_H
 
-#include <QtitanRibbon.h>
+#include "QtitanRibbon.h"
 
 
 /* RibbonWindow */

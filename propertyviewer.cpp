@@ -1,13 +1,10 @@
-#include "propertyviewer.h"
 
-#include <QLabel>
 #include <QTextEdit>
-#include <QGroupBox>
-#include <QHBoxLayout>
 #include <QVBoxLayout>
 #include <QFrame>
 #include <QDebug>
 
+#include "propertyviewer.h"
 
 PropertyViewer::PropertyViewer(QWidget *parent)
 	:QDockWidget(parent)

@@ -1,15 +1,9 @@
-#include "fatiguewidget.h"
 
-#include <QLabel>
-#include <QTextEdit>
-#include <QGroupBox>
-#include <QHBoxLayout>
 #include <QVBoxLayout>
-#include <QFrame>
-#include <QTableWidget>
 #include <QPushButton>
 #include <QDebug>
 
+#include "fatiguewidget.h"
 #include "analysiswidget.h"
 #include "loadWidget.h"
 

@@ -1,8 +1,7 @@
-#include "model.h"
-
 
 #include <QDebug>
 
+#include "model.h"
 
 Model::Model(QString type, QObject *parent)
 :QAbstractTableModel(parent)

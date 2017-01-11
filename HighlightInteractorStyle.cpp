@@ -1,10 +1,22 @@
-
-#include "HighlightInteractorStyle.h"
-#include "vtkMath.h"
+#include "vtkInteractorStyleRubberBandPick.h"
+#include "vtkRenderWindowInteractor.h"
+#include "vtkRenderWindow.h"
+#include "vtkProperty.h"
+#include "vtkCellArray.h"
+#include "vtkRendererCollection.h"
+#include "vtkVertexGlyphFilter.h"
+#include "vtkCellPicker.h"
+#include "vtkPointPicker.h"
+#include "vtkVertex.h"
+#include "vtkPlanes.h"
 #include "vtkHardwareSelector.h"
+#include "vtkMath.h"
+#include "vtkProp3DCollection.h"
 #include "vtkSelection.h"
 #include "vtkAreaPicker.h"
-#include "vtkProp3DCollection.h"
+#include "vtkObjectFactory.h"
+
+#include "HighlightInteractorStyle.h"
 
 vtkStandardNewMacro(HighlightInteractorStyle);
 

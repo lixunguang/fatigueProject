@@ -1,7 +1,8 @@
-#ifndef LoadEventDialog_H_
-#define LoadEventDialog_H_
+#ifndef LOADEVENTDIALOG_H_
+#define LOADEVENTDIALOG_H_
 
-#include "QDialog.h"
+#include <QDialog>
+
 #include "table.h"
 
 class  LoadEventDialog : public QDialog

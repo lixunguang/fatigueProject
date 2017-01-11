@@ -1,16 +1,11 @@
-#include "loadeventdialog.h"
 
 #include <QLabel>
-#include <QTextEdit>
-#include <QGroupBox>
 #include <QHBoxLayout>
 #include <QVBoxLayout>
-
-#include <QTableWidget>
-#include <QPushButton>
 #include <QDebug>
+#include <QPushButton>
 
-
+#include "loadeventdialog.h"
 
 LoadEventDialog::LoadEventDialog(QString type, QWidget *parent)
 :QDialog(parent)

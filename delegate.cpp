@@ -1,11 +1,10 @@
-#include "delegate.h"
 
 #include <QComboBox>
 #include <QLineEdit>
 #include <QString>
 #include <QDebug>
 
-
+#include "delegate.h"
 
 Delegate::Delegate(QObject *parent)
 :QStyledItemDelegate(parent)

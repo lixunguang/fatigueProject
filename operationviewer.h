@@ -1,7 +1,7 @@
-#ifndef operationview_H_
-#define operationview_H_
+#ifndef OPERATIONVIEW_H_
+#define OPERATIONVIEW_H_
 
-#include "QDockWidget.h"
+#include <QDockWidget>
 
 class  OperationViewer : public QDockWidget
 {

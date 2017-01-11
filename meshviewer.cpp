@@ -1,21 +1,12 @@
-#include "meshviewer.h"
 
 #include <QDebug>
 #include <QLabel>
 #include <QToolBar>
 
-#include <vtkGenericOpenGLRenderWindow.h>
-#include <vtkRenderWindowInteractor.h>
-#include <vtkTextMapper.h>
-#include <vtkTextActor.h>
-#include <vtkTextProperty.h>
-#include <vtkCoordinate.h>
-#include <vtkPolyDataMapper.h>
-#include <vtkFollower.h>
-#include <vtkDynamicLoader.h>
-#include <vtkMultiBlockDataSetAlgorithm.h>
-#include <vtkCell.h>
-#include <vtkIdList.h>
+#include "vtkGenericOpenGLRenderWindow.h"
+
+
+#include "meshviewer.h"
 
 /*
 MeshView类用用来可视化mesh

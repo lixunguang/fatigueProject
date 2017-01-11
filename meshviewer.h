@@ -1,49 +1,31 @@
-#ifndef MeshViewer_H_
-#define MeshViewer_H_
+#ifndef MESHVIEWER_H_
+#define MESHVIEWER_H_
 
 #include <QWidget>
-#include <QTimer>
-#include <QString>
-#include <QStringList>
-#include <QMap>
-#include <QIcon>
 #include <QAction>
-#include <QVector>
 #include <QComboBox>
 
-#include <vtkDataSetMapper.h>
-#include <QVTKWidget2.h>
-#include <vtkActor.h>
-#include <vtkActor2D.h>
-#include <vtkScalarBarActor.h>
-#include <vtkLookupTable.h>
-#include <vtkSmartPointer.h>
-#include <vtkDataSet.h>
-#include <vtkRenderWindow.h>
-#include <vtkRenderer.h>
-#include <vtkDataArray.h>
-#include <vtkUnstructuredGrid.h>
-#include <vtkCellData.h>
-#include <vtkPointData.h>
-#include <vtkProperty.h>
-#include <vtkCamera.h>
-#include <vtkOrientationMarkerWidget.h>
-#include <vtkMultiBlockDataSet.h>
-#include <vtkAxesActor.h>
-#include <vtkMath.h>
-#include <vtkArrowSource.h>
-#include <vtkPolyData.h>
-#include <vtkTransform.h>
-#include <vtkDoubleArray.h>
-#include <vtkWarpVector.h>
-#include <vtkExtractGrid.h>
-#include <vtkWarpScalar.h>
-#include <vtkLogLookupTable.h>
-#include <vtkPolyDataNormals.h>
-#include <vtkTooltipItem.h>
+#include "vtkDataSetMapper.h"
+#include "QVTKWidget2.h"
+#include "vtkActor.h"
+#include "vtkSmartPointer.h"
+#include "vtkDataSet.h"
+#include "vtkRenderWindow.h"
+#include "vtkRenderer.h"
+#include "vtkDataArray.h"
+#include "vtkUnstructuredGrid.h"
+#include "vtkCellData.h"
+#include "vtkPointData.h"
+#include "vtkProperty.h"
+#include "vtkCamera.h"
+#include "vtkOrientationMarkerWidget.h"
+#include "vtkAxesActor.h"
+#include "vtkPolyData.h"
+#include "vtkTooltipItem.h"
 
-#include "mesh.h"
 #include "HighlightInteractorStyle.h"
+#include "mesh.h"
+
 
 struct struct_tensor 
 {

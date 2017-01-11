@@ -1,7 +1,6 @@
 #include "table.h"
 
-#include <QLabel>
-#include <QTextEdit>
+
 #include <QGroupBox>
 #include <QTableView>
 #include <QHBoxLayout>

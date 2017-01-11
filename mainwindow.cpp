@@ -2,10 +2,10 @@
 #include <QFileDialog>
 #include <QCheckBox>
 #include <QMessageBox>
+#include <QDesktopServices>
 
 #include "stdio.h"
 
-#include <Python.h>
 
 #include "mainwindow.h"
 #include "about.h"
@@ -41,7 +41,7 @@ MainWindow::MainWindow(QWidget *parent) :RibbonWindow(parent)
 
 	opViewer->setWindowTitle("operation");
 	opViewer->setAllowedAreas(Qt::RightDockWidgetArea);
-	opViewer->setMinimumWidth(250);
+	opViewer->setMinimumWidth(200);
 
 	this->addDockWidget(Qt::LeftDockWidgetArea, labelViewer);
 	this->addDockWidget(Qt::LeftDockWidgetArea, propViewer);
@@ -49,6 +49,8 @@ MainWindow::MainWindow(QWidget *parent) :RibbonWindow(parent)
 
 	this->setOptions(OfficeStyle::Windows7Scenic);
 
+	this->setMinimumSize(1380,768);
+	
 }
 
 void MainWindow::createAction()
@@ -254,8 +256,7 @@ void MainWindow::createGroupAbout(Qtitan::RibbonPage* aboutPage)
 
 void MainWindow::help()
 {
-	qDebug() << "MainWindow::help()";
-    
+	QDesktopServices::openUrl(QUrl("http://www.qq.com"));
 }
 
 void MainWindow::about()
