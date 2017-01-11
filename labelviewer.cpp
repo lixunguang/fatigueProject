@@ -26,9 +26,12 @@ LabelViewer::LabelViewer(QWidget *parent)
 	removeBtn->setIcon(QIcon(QPixmap(":/res/label/remove.png")));
 	connect(removeBtn, SIGNAL(clicked()), this, SLOT(onRemoveBtn()));
 
+	QSpacerItem *space = new QSpacerItem(0, 0, QSizePolicy::MinimumExpanding, QSizePolicy::Minimum);
+
 	QHBoxLayout *hLayout = new QHBoxLayout();
 	hLayout->addWidget(addBtn);
 	hLayout->addWidget(removeBtn);
+	hLayout->addSpacerItem(space);
 
 	vLayout->addLayout(hLayout);
 

@@ -1,4 +1,4 @@
-#include "vtkInteractorStyleRubberBandPick.h"
+
 #include "vtkRenderWindowInteractor.h"
 #include "vtkRenderWindow.h"
 #include "vtkProperty.h"

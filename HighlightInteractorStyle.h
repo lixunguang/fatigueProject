@@ -10,7 +10,7 @@
 #include "vtkSmartPointer.h"
 #include "vtkUnstructuredGrid.h"
 #include "vtkPolyDataMapper.h"
-
+#include "vtkInteractorStyleRubberBandPick.h"
 
 
 

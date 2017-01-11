@@ -22,7 +22,9 @@
 #include "vtkAxesActor.h"
 #include "vtkPolyData.h"
 #include "vtkTooltipItem.h"
-
+#include "vtkAreaPicker.h"
+#include "vtkSmartPointer.h"
+#include "vtkRenderWindowInteractor.h"
 #include "HighlightInteractorStyle.h"
 #include "mesh.h"
 
