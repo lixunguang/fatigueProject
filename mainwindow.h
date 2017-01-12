@@ -34,9 +34,11 @@ private:
 	void createGroupAbout(Qtitan::RibbonPage* aboutPage);
 
 protected Q_SLOTS:
-	void openFile();
-	void closeFile();
 
+
+	void importFile();
+	void save();
+	void saveAs();
 	void openProject();
 	void closeProject();
 
@@ -57,6 +59,9 @@ protected:
 
 protected:
 	QAction* m_actionOpenFile;
+	QAction* m_actionImportFile;
+	QAction* m_actionSave;
+	QAction* m_actionSaveAs;
 	QAction* m_actionCloseFile;
 
 	QAction* m_showFatigueDialog;

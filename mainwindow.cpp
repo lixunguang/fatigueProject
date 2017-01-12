@@ -63,7 +63,31 @@ void MainWindow::createAction()
 	m_actionOpenFile->setShortcut(QKeySequence::Open);
 	m_actionOpenFile->setToolTip(tr("Open"));
 	m_actionOpenFile->setStatusTip(tr("Open an existing document"));
-	connect(m_actionOpenFile, SIGNAL(triggered()), this, SLOT(openFile()));
+	connect(m_actionOpenFile, SIGNAL(triggered()), this, SLOT(openProject()));
+
+	QIcon iconImport;
+	iconImport.addPixmap(QPixmap(":/res/mainwin_mainwin_largeOpenFile.png"));
+	iconImport.addPixmap(QPixmap(":/res/mainwin_smallOpen.png"));
+	m_actionImportFile = new QAction(iconImport, tr("&Import..."), this);
+	m_actionImportFile->setToolTip(tr("Open"));
+	m_actionImportFile->setStatusTip(tr("Open an existing document"));
+	connect(m_actionImportFile, SIGNAL(triggered()), this, SLOT(importFile()));
+
+	QIcon iconSave;
+	iconSave.addPixmap(QPixmap(":/res/mainwin_mainwin_largeOpenFile.png"));
+	iconSave.addPixmap(QPixmap(":/res/mainwin_smallOpen.png"));
+	m_actionSave = new QAction(iconSave, tr("&Save"), this);
+	m_actionSave->setToolTip(tr("Open"));
+	m_actionSave->setStatusTip(tr("Open an existing document"));
+	connect(m_actionSave, SIGNAL(triggered()), this, SLOT(save()));
+
+	QIcon iconSaveAs;
+	iconSaveAs.addPixmap(QPixmap(":/res/mainwin_mainwin_largeOpenFile.png"));
+	iconSaveAs.addPixmap(QPixmap(":/res/mainwin_smallOpen.png"));
+	m_actionSaveAs = new QAction(iconSaveAs, tr("&Save As..."), this);
+	m_actionSaveAs->setToolTip(tr("Open"));
+	m_actionSaveAs->setStatusTip(tr("Open an existing document"));
+	connect(m_actionSaveAs, SIGNAL(triggered()), this, SLOT(saveAs()));
 
 	QIcon iconClose;
 	iconClose.addPixmap(QPixmap(":/res/mainwin_largeOpenFile.png"));
@@ -72,11 +96,20 @@ void MainWindow::createAction()
 	m_actionCloseFile->setShortcut(QKeySequence::Save);
 	m_actionCloseFile->setToolTip(tr("Save"));
 	m_actionCloseFile->setStatusTip(tr("Save the active document"));
-	connect(m_actionCloseFile, SIGNAL(triggered()), this, SLOT(closeFile()));
+	connect(m_actionCloseFile, SIGNAL(triggered()), this, SLOT(closeProject()));
 
 }
 
-void MainWindow::openFile()
+
+void MainWindow::openProject()
+{//todo:明天先从这个开始
+	//1 parase xml ,get model file path
+
+	//2 get the label that has been added
+
+}
+
+void MainWindow::importFile()
 {
 	QString fileName = QFileDialog::getOpenFileName(this, tr("Open File..."),
 		QString(), tr("Ansys result (*.fil *.odb);;All Files (*)"));
@@ -89,20 +122,17 @@ void MainWindow::openFile()
 	meshViewer->loadMeshData(fileName.toLatin1().data());
 }
 
-void MainWindow::openProject()
-{//todo:
-	//1 parase xml ,get model file path
-
-	//2 get the label that has been added
+void MainWindow::save()
+{
 
 }
-
-void MainWindow::closeProject()
+void MainWindow::saveAs()
 {
 
 }
 
-void MainWindow::closeFile()
+
+void MainWindow::closeProject()
 {
 	QString fn = QFileDialog::getOpenFileName(this, tr("Open File..."),
 		QString(), tr("HTML-Files (*.htm *.html);;All Files (*)"));
@@ -131,7 +161,10 @@ void MainWindow::createMenuFile()
 		Qtitan::RibbonSystemPopupBar* popupBar = qobject_cast<Qtitan::RibbonSystemPopupBar*>(actionFile->menu());
 
 		popupBar->addAction(m_actionOpenFile);
-
+		popupBar->addSeparator();
+		popupBar->addAction(m_actionImportFile);
+		popupBar->addAction(m_actionSave);
+		popupBar->addAction(m_actionSaveAs);
 		popupBar->addSeparator();
 		popupBar->addAction(m_actionCloseFile);
 	}
