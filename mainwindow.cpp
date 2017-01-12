@@ -224,18 +224,25 @@ void MainWindow::createGroupView(Qtitan::RibbonPage* page)
 		connect(fatigueCheck, SIGNAL(stateChanged(int)), this, SLOT(onFatigueCheckStateChanged(int)));
 	}
 
-	Qtitan::RibbonGroup* viewButtons = page->addGroup(tr("3D View"));
-	if (viewButtons)
+	Qtitan::RibbonGroup* viewDirectionGroup = page->addGroup(tr("3D View"));
+	if (viewDirectionGroup)
 	{
-		viewButtons->setControlsCentering(true);
+		viewDirectionGroup->setControlsCentering(true);
 		
-	    viewButtons->addAction(meshViewer->action_reset);
-		viewButtons->addAction(meshViewer->action_viewLeft);
-		viewButtons->addAction(meshViewer->action_viewRight);
-		viewButtons->addAction(meshViewer->action_viewTop);
-		viewButtons->addAction(meshViewer->action_viewBottom);
-		viewButtons->addAction(meshViewer->action_viewFront);
-		viewButtons->addWidget(meshViewer->reprsentationComboBox);
+		viewDirectionGroup->addAction(meshViewer->action_reset);
+		viewDirectionGroup->addAction(meshViewer->action_viewLeft);
+		viewDirectionGroup->addAction(meshViewer->action_viewRight);
+		viewDirectionGroup->addAction(meshViewer->action_viewTop);
+		viewDirectionGroup->addAction(meshViewer->action_viewBottom);
+		viewDirectionGroup->addAction(meshViewer->action_viewFront);
+
+	}
+
+	Qtitan::RibbonGroup* viewReprsentation = page->addGroup(tr("Reprsentation"));
+	if (viewReprsentation)
+	{
+		viewReprsentation->setControlsCentering(true);
+		viewReprsentation->addWidget(meshViewer->reprsentationComboBox);
 	}
 }
 

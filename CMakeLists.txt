@@ -60,6 +60,7 @@ if(${VTK_VERSION} VERSION_GREATER "6")
   table.cpp
   model.cpp
   delegate.cpp
+  treeitem.cpp
   about.cpp
   
   )

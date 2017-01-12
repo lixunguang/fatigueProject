@@ -4,6 +4,8 @@
 #include <QTreeWidget>
 #include <QDockWidget>
 
+#include "treeitem.h"
+
 class  LabelViewer : public QDockWidget
 {
 	Q_OBJECT
@@ -14,6 +16,13 @@ public slots:
 	void onAddBtn();
 	void onRemoveBtn();
 
+	void onAddLabel(QString &labelName);
+
+	void onItemPressed(QTreeWidgetItem * item, int column);
+private:
+	QList<QTreeWidgetItem*> topItems;
+	QTreeWidgetItem *labelItem;
+	QTreeWidgetItem *OperationItem;
 };
 
 #endif

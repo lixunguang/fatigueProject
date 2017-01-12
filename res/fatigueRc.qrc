@@ -30,8 +30,10 @@
         <file>tool_largebutton2.png</file>
     </qresource>
     <qresource prefix="/res/label">
-        <file>add.png</file>
-        <file>remove.png</file>
+        <file>label_add.png</file>
+        <file>label_remove.png</file>
+        <file>label_visibility_off.png</file>
+        <file>label_visibility_on.png</file>
     </qresource>
     <qresource prefix="/about">
         <file>about_about.png</file>
