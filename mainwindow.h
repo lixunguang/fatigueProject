@@ -37,8 +37,6 @@ private:
 protected Q_SLOTS:
 	void importFile();
 	void save();
-	void saveAs();
-
 
 	void closeProject();
 
@@ -68,8 +66,6 @@ protected Q_SLOTS:
 	void domElemFromInputConfig(QDomElement& e, QDomDocument&doc);
 	void domElemFromOutputConfig(QDomElement& e, QDomDocument&doc);
 
-protected:
-	void paintEvent(QPaintEvent * event);
 
 protected:
 	QAction* m_actionOpenFile;
