@@ -20,8 +20,7 @@ if(${VTK_VERSION} VERSION_GREATER "6" )
   # Instruct CMake to run moc automatically when needed.
   MESSAGE("VERSION_GREATER 6")
   set(CMAKE_AUTOMOC ON)
-  find_package(Qt5Widgets REQUIRED QUIET)
-  find_package(Qt5OpenGL REQUIRED)
+find_package(Qt5 COMPONENTS Core Gui OpenGL WebKit WebKitWidgets Xml )
 else()
   MESSAGE("VERSION_GREATER 4")
   find_package(Qt4 REQUIRED)
@@ -70,7 +69,7 @@ if(${VTK_VERSION} VERSION_GREATER "6")
   ${UI_FILES}
   ${QRC_SOURCES}
   )
-  qt5_use_modules(fatigueProject Core Gui Widgets)
+  qt5_use_modules(fatigueProject Core Gui Widgets OpenGL Xml WebKit WebKitWidgets)
   target_link_libraries(fatigueProject ${VTK_LIBRARIES})
 
  

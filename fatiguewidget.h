@@ -11,7 +11,7 @@ public:
 	~FatigueWidget();
 
 public slots:
-void onFinish();
+void writeToFile();
 };
 
 #endif

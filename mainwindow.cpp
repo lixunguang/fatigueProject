@@ -3,9 +3,9 @@
 #include <QCheckBox>
 #include <QMessageBox>
 #include <QDesktopServices>
+#include <QSet>
 
 #include "stdio.h"
-
 
 #include "mainwindow.h"
 #include "about.h"
@@ -29,7 +29,7 @@ MainWindow::MainWindow(QWidget *parent) :RibbonWindow(parent)
 	labelViewer = new LabelViewer(this);
 	propViewer = new PropertyViewer(this);
 	opViewer = new OperationViewer(this);
-	
+
 	labelViewer->setWindowTitle("Label Browser");
 	labelViewer->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
 	labelViewer->setMinimumWidth(80);
@@ -49,13 +49,12 @@ MainWindow::MainWindow(QWidget *parent) :RibbonWindow(parent)
 
 	this->setOptions(OfficeStyle::Windows7Scenic);
 
-	this->setMinimumSize(1380,768);
-	
+	this->setMinimumSize(1380, 768);
+
 }
 
 void MainWindow::createAction()
 {
-
 	QIcon iconOpen;
 	iconOpen.addPixmap(QPixmap(":/res/mainwin_mainwin_largeOpenFile.png"));
 	iconOpen.addPixmap(QPixmap(":/res/mainwin_smallOpen.png"));
@@ -87,7 +86,7 @@ void MainWindow::createAction()
 	m_actionSaveAs = new QAction(iconSaveAs, tr("&Save As..."), this);
 	m_actionSaveAs->setToolTip(tr("Open"));
 	m_actionSaveAs->setStatusTip(tr("Open an existing document"));
-	connect(m_actionSaveAs, SIGNAL(triggered()), this, SLOT(saveAs()));
+	connect(m_actionSaveAs, SIGNAL(triggered()), this, SLOT(writeProject()));
 
 	QIcon iconClose;
 	iconClose.addPixmap(QPixmap(":/res/mainwin_largeOpenFile.png"));
@@ -100,13 +99,359 @@ void MainWindow::createAction()
 
 }
 
-
 void MainWindow::openProject()
-{//todo:明天先从这个开始
+{
+	propViewer->setData(QString("openProject"));
+
+	QString fileName = QFileDialog::getOpenFileName(this, tr("Open Project File"),
+		QDir::currentPath(),
+		tr("fatigue project Files (*.fproj)"));
+
+	if (fileName.isEmpty())
+		return;
+
 	//1 parase xml ,get model file path
+
+	parseProjectFile(fileName);
 
 	//2 get the label that has been added
 
+
+	//3 获取求解文件的设置，
+
+}
+
+void MainWindow::parseProjectFile(QString &fileName)
+{//和下面的domelemFrom...对应
+	propViewer->setData(QString("parseProjectFile"));
+
+	QDomDocument doc("fatigueProject");
+
+	QFile file(fileName);
+	if (!file.open(QFile::ReadOnly | QFile::Text))
+	{
+		propViewer->setData(tr("Cannot read file %1:\n%2.").arg(fileName).arg(file.errorString()));
+		return;
+	}
+
+	if (!doc.setContent(&file))
+	{
+		propViewer->setData(QString("read %1 error").arg(fileName));
+		file.close();
+		return;
+	}
+	file.close();
+
+	QDomElement docElem = doc.documentElement();
+
+	QDomNode n = docElem.firstChild();
+	while (!n.isNull())
+	{
+		QDomElement e = n.toElement(); 
+		if (!e.isNull())
+		{
+			if (e.tagName() == "ProjectConfig")
+			{
+				readProjectConfig(e);
+			}
+
+			if (e.tagName() == "InputConfig")
+			{
+				readInputConfig(e);
+			}
+
+			if (e.tagName() == "OutputConfig")
+			{
+				readOutputConfig(e);
+			}
+
+		}
+		n = n.nextSibling();
+	}
+
+}
+
+void MainWindow::travelElement(QDomElement element, QMap<QString, QString> &map)
+{//tree--->map
+
+	if (!element.isNull())
+	{
+		QDomNodeList childNodes = element.childNodes();
+		QDomNode node;
+		QDomElement elem;
+		QString keyStr;
+		QString attrNamestr;
+		QString attrValstr;
+
+		int count = 0;
+		for (int i = 0; i < childNodes.size(); i++)
+		{
+			elem = childNodes.at(i).toElement();
+		
+			if (elem.tagName() == "Item")
+			{
+
+				QDomNamedNodeMap attrMap = elem.attributes();
+				QDomAttr attr;
+				attrNamestr = "";
+				keyStr = "";
+				attrValstr = "";
+				for (int j = 0; j < attrMap.count(); j++)//读取多个attr
+				{
+					attr = attrMap.item(j).toAttr();
+					attrNamestr += attr.name();
+					attrNamestr += "@";
+
+					attrValstr += attr.value();
+					attrValstr += "@";
+				}
+				keyStr = QString("%1@%2%3").arg(element.tagName()).arg(attrNamestr).arg(count++);
+				
+				map[keyStr] = attrValstr + elem.text().trimmed();//trimmed: remove space
+
+			}
+			travelElement(elem, map);
+		}
+	}
+}
+
+void MainWindow::readProjectConfig(QDomElement& e)
+{
+	travelElement(e, projectConfigMapData);
+}
+
+void MainWindow::readInputConfig(QDomElement& e)
+{
+	travelElement(e, inputConfigMapData);
+}
+
+void MainWindow::readOutputConfig(QDomElement& e)
+{
+	travelElement(e, outputConfigMapData);
+}
+
+
+void MainWindow::domElemFromProjectConfig(QDomElement& projectConfigElem, QDomDocument& doc)
+{
+	QSet<QString> keys;
+	for each (QString itemKey in projectConfigMapData.keys())
+	{
+		QStringList list = itemKey.split("@");
+		keys.insert(list[0]);
+	}
+
+	for each (QString key in keys)
+	{
+		QDomElement elem = doc.createElement(key);
+		projectConfigElem.appendChild(elem);
+	}
+
+	QDomElement sElem = projectConfigElem.elementsByTagName("ShowView").at(0).toElement();
+		
+	for each (QString itemKey in projectConfigMapData.keys())
+	{
+		QDomElement elem = doc.createElement("Item");
+
+		QStringList valList = projectConfigMapData[itemKey].split("@");
+		QDomText t = doc.createTextNode(valList[valList.size() - 1]);
+		elem.appendChild(t);
+
+		QStringList keyList = itemKey.split("@");
+
+		for (int i = 1; i < keyList.size() - 1; i++)
+		{
+			elem.setAttribute(keyList[i], valList[i - 1]);
+
+		}
+
+		QStringList list = itemKey.split("@");
+
+		if (itemKey.startsWith("ShowView"))
+		{
+
+			elem.appendChild(elem);
+		}
+	}
+
+}
+
+void MainWindow::domElemFromInputConfig(QDomElement& inputConfigElem, QDomDocument& doc)
+{
+	//构建section 部分 ex. InputConfig File NodeLabel ElementLabel,etc
+	QSet<QString> keys;
+	for each (QString itemKey in inputConfigMapData.keys())
+	{
+		QStringList list = itemKey.split("@");
+		keys.insert(list[0]);
+	}
+
+	for each (QString key in keys)
+	{
+		QDomElement elem = doc.createElement(key);
+		inputConfigElem.appendChild(elem);
+	}
+ 
+	QDomElement fElem = inputConfigElem.elementsByTagName("File").at(0).toElement();
+	QDomElement nElem = inputConfigElem.elementsByTagName("NodeLabel").at(0).toElement();
+	QDomElement eElem = inputConfigElem.elementsByTagName("ElementLabel").at(0).toElement();
+
+ 	for each (QString itemKey in inputConfigMapData.keys())
+	{
+		QDomElement elem = doc.createElement("Item");
+
+		QStringList valList = inputConfigMapData[itemKey].split("@");
+		QDomText t = doc.createTextNode(valList[valList.size()-1]);
+		elem.appendChild(t);
+	 
+
+		QStringList keyList = itemKey.split("@");
+		
+		qDebug() << valList;
+	
+		for (int i = 1; i < keyList.size()-1;i++)
+		{
+			elem.setAttribute(keyList[i], valList[i-1]);
+
+		}
+	
+		if (itemKey.startsWith("File"))
+		{
+			fElem.appendChild(elem);
+		}
+		else if (itemKey.startsWith("NodeLabel"))
+		{
+		
+			nElem.appendChild(elem);
+		}
+		else if (itemKey.startsWith("ElementLabel"))
+		{
+		
+			eElem.appendChild(elem);
+		}
+	}
+
+}
+
+void MainWindow::domElemFromOutputConfig(QDomElement& outputConfigElem, QDomDocument& doc)
+{
+	QSet<QString> keys;
+	for each (QString itemKey in outputConfigMapData.keys())
+	{
+		QStringList list = itemKey.split("@");
+		keys.insert(list[0]);
+	}
+
+	for each (QString key in keys)
+	{
+		QDomElement elem = doc.createElement(key);
+		outputConfigElem.appendChild(elem);
+	}
+
+	QDomElement fElem = outputConfigElem.elementsByTagName("File").at(0).toElement();
+	QDomElement algorithmElem = outputConfigElem.elementsByTagName("AlgorithmSection").at(0).toElement();
+	QDomElement analisisElem = outputConfigElem.elementsByTagName("AnalisisDefSection").at(0).toElement();
+	QDomElement rainFlowElem = outputConfigElem.elementsByTagName("RainFlowSection").at(0).toElement();
+	QDomElement entityElem = outputConfigElem.elementsByTagName("EntitySection").at(0).toElement();
+	QDomElement caseElem = outputConfigElem.elementsByTagName("CaseSection").at(0).toElement();
+	QDomElement loadElem = outputConfigElem.elementsByTagName("LoadSection").at(0).toElement();
+
+	//itemKey: 
+	for each (QString itemKey in outputConfigMapData.keys())
+	{
+		QDomElement elem = doc.createElement("Item");
+
+
+		QStringList valList = outputConfigMapData[itemKey].split("@");
+		QDomText t = doc.createTextNode(valList[valList.size() - 1]);
+		elem.appendChild(t);
+
+		QStringList keyList = itemKey.split("@");
+
+		for (int i = 1; i < keyList.size() - 1; i++)
+		{
+			elem.setAttribute(keyList[i], valList[i - 1]);
+
+		}
+
+
+/////////////////////////////////////////////
+
+		if (itemKey.startsWith("File"))
+		{
+			fElem.appendChild(elem);
+		}
+		else if (itemKey.startsWith("AlgorithmSection"))
+		{
+			algorithmElem.appendChild(elem);
+		}
+		else if (itemKey.startsWith("AnalisisDefSection"))
+		{
+			analisisElem.appendChild(elem);
+		}
+		else if (itemKey.startsWith("RainFlowSection"))
+		{
+			rainFlowElem.appendChild(elem);
+		}
+		else if (itemKey.startsWith("EntitySection"))
+		{	
+			entityElem.appendChild(elem);
+		}
+		else if (itemKey.startsWith("CaseSection"))
+		{		
+			caseElem.appendChild(elem);
+		}
+		else if (itemKey.startsWith("LoadSection"))
+		{
+			loadElem.appendChild(elem);
+		}
+	}
+
+}
+
+void MainWindow::writeProject()
+{
+	//1 open file
+	QString fileName = QFileDialog::getSaveFileName(this, tr("Save Project File"),
+		QDir::currentPath(),
+		tr("fatigue project Files (*.fproj)"));
+
+	if (fileName.isEmpty())
+		return;
+
+	QFile outFile(fileName);
+	if (!outFile.open(QIODevice::WriteOnly | QIODevice::Text))
+	{
+		propViewer->setData(tr("Failed to open file for writing."));
+		return ;
+	}
+
+	//2 write to file
+	QDomDocument doc("fatigueProject");
+	QDomProcessingInstruction instruction;
+	instruction = doc.createProcessingInstruction("xml", "version=\"1.0\" encoding=\"UTF-8\"");
+	doc.appendChild(instruction);
+
+	QDomElement root = doc.createElement("Project");
+	root.setAttribute("Version", "1.0");
+	doc.appendChild(root);
+
+	QDomElement projectConfigElem = doc.createElement("projectConfig");
+	domElemFromProjectConfig(projectConfigElem,doc);
+
+	QDomElement inputConfigElem = doc.createElement("inputConfig");
+	domElemFromInputConfig(inputConfigElem,doc);
+
+	QDomElement outputConfigElem = doc.createElement("OutputConfig");
+	domElemFromOutputConfig(outputConfigElem,doc);
+	
+	root.appendChild(projectConfigElem);
+	root.appendChild(inputConfigElem);
+	root.appendChild(outputConfigElem);
+
+	QTextStream stream(&outFile);
+	stream << doc.toString();
+
+	outFile.close();
 }
 
 void MainWindow::importFile()
@@ -126,11 +471,11 @@ void MainWindow::save()
 {
 
 }
+
 void MainWindow::saveAs()
 {
 
 }
-
 
 void MainWindow::closeProject()
 {
@@ -261,7 +606,7 @@ void MainWindow::createGroupView(Qtitan::RibbonPage* page)
 	if (viewDirectionGroup)
 	{
 		viewDirectionGroup->setControlsCentering(true);
-		
+
 		viewDirectionGroup->addAction(meshViewer->action_reset);
 		viewDirectionGroup->addAction(meshViewer->action_viewLeft);
 		viewDirectionGroup->addAction(meshViewer->action_viewRight);
@@ -301,7 +646,7 @@ void MainWindow::help()
 
 void MainWindow::about()
 {
-	QMessageBox::about(this,"fatigue","asfddddddddddddddddddddddddddd\nasdfsdfsdkf");
+	QMessageBox::about(this, "fatigue", "asfddddddddddddddddddddddddddd\nasdfsdfsdkf");
 }
 
 void MainWindow::paintEvent(QPaintEvent * event)
@@ -339,7 +684,7 @@ void MainWindow::onPropertyCheckStateChanged(int state)
 	{
 		this->removeDockWidget(propViewer);
 		this->update();
-		 
+
 	}
 	else
 	{
@@ -347,7 +692,7 @@ void MainWindow::onPropertyCheckStateChanged(int state)
 		propViewer->setVisible(true);
 	}
 
- 
+
 }
 
 void MainWindow::onFatigueCheckStateChanged(int state)

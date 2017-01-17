@@ -1,5 +1,5 @@
 
-#include <QTextEdit>
+
 #include <QVBoxLayout>
 #include <QFrame>
 #include <QDebug>
@@ -18,7 +18,7 @@ PropertyViewer::PropertyViewer(QWidget *parent)
 	dockWidget->setLayout(vLayout);
 
 
-	QTextEdit *nodeEdit = new QTextEdit();
+	nodeEdit = new QTextEdit();
  
 	vLayout->addWidget(nodeEdit);
  
@@ -27,4 +27,17 @@ PropertyViewer::PropertyViewer(QWidget *parent)
 PropertyViewer::~PropertyViewer()
 {
 
+}
+
+//嵌入webkit？
+void PropertyViewer::setData(QString& strData)
+{//比如接受一个字符串
+
+	nodeEdit->append(strData);
+	qDebug() << strData;
+}
+
+void PropertyViewer::setData(QMap<QString, QString> &mapData)
+{//比如接受一个字典
+	qDebug() << mapData;
 }

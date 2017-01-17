@@ -1,7 +1,9 @@
 #ifndef propertyview_H_
 #define propertyview_H_
 
-#include "QDockWidget.h"
+#include <QTextEdit>
+#include <QMap>
+#include <QDockWidget>
 
 class  PropertyViewer : public QDockWidget
 {
@@ -9,7 +11,12 @@ class  PropertyViewer : public QDockWidget
 public:
 	PropertyViewer(QWidget *parent = 0);
 	~PropertyViewer();
+public:
+	void setData(QString& strData);
+	void setData(QMap<QString, QString> &mapData);
 
+private:
+	QTextEdit *nodeEdit;
 };
 
 #endif

@@ -3,6 +3,7 @@
 #define MAINWINDOW_H
 
 #include <QDebug>
+#include <QDomDocument>
 
 #include "Python.h"
 
@@ -34,12 +35,11 @@ private:
 	void createGroupAbout(Qtitan::RibbonPage* aboutPage);
 
 protected Q_SLOTS:
-
-
 	void importFile();
 	void save();
 	void saveAs();
-	void openProject();
+
+
 	void closeProject();
 
 	virtual void options(QAction* action);
@@ -54,6 +54,20 @@ protected Q_SLOTS:
 	void onLabelBrowserStateChanged(int state);
 	void onPropertyCheckStateChanged(int state);
 	void onFatigueCheckStateChanged(int state);
+
+	public slots:
+	// project manager
+	void openProject();
+	void parseProjectFile(QString &filePath);
+	void readProjectConfig(QDomElement& e);
+	void readInputConfig(QDomElement& e);
+	void readOutputConfig(QDomElement& e);
+	void travelElement(QDomElement element, QMap<QString, QString> &map);
+	void writeProject();
+	void domElemFromProjectConfig(QDomElement& e, QDomDocument&doc);
+	void domElemFromInputConfig(QDomElement& e, QDomDocument&doc);
+	void domElemFromOutputConfig(QDomElement& e, QDomDocument&doc);
+
 protected:
 	void paintEvent(QPaintEvent * event);
 
@@ -81,6 +95,12 @@ private:
 	PropertyViewer *propViewer;
 	OperationViewer *opViewer;
 		
+	//存放xml格式的工程文件数据
+	//key name：sectionName_name_type_val，名字中含有xml的数据结构，这也是把树形的xml转为map的关键
+	//      val:
+	QMap<QString, QString> projectConfigMapData;
+	QMap<QString, QString> inputConfigMapData;
+	QMap<QString, QString> outputConfigMapData;
 };
 
 #endif

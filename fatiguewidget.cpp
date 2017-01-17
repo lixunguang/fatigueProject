@@ -25,7 +25,7 @@ FatigueWidget::FatigueWidget(QWidget *parent)
 	layout->addWidget(tab);
 	layout->addWidget(finishBtn);
 
-	connect(finishBtn, SIGNAL(clicked()), this, SLOT(onFinish()));
+	connect(finishBtn, SIGNAL(clicked()), this, SLOT(writeToFile()));
 
 	this->setLayout(layout);
 }
@@ -35,7 +35,7 @@ FatigueWidget::~FatigueWidget()
 
 }
 
-void FatigueWidget::onFinish()
+void FatigueWidget::writeToFile()
 {
-	qDebug() << "FatigueWidget::onFinish";
+	qDebug() << "FatigueWidget::writeToFile";
 }
