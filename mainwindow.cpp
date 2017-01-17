@@ -3,7 +3,7 @@
 #include <QCheckBox>
 #include <QMessageBox>
 #include <QDesktopServices>
-#include <QSet>
+
 
 #include "stdio.h"
 
@@ -87,7 +87,7 @@ void MainWindow::createAction()
 	m_actionSaveAs = new QAction(iconSaveAs, tr("&Save As..."), this);
 	m_actionSaveAs->setToolTip(tr("Open"));
 	m_actionSaveAs->setStatusTip(tr("Open an existing document"));
-	connect(m_actionSaveAs, SIGNAL(triggered()), this, SLOT(writeProject()));
+	connect(m_actionSaveAs, SIGNAL(triggered()), this, SLOT(saveAs()));
 
 	QIcon iconClose;
 	iconClose.addPixmap(QPixmap(":/res/mainwin_largeOpenFile.png"));
@@ -100,16 +100,82 @@ void MainWindow::createAction()
 
 }
 
+void MainWindow::openProject()
+{
+	propViewer->setData(QString("openProject"));
+
+	QString fileName = QFileDialog::getOpenFileName(this, tr("Open Project File"),
+		QDir::currentPath(),
+		tr("fatigue project Files (*.fproj)"));
+
+	if (fileName.isEmpty())
+		return;
+
+	projectManager.parse(fileName);
+
+	FatigueWidget *w = (FatigueWidget *)(opViewer->widget());
+	w->updateUi(projectManager.getUiData());
+}
+
 void MainWindow::save()
 {
+	FatigueWidget *w = (FatigueWidget *)(opViewer->widget());
+	w->updateData(projectManager.getUiData());
+ 
+	if (projectManager.getProjectFileName().isEmpty())
+	{
+		saveAs();
+	}
+	else
+	{
+		projectManager.save();
+	}
+		
+}
 
+void MainWindow::saveAs()
+{
+	FatigueWidget *w = (FatigueWidget *)(opViewer->widget());
+	w->updateData(projectManager.getUiData());
+
+	QString fileName = QFileDialog::getSaveFileName(this, tr("Save Project File"),
+		QDir::currentPath(),
+		tr("fatigue project Files (*.fproj)"));
+
+	if (fileName.isEmpty())
+	{
+		qDebug() << "file name is empty";
+		return;
+	}
+		
+
+	projectManager.setProjectFileName(fileName);
+	projectManager.save();
 }
 
 void MainWindow::closeProject()
 {
-	QString fn = QFileDialog::getOpenFileName(this, tr("Open File..."),
-		QString(), tr("HTML-Files (*.htm *.html);;All Files (*)"));
+	//todo:应该执行一些数据清理，以便于下次打开
+}
 
+void MainWindow::importFile()
+{
+	QString fileName = QFileDialog::getOpenFileName(this, tr("Open File..."),
+		QString(), tr("Ansys result (*.fil *.odb);;All Files (*)"));
+
+	if (fileName.isEmpty())
+	{
+		qDebug() << "file name is empty";
+		return;
+	}
+
+	// read mesh
+	meshViewer->loadMeshData(fileName.toLatin1().data());
+
+	projectManager.reset();
+	QStringList sl;
+	sl << fileName;
+	projectManager.setModelFileName(sl);
 }
 
 void MainWindow::showFatigueDialog()
@@ -286,366 +352,7 @@ void MainWindow::runPython()
 }
 
 #pragma endregion MainWindow func
-#pragma region project func
-void MainWindow::openProject()
-{
-	propViewer->setData(QString("openProject"));
 
-	QString fileName = QFileDialog::getOpenFileName(this, tr("Open Project File"),
-		QDir::currentPath(),
-		tr("fatigue project Files (*.fproj)"));
-
-	if (fileName.isEmpty())
-		return;
-
-	//1 parase xml ,get model file path
-
-	parseProjectFile(fileName);
-
-	//2 get the label that has been added
-
-
-	//3 获取求解文件的设置，
-
-}
-
-void MainWindow::parseProjectFile(QString &fileName)
-{//和下面的domelemFrom...对应
-	propViewer->setData(QString("parseProjectFile"));
-
-	QDomDocument doc("fatigueProject");
-
-	QFile file(fileName);
-	if (!file.open(QFile::ReadOnly | QFile::Text))
-	{
-		propViewer->setData(tr("Cannot read file %1:\n%2.").arg(fileName).arg(file.errorString()));
-		return;
-	}
-
-	if (!doc.setContent(&file))
-	{
-		propViewer->setData(QString("read %1 error").arg(fileName));
-		file.close();
-		return;
-	}
-	file.close();
-
-	QDomElement docElem = doc.documentElement();
-
-	QDomNode n = docElem.firstChild();
-	while (!n.isNull())
-	{
-		QDomElement e = n.toElement();
-		if (!e.isNull())
-		{
-			if (e.tagName() == "ProjectConfig")
-			{
-				readProjectConfig(e);
-			}
-
-			if (e.tagName() == "InputConfig")
-			{
-				readInputConfig(e);
-			}
-
-			if (e.tagName() == "OutputConfig")
-			{
-				readOutputConfig(e);
-			}
-
-		}
-		n = n.nextSibling();
-	}
-
-}
-
-void MainWindow::travelElement(QDomElement element, QMap<QString, QString> &map)
-{//tree--->map
-
-	if (!element.isNull())
-	{
-		QDomNodeList childNodes = element.childNodes();
-		QDomNode node;
-		QDomElement elem;
-		QString keyStr;
-		QString attrNamestr;
-		QString attrValstr;
-
-		int count = 0;
-		for (int i = 0; i < childNodes.size(); i++)
-		{
-			elem = childNodes.at(i).toElement();
-
-			if (elem.tagName() == "Item")
-			{
-
-				QDomNamedNodeMap attrMap = elem.attributes();
-				QDomAttr attr;
-				attrNamestr = "";
-				keyStr = "";
-				attrValstr = "";
-				for (int j = 0; j < attrMap.count(); j++)//读取多个attr
-				{
-					attr = attrMap.item(j).toAttr();
-					attrNamestr += attr.name();
-					attrNamestr += "@";
-
-					attrValstr += attr.value();
-					attrValstr += "@";
-				}
-				keyStr = QString("%1@%2%3").arg(element.tagName()).arg(attrNamestr).arg(count++);
-
-				map[keyStr] = attrValstr + elem.text().trimmed();//trimmed: remove space
-
-			}
-			travelElement(elem, map);
-		}
-	}
-}
-
-void MainWindow::readProjectConfig(QDomElement& e)
-{
-	travelElement(e, projectConfigMapData);
-}
-
-void MainWindow::readInputConfig(QDomElement& e)
-{
-	travelElement(e, inputConfigMapData);
-}
-
-void MainWindow::readOutputConfig(QDomElement& e)
-{
-	travelElement(e, outputConfigMapData);
-}
-
-void MainWindow::domElemFromProjectConfig(QDomElement& projectConfigElem, QDomDocument& doc)
-{
-	QSet<QString> keys;
-	for each (QString itemKey in projectConfigMapData.keys())
-	{
-		QStringList list = itemKey.split("@");
-		keys.insert(list[0]);
-	}
-
-	for each (QString key in keys)
-	{
-		QDomElement elem = doc.createElement(key);
-		projectConfigElem.appendChild(elem);
-	}
-
-	QDomElement sElem = projectConfigElem.elementsByTagName("ShowView").at(0).toElement();
-
-	for each (QString itemKey in projectConfigMapData.keys())
-	{
-		QDomElement elem = doc.createElement("Item");
-
-		QStringList valList = projectConfigMapData[itemKey].split("@");
-		QDomText t = doc.createTextNode(valList[valList.size() - 1]);
-		elem.appendChild(t);
-
-		QStringList keyList = itemKey.split("@");
-
-		for (int i = 1; i < keyList.size() - 1; i++)
-		{
-			elem.setAttribute(keyList[i], valList[i - 1]);
-		}
-
-		QStringList list = itemKey.split("@");
-
-		if (itemKey.startsWith("ShowView"))
-		{
-			elem.appendChild(elem);
-		}
-	}
-
-}
-
-void MainWindow::domElemFromInputConfig(QDomElement& inputConfigElem, QDomDocument& doc)
-{
-	//构建section 部分 ex. InputConfig File NodeLabel ElementLabel,etc
-	QSet<QString> keys;
-	for each (QString itemKey in inputConfigMapData.keys())
-	{
-		QStringList list = itemKey.split("@");
-		keys.insert(list[0]);
-	}
-
-	for each (QString key in keys)
-	{
-		QDomElement elem = doc.createElement(key);
-		inputConfigElem.appendChild(elem);
-	}
-
-	QDomElement fElem = inputConfigElem.elementsByTagName("File").at(0).toElement();
-	QDomElement nElem = inputConfigElem.elementsByTagName("NodeLabel").at(0).toElement();
-	QDomElement eElem = inputConfigElem.elementsByTagName("ElementLabel").at(0).toElement();
-
-	for each (QString itemKey in inputConfigMapData.keys())
-	{
-		QDomElement elem = doc.createElement("Item");
-
-		QStringList valList = inputConfigMapData[itemKey].split("@");
-		QDomText t = doc.createTextNode(valList[valList.size() - 1]);
-		elem.appendChild(t);
-
-		QStringList keyList = itemKey.split("@");
-
-		for (int i = 1; i < keyList.size() - 1; i++)
-		{
-			elem.setAttribute(keyList[i], valList[i - 1]);
-		}
-
-		if (itemKey.startsWith("File"))
-		{
-			fElem.appendChild(elem);
-		}
-		else if (itemKey.startsWith("NodeLabel"))
-		{
-			nElem.appendChild(elem);
-		}
-		else if (itemKey.startsWith("ElementLabel"))
-		{
-			eElem.appendChild(elem);
-		}
-	}
-
-}
-
-void MainWindow::domElemFromOutputConfig(QDomElement& outputConfigElem, QDomDocument& doc)
-{
-	QSet<QString> keys;
-	for each (QString itemKey in outputConfigMapData.keys())
-	{
-		QStringList list = itemKey.split("@");
-		keys.insert(list[0]);
-	}
-
-	for each (QString key in keys)
-	{
-		QDomElement elem = doc.createElement(key);
-		outputConfigElem.appendChild(elem);
-	}
-
-	QDomElement fElem = outputConfigElem.elementsByTagName("File").at(0).toElement();
-	QDomElement algorithmElem = outputConfigElem.elementsByTagName("AlgorithmSection").at(0).toElement();
-	QDomElement analisisElem = outputConfigElem.elementsByTagName("AnalisisDefSection").at(0).toElement();
-	QDomElement rainFlowElem = outputConfigElem.elementsByTagName("RainFlowSection").at(0).toElement();
-	QDomElement entityElem = outputConfigElem.elementsByTagName("EntitySection").at(0).toElement();
-	QDomElement caseElem = outputConfigElem.elementsByTagName("CaseSection").at(0).toElement();
-	QDomElement loadElem = outputConfigElem.elementsByTagName("LoadSection").at(0).toElement();
-
-	//itemKey: 
-	for each (QString itemKey in outputConfigMapData.keys())
-	{
-		QDomElement elem = doc.createElement("Item");
-
-
-		QStringList valList = outputConfigMapData[itemKey].split("@");
-		QDomText t = doc.createTextNode(valList[valList.size() - 1]);
-		elem.appendChild(t);
-
-		QStringList keyList = itemKey.split("@");
-
-		for (int i = 1; i < keyList.size() - 1; i++)
-		{
-			elem.setAttribute(keyList[i], valList[i - 1]);
-
-		}
-
-		/////////////////////////////////////////////
-
-		if (itemKey.startsWith("File"))
-		{
-			fElem.appendChild(elem);
-		}
-		else if (itemKey.startsWith("AlgorithmSection"))
-		{
-			algorithmElem.appendChild(elem);
-		}
-		else if (itemKey.startsWith("AnalisisDefSection"))
-		{
-			analisisElem.appendChild(elem);
-		}
-		else if (itemKey.startsWith("RainFlowSection"))
-		{
-			rainFlowElem.appendChild(elem);
-		}
-		else if (itemKey.startsWith("EntitySection"))
-		{
-			entityElem.appendChild(elem);
-		}
-		else if (itemKey.startsWith("CaseSection"))
-		{
-			caseElem.appendChild(elem);
-		}
-		else if (itemKey.startsWith("LoadSection"))
-		{
-			loadElem.appendChild(elem);
-		}
-	}
-
-}
-
-void MainWindow::writeProject()
-{
-	//1 open file
-	QString fileName = QFileDialog::getSaveFileName(this, tr("Save Project File"),
-		QDir::currentPath(),
-		tr("fatigue project Files (*.fproj)"));
-
-	if (fileName.isEmpty())
-		return;
-
-	QFile outFile(fileName);
-	if (!outFile.open(QIODevice::WriteOnly | QIODevice::Text))
-	{
-		propViewer->setData(tr("Failed to open file for writing."));
-		return;
-	}
-
-	//2 write to file
-	QDomDocument doc("fatigueProject");
-	QDomProcessingInstruction instruction;
-	instruction = doc.createProcessingInstruction("xml", "version=\"1.0\" encoding=\"UTF-8\"");
-	doc.appendChild(instruction);
-
-	QDomElement root = doc.createElement("Project");
-	root.setAttribute("Version", "1.0");
-	doc.appendChild(root);
-
-	QDomElement projectConfigElem = doc.createElement("projectConfig");
-	domElemFromProjectConfig(projectConfigElem, doc);
-
-	QDomElement inputConfigElem = doc.createElement("inputConfig");
-	domElemFromInputConfig(inputConfigElem, doc);
-
-	QDomElement outputConfigElem = doc.createElement("OutputConfig");
-	domElemFromOutputConfig(outputConfigElem, doc);
-
-	root.appendChild(projectConfigElem);
-	root.appendChild(inputConfigElem);
-	root.appendChild(outputConfigElem);
-
-	QTextStream stream(&outFile);
-	stream << doc.toString();
-
-	outFile.close();
-}
-
-void MainWindow::importFile()
-{
-	QString fileName = QFileDialog::getOpenFileName(this, tr("Open File..."),
-		QString(), tr("Ansys result (*.fil *.odb);;All Files (*)"));
-
-	if (fileName.isEmpty())
-	{
-		return;
-	}
-	// read mesh
-	meshViewer->loadMeshData(fileName.toLatin1().data());
-}
-
-#pragma endregion project func
 #pragma region label func
 void MainWindow::onLabelBrowserStateChanged(int state)
 {

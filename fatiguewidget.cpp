@@ -39,3 +39,13 @@ void FatigueWidget::writeToFile()
 {
 	qDebug() << "FatigueWidget::writeToFile";
 }
+
+void FatigueWidget::updateUi(QMap<QString,QString> &data)
+{//from Data to UI
+	//according to object name
+}
+
+void FatigueWidget::updateData(QMap<QString, QString> &data)
+{//From UI to Data
+
+}

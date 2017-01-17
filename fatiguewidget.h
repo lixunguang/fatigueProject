@@ -2,6 +2,7 @@
 #define FATIGUEWIDGET_H_
 
 #include <QWidget>
+#include <QMap>
 
 class  FatigueWidget : public QWidget
 {
@@ -12,6 +13,10 @@ public:
 
 public slots:
 void writeToFile();
+
+public:
+	void updateUi(QMap<QString, QString> &data);
+	void updateData(QMap<QString, QString> &data);
 };
 
 #endif
