@@ -21,6 +21,7 @@ AnalysisWidget::AnalysisWidget(QWidget *parent)
 	QHBoxLayout *algorithmHBox = new QHBoxLayout();
 	algorithmLabel = new QLabel("Algorithm:");
 	algorithmCombo = new QComboBox();
+	algorithmCombo->setObjectName("AlgorithmSection_algorithmCombo");
 	QStringList items;
 	items << "Stress Life(Manson-Coffin)" << "Stress Life(Morrow)" << "Stress Life(BWI Weld)" <<
 		"Strain Life(Manson-Coffin)" << "Strain Life(Morrow)" << "Strain Life(S-W-T)" <<
@@ -39,6 +40,7 @@ AnalysisWidget::AnalysisWidget(QWidget *parent)
 
 	pathLabel = new QLabel("Path of material:             ");
 	pathEdit = new QLineEdit();
+	pathEdit->setObjectName("AnalisisDefSection_pathEdit");
 	pathEdit->setReadOnly(true);
 	pathBtn = new QPushButton("...");
 	QHBoxLayout *pathHBox = new QHBoxLayout();
@@ -46,6 +48,7 @@ AnalysisWidget::AnalysisWidget(QWidget *parent)
 
 	meanStressLabel = new QLabel("Mean Stress Correction        ");
 	meanStressCombo = new QComboBox();
+	meanStressCombo->setObjectName("AnalisisDefSection_meanStressCombo");
 	items.clear();
 	items << "None" << "Goodman" << "Gerber" << "Sodeberg";
 	meanStressCombo->addItems(items);
@@ -53,12 +56,14 @@ AnalysisWidget::AnalysisWidget(QWidget *parent)
 
 	inFluenceFactorsLabel = new QLabel("influence factors             ");
 	inFluenceFactorsEdit = new QLineEdit("1.0,1.0,1.0,1.0,1.0");
+	inFluenceFactorsEdit->setObjectName("AnalisisDefSection_inFluenceFactorsEdit");
 	inFluenceFactorsEdit->setReadOnly(true);
 	inFluenceFactorsBtn = new QPushButton("...");
 	QHBoxLayout *inFluenceFactorsHBox = new QHBoxLayout();
 
 	weldLabel = new QLabel("Weld Class               ");
 	weldCombo = new QComboBox();
+	weldCombo->setObjectName("AnalisisDefSection_weldCombo");
 	items.clear();
 	items << "B" << "C" << "D" << "E" << "F" << "G";
 	weldCombo->addItems(items);
@@ -68,6 +73,7 @@ AnalysisWidget::AnalysisWidget(QWidget *parent)
 
 	sdNumLabel = new QLabel("Num of SD             ");
 	sdNumCombo = new QComboBox();
+	sdNumCombo->setObjectName("AnalisisDefSection_sdNumCombo");
 	items.clear();
 	items << "2" << "3" << "4" << "5";
 	sdNumCombo->addItems(items);
@@ -98,6 +104,7 @@ AnalysisWidget::AnalysisWidget(QWidget *parent)
 	QHBoxLayout* peakValleyHBox = new QHBoxLayout();
 	peakValleyLabel = new QLabel("Peak-Valley Reduction Factor (Between 0 to 1)");
 	peakValleyCombo = new QComboBox();
+	peakValleyCombo->setObjectName("RainFlowSection_peakValleyCombo");
 	items.clear();
 	items << "0.1" << "0.2" << "0.3" << "0.4" << "0.5" << "0.6" << "0.7" << "0.8" << "0.9" << "1.0";
 	peakValleyCombo->addItems(items); //#todo
@@ -107,6 +114,7 @@ AnalysisWidget::AnalysisWidget(QWidget *parent)
 	QHBoxLayout* countHBox = new QHBoxLayout();
 	countLabel = new QLabel("Number of RAnges for counting(>0)");
 	countCombo = new QComboBox();
+	countCombo->setObjectName("RainFlowSection_countCombo");
 	items.clear();
 	items << "10" << "20";
 	countCombo->addItems(items);// #todo
@@ -124,6 +132,7 @@ AnalysisWidget::AnalysisWidget(QWidget *parent)
 
 	entityTypeLabel = new QLabel("Entity Type                   ");
 	entityTypeCombo = new QComboBox();
+	entityTypeCombo->setObjectName("EntitySection_entityTypeCombo");
 	items.clear();
 	items << "Node" << "Element";
 	entityTypeCombo->addItems(items);
@@ -133,6 +142,7 @@ AnalysisWidget::AnalysisWidget(QWidget *parent)
 
 	entityNumLabel = new QLabel("Selected Entities             ");
 	entityNumEdit = new QLineEdit();
+	entityNumEdit->setObjectName("EntitySection_entityNumEdit");
 	entityNumEdit->setReadOnly(true);
 
 	entityNumBtn = new QPushButton("update");

@@ -4,6 +4,12 @@
 #include <QWidget>
 #include <QMap>
 
+enum OBJECTTYPE
+{//2÷÷ ‰»Î£¨edit,comb
+	type_NONE,
+	type_edit,
+	type_combo,
+};
 class  FatigueWidget : public QWidget
 {
 	Q_OBJECT
@@ -15,8 +21,9 @@ public slots:
 void writeToFile();
 
 public:
-	void updateUi(QMap<QString, QString> &data);
-	void updateData(QMap<QString, QString> &data);
+	void writeToMap(QMap<QString, QString> &mapData, QString objName , QString val,int type,int count);
+	void updateUi(QMap<QString, QString> &mapData);
+	void updateData(QMap<QString, QString> &mapData);
 };
 
 #endif

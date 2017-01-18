@@ -4,8 +4,6 @@
 ProjectManager::ProjectManager()
 :doc("fatigueProject")
 {
-
-
 	QDomProcessingInstruction instruction;
 	instruction = doc.createProcessingInstruction("xml", "version=\"1.0\" encoding=\"UTF-8\"");
 	doc.appendChild(instruction);
@@ -13,6 +11,19 @@ ProjectManager::ProjectManager()
 	root = doc.createElement("Project");
 	root.setAttribute("Version", "1.0");
 	doc.appendChild(root);
+
+	QDomElement projectConfigElem = doc.createElement("projectConfig");
+	domElemFromProjectConfig(projectConfigElem);
+
+	QDomElement modelConfigElem = doc.createElement("ModelConfig");
+	domElemFromModelConfig(modelConfigElem);
+
+	QDomElement outputConfigElem = doc.createElement("OutputConfig");
+	domElemFromOutputConfig(outputConfigElem);
+
+	root.appendChild(projectConfigElem);
+	root.appendChild(modelConfigElem);
+	root.appendChild(outputConfigElem);
 
 }
 
@@ -251,7 +262,6 @@ void ProjectManager::domElemFromOutputConfig(QDomElement& outputConfigElem)
 	{
 		QDomElement elem = doc.createElement("Item");
 
-
 		QStringList valList = outputConfigMapData[itemKey].split("@");
 		QDomText t = doc.createTextNode(valList[valList.size() - 1]);
 		elem.appendChild(t);
@@ -261,7 +271,6 @@ void ProjectManager::domElemFromOutputConfig(QDomElement& outputConfigElem)
 		for (int i = 1; i < keyList.size() - 1; i++)
 		{
 			elem.setAttribute(keyList[i], valList[i - 1]);
-
 		}
 
 		/////////////////////////////////////////////

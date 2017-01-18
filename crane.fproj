@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project Version="1.0">
+    <ProjectConfig>
+        <ShowView>
+            <Item name="objname">1 </Item>
+        </ShowView>
+    </ProjectConfig>
+    <ModelConfig>
+        <File>
+            <Item>d:\model\Crane_Support.fil</Item>
+            <Item>d:\model\Crane_Support1.fil</Item>
+            <Item>d:\model\Crane_Support2.fil</Item>
+        </File>
+        <NodeLabel>
+            <Item name="xxx0">14 15 16 17 18 </Item>
+            <Item name="xxx1">2 3 4 5 6 7</Item>
+        </NodeLabel>
+        <ElementLabel>
+            <Item name="xxx2"> 5 200 30</Item >
+            <Item name="xxx4">102 135 183</Item >
+        </ElementLabel>
+    </ModelConfig>`
+    <OutputConfig>
+        <File>
+            <Item>c:\cube.input</Item>
+        </File>
+        <AlgorithmSection>
+            <Item name="AlgorithmSection_algorithmCombo" type="2">2</Item >
+        </AlgorithmSection>
+        <AnalisisDefSection>
+            <Item name="AnalisisDefSection_pathEdit" type="1">c:\aaaa.mat</Item>
+            <Item name="AnalisisDefSection_meanStressCombo" type="2">2</Item>
+            <Item name="AnalisisDefSection_inFluenceFactorsEdit" type="1">1,0,2.0,1.0,1.0,6.0</Item>
+            <Item name="AnalisisDefSection_weldCombo" type="2">3</Item>
+            <Item name="AnalisisDefSection_sdNumCombo" type="2">2</Item >
+        </AnalisisDefSection>
+        <RainFlowSection>
+            <Item name="RainFlowSection_peakValleyCombo" type="2">6</Item> 
+            <Item name="RainFlowSection_countCombo" type="2">0</Item>
+        </RainFlowSection>
+        <EntitySection>
+            <Item name="EntitySection_entityTypeCombo" type="2">1</Item> 
+            <Item name="EntitySection_entityNumEdit" type="1">28</Item>
+        </EntitySection>
+        <CaseSection>
+        </CaseSection> 
+        <LoadSection>
+        </LoadSection>
+    </OutputConfig>
+</Project>
