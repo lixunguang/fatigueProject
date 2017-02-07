@@ -26,8 +26,11 @@
 #include "vtkSmartPointer.h"
 #include "vtkRenderWindowInteractor.h"
 #include "HighlightInteractorStyle.h"
-#include "mesh.h"
 
+
+#include <QTreeWidgetItem>
+
+#include "mesh.h"
 
 struct struct_tensor 
 {
@@ -67,6 +70,10 @@ public:
 public slots:
 	void setBackground(const QColor color);
 	void renderWindowEx();
+
+	void showLabel(QTreeWidgetItem *item);
+	void hideLabel(QTreeWidgetItem *item);
+
 private slots:
 	void viewTop();
 	void viewBottom();
@@ -77,6 +84,8 @@ private slots:
 	void viewReset();
 
 	void reprsentationComboBoxIndexChanged(int index);
+
+
 
 private:
 	void showOrientationMarkerWidget(bool isShow);

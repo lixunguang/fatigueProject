@@ -3,6 +3,7 @@
 
 
 #include <QTreeWidgetItem>
+#include "mesh.h"
 
 class  TreeItem : public QTreeWidgetItem
 {
@@ -19,8 +20,13 @@ public:
 	{
 		_show = show;
 	}
+
+	void setAttrData(QString& data);
+	void setType(SETTYPE type);
 private: 
 	bool _show;
+	QString attrData;
+	SETTYPE type;
 };
 
 #endif

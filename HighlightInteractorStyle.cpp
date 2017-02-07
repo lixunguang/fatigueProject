@@ -20,6 +20,24 @@
 
 vtkStandardNewMacro(HighlightInteractorStyle);
 
+HighlightInteractorStyle::HighlightInteractorStyle() : vtkInteractorStyleRubberBandPick()
+{
+	this->SelectedMapper = vtkSmartPointer<vtkPolyDataMapper>::New();
+	this->SelectedActor = vtkSmartPointer<vtkActor>::New();
+	this->SelectedActor->SetMapper(SelectedMapper);
+
+	circleR = 12;
+}
+
+void HighlightInteractorStyle::SetData(vtkSmartPointer<vtkUnstructuredGrid> data)
+{
+	this->ugrid = data;
+}
+
+vtkUnstructuredGrid* HighlightInteractorStyle::GetData()
+{
+	return this->ugrid; 
+}
 
 void HighlightInteractorStyle::OnLeftButtonUp()
 {

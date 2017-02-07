@@ -261,3 +261,13 @@ void MeshViewer::loadMeshData(char* fileName)
 	mesh->loadData(fileName);
 	viewReset();
 }
+
+void MeshViewer::showLabel(QTreeWidgetItem *item)
+{
+	qDebug() << "MeshViewer::showLabel";
+}
+
+void MeshViewer::hideLabel(QTreeWidgetItem *item)
+{
+	qDebug() << "MeshViewer::hideLabel";
+}

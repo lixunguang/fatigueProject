@@ -16,9 +16,14 @@ public slots:
 	void onAddBtn();
 	void onRemoveBtn();
 
-	void onAddLabel(QString &labelName);
+	void addLabel(QString &labelName, QString &attrdata, SETTYPE type);
+	void addNodeLabel(QString &labelName, QString &attrdata);
+	void addElemLabel(QString &labelName, QString &attrdata);
 
 	void onItemPressed(QTreeWidgetItem * item, int column);
+signals:
+	void showLabel(QTreeWidgetItem* item);
+	void hideLabel(QTreeWidgetItem* item);
 private:
 	QList<QTreeWidgetItem*> topItems;
 	QTreeWidgetItem *labelItem;

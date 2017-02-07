@@ -62,7 +62,27 @@ if(${VTK_VERSION} VERSION_GREATER "6")
   delegate.cpp
   treeitem.cpp
   about.cpp
-  
+
+  about.h
+  analysiswidget.h
+  delegate.h
+  fatiguewidget.h
+  HighlightInteractorStyle.h
+  influencefactordialog.h
+  labelviewer.h
+  loadeventdialog.h
+  loadwidget.h
+  mainwindow.h
+  mesh.h
+  meshviewer.h
+  model.h
+  operationviewer.h
+  projectManager.h
+  propertyviewer.h
+  ribbonwindow.h
+  table.h
+  treeitem.h
+
   )
 
  

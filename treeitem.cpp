@@ -13,3 +13,13 @@ TreeItem::~TreeItem()
 
 }
 
+void TreeItem::setAttrData(QString& data)
+{
+	attrData = data;
+}
+
+void TreeItem::setType(SETTYPE	type)
+{
+	this->type = type;
+}
+

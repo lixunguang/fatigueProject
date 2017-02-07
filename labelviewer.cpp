@@ -7,6 +7,7 @@
 #include <QIcon>
 #include <QDebug>
 
+#include "mesh.h"
 #include "labelviewer.h"
 
 LabelViewer::LabelViewer(QWidget *parent)
@@ -92,6 +93,7 @@ void LabelViewer::onItemPressed(QTreeWidgetItem * item, int column)
 	if (show)
 	{
 		_item->setShow(false);
+		emit hideLabel(_item);
 		icon.addPixmap(QPixmap(":/res/label/label_visibility_off.png"));
 
 		//hide children if item is top item
@@ -102,6 +104,7 @@ void LabelViewer::onItemPressed(QTreeWidgetItem * item, int column)
 			{
 				TreeItem *childItem = (TreeItem *)item->child(cnt);
 				childItem->setShow(false);
+				emit hideLabel(childItem);
 
 				icon.addPixmap(QPixmap(":/res/label/label_visibility_off.png"));
 				childItem->setIcon(0, icon);
@@ -111,6 +114,7 @@ void LabelViewer::onItemPressed(QTreeWidgetItem * item, int column)
 	else
 	{
 		_item->setShow(true);
+		emit showLabel(_item);
 		icon.addPixmap(QPixmap(":/res/label/label_visibility_on.png"));
 
 		//hide children if item is top item
@@ -121,6 +125,7 @@ void LabelViewer::onItemPressed(QTreeWidgetItem * item, int column)
 			{
 				TreeItem *childItem = (TreeItem *)item->child(cnt);
 				childItem->setShow(true);
+				emit showLabel(childItem);
 
 				icon.addPixmap(QPixmap(":/res/label/label_visibility_on.png"));
 				childItem->setIcon(0, icon);
@@ -131,7 +136,17 @@ void LabelViewer::onItemPressed(QTreeWidgetItem * item, int column)
 	item->setIcon(0, icon);
 }
 
-void LabelViewer::onAddLabel(QString &labelName)
+void LabelViewer::addNodeLabel(QString &labelName, QString &attrdata)
+{
+	addLabel(labelName, attrdata, SETTYPE_NODE);
+}
+
+void LabelViewer::addElemLabel(QString &labelName, QString &attrdata)
+{
+	addLabel(labelName, attrdata, SETTYPE_ELEM);
+}
+
+void LabelViewer::addLabel(QString &labelName, QString &attrdata, SETTYPE type)
 {
 	QIcon icon;
 	icon.addPixmap(QPixmap(":/res/label/label_visibility_off.png"));
@@ -140,27 +155,15 @@ void LabelViewer::onAddLabel(QString &labelName)
 	item->setShow(false);
 	item->setIcon(0, icon);
 	item->setText(1, labelName);
+	item->setAttrData(attrdata);
+	item->setType(type);
 
 	labelItem->addChild(item);
 }
 
 void LabelViewer::onAddBtn()
 {
-	onAddLabel(QString("sdfsdf"));
-	return;
 
-	bool ok;
-	QString text = QInputDialog::getText(this, tr("input Label name"),	
-		tr("Label name:"), QLineEdit::Normal,
-		0, &ok);
-
-	if (ok && !text.isEmpty())
-	{
-		TreeItem *item = new TreeItem();
-		item->setText(1,"asdfsd");
-
-		labelItem->addChild(item);
-	}
 		
 }
 

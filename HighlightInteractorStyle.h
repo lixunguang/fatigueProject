@@ -24,23 +24,12 @@ public:
 	static HighlightInteractorStyle* New();
 	vtkTypeMacro(HighlightInteractorStyle, vtkInteractorStyleRubberBandPick);
 
-	HighlightInteractorStyle() : vtkInteractorStyleRubberBandPick()
-	{
-		this->SelectedMapper = vtkSmartPointer<vtkPolyDataMapper>::New();
-		this->SelectedActor = vtkSmartPointer<vtkActor>::New();
-		this->SelectedActor->SetMapper(SelectedMapper);
-
-		circleR = 12;
-	}
+	HighlightInteractorStyle();
 
 	virtual void OnLeftButtonUp();
 	
-	void SetData(vtkSmartPointer<vtkUnstructuredGrid> data) 
-	{ 
-		this->ugrid = data;
-	}
-
-	vtkUnstructuredGrid* GetData() { return this->ugrid; }
+	void SetData(vtkSmartPointer<vtkUnstructuredGrid> data);
+	vtkUnstructuredGrid* GetData();
 
 private:
 	void selectArea(int* pos, int *prepos);

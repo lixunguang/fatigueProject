@@ -52,6 +52,8 @@ MainWindow::MainWindow(QWidget *parent) :RibbonWindow(parent)
 
 	this->setMinimumSize(1380, 768);
 
+	connect(labelViewer, SIGNAL(showLabel(QTreeWidgetItem *)), meshViewer, SLOT(showLabel(QTreeWidgetItem *)));
+	connect(labelViewer, SIGNAL(hideLabel(QTreeWidgetItem *)), meshViewer, SLOT(hideLabel(QTreeWidgetItem *)));
 }
 
 void MainWindow::createAction()
@@ -100,6 +102,60 @@ void MainWindow::createAction()
 
 }
 
+void MainWindow::writeToMap(QMap<QString, QString> &mapData, QString objName, QString val, int type, int count)
+{
+
+}
+
+void MainWindow::updateUi(QMap<QString, QString> &mapData)
+{
+	QStringList projectFileName;
+	QMap<QString, QString> NodeLabel;
+	QMap<QString, QString> ElementLabel;
+
+	for each (QString key in mapData.keys())
+	{
+		QStringList keyList = key.split("@");
+		QStringList valList = mapData[key].split("@");
+
+		if (keyList[0] == "File")
+		{
+			projectFileName << valList[0];
+		}
+		else if (keyList[0] == "NodeLabel")
+		{
+			NodeLabel[valList[0]] = valList[1];
+		}
+		else if (keyList[0] == "ElementLabel")
+		{
+			ElementLabel[valList[0]] = valList[1];
+		}
+	}
+	
+	//read mesh
+	if (!projectFileName.empty())
+	{
+		readMesh(projectFileName[0]);//todo:如果有多个文件？
+	}
+
+	//update labelViewer
+	for each (QString labelName in NodeLabel.keys())
+	{
+		labelViewer->addNodeLabel(labelName, NodeLabel[labelName]);
+	}
+	
+	for each (QString labelName in ElementLabel.keys())
+	{
+		labelViewer->addElemLabel(labelName, ElementLabel[labelName]);
+	}
+
+}
+
+void MainWindow::updateMapData(QMap<QString, QString> &mapData)
+{
+
+}
+
 void MainWindow::openProject()
 {
 	propViewer->setData(QString("openProject"));
@@ -113,6 +169,8 @@ void MainWindow::openProject()
 
 	projectManager.parse(fileName);
 
+	this->updateUi(projectManager.getModelData());
+
 	FatigueWidget *w = (FatigueWidget *)(opViewer->widget());
 	w->updateUi(projectManager.getUiData());
 }
@@ -120,7 +178,7 @@ void MainWindow::openProject()
 void MainWindow::save()
 {
 	FatigueWidget *w = (FatigueWidget *)(opViewer->widget());
-	w->updateData(projectManager.getUiData());
+	w->updateMapData(projectManager.getUiData());
  
 	if (projectManager.getProjectFileName().isEmpty())
 	{
@@ -136,7 +194,7 @@ void MainWindow::save()
 void MainWindow::saveAs()
 {
 	FatigueWidget *w = (FatigueWidget *)(opViewer->widget());
-	w->updateData(projectManager.getUiData());
+	w->updateMapData(projectManager.getUiData());
 
 	QString fileName = QFileDialog::getSaveFileName(this, tr("Save Project File"),
 		QDir::currentPath(),
@@ -169,6 +227,12 @@ void MainWindow::importFile()
 		return;
 	}
 
+	readMesh(fileName);
+
+}
+
+void MainWindow::readMesh(QString fileName)
+{
 	// read mesh
 	meshViewer->loadMeshData(fileName.toLatin1().data());
 
@@ -176,6 +240,7 @@ void MainWindow::importFile()
 	QStringList sl;
 	sl << fileName;
 	projectManager.setModelFileName(sl);
+
 }
 
 void MainWindow::showFatigueDialog()

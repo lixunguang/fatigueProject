@@ -12,18 +12,18 @@ ProjectManager::ProjectManager()
 	root.setAttribute("Version", "1.0");
 	doc.appendChild(root);
 
-	QDomElement projectConfigElem = doc.createElement("projectConfig");
-	domElemFromProjectConfig(projectConfigElem);
-
-	QDomElement modelConfigElem = doc.createElement("ModelConfig");
-	domElemFromModelConfig(modelConfigElem);
-
-	QDomElement outputConfigElem = doc.createElement("OutputConfig");
-	domElemFromOutputConfig(outputConfigElem);
-
-	root.appendChild(projectConfigElem);
-	root.appendChild(modelConfigElem);
-	root.appendChild(outputConfigElem);
+// 	QDomElement projectConfigElem = doc.createElement("projectConfig");
+// 	domElemFromProjectConfig(projectConfigElem);
+// 
+// 	QDomElement modelConfigElem = doc.createElement("ModelConfig");
+// 	domElemFromModelConfig(modelConfigElem);
+// 
+// 	QDomElement outputConfigElem = doc.createElement("OutputConfig");
+// 	domElemFromOutputConfig(outputConfigElem);
+// 
+// 	root.appendChild(projectConfigElem);
+// 	root.appendChild(modelConfigElem);
+// 	root.appendChild(outputConfigElem);
 
 }
 
@@ -141,7 +141,7 @@ void ProjectManager::outputConfigFromDomElem(QDomElement& e)
 	travelElement(e, outputConfigMapData);
 }
 
-void ProjectManager::domElemFromProjectConfig(QDomElement& projectConfigElem)
+void ProjectManager::xmlElemFromProjectConfig(QDomElement& projectConfigElem)
 {
 	QSet<QString> keys;
 	for each (QString itemKey in projectConfigMapData.keys())
@@ -183,7 +183,7 @@ void ProjectManager::domElemFromProjectConfig(QDomElement& projectConfigElem)
 
 }
 
-void ProjectManager::domElemFromModelConfig(QDomElement& modelConfigElem)
+void ProjectManager::xmlElemFromModelConfig(QDomElement& modelConfigElem)
 {
 	//构建section 部分 ex. ModelConfig File NodeLabel ElementLabel,etc
 	QSet<QString> keys;
@@ -234,7 +234,7 @@ void ProjectManager::domElemFromModelConfig(QDomElement& modelConfigElem)
 
 }
 
-void ProjectManager::domElemFromOutputConfig(QDomElement& outputConfigElem)
+void ProjectManager::xmlElemFromOutputConfig(QDomElement& outputConfigElem)
 {
 	QSet<QString> keys;
 	for each (QString itemKey in outputConfigMapData.keys())
@@ -347,13 +347,13 @@ void ProjectManager::save()
 	}
 
 	QDomElement projectConfigElem = doc.createElement("projectConfig");
-	domElemFromProjectConfig(projectConfigElem);
+	xmlElemFromProjectConfig(projectConfigElem);
 
 	QDomElement modelConfigElem = doc.createElement("ModelConfig");
-	domElemFromModelConfig(modelConfigElem);
+	xmlElemFromModelConfig(modelConfigElem);
 
 	QDomElement outputConfigElem = doc.createElement("OutputConfig");
-	domElemFromOutputConfig(outputConfigElem);
+	xmlElemFromOutputConfig(outputConfigElem);
 
 	root.appendChild(projectConfigElem);
 	root.appendChild(modelConfigElem);
@@ -370,4 +370,13 @@ QMap<QString,QString>& ProjectManager::getUiData()
 	return outputConfigMapData;
 }
 
+QMap<QString, QString>& ProjectManager::getProjectData()
+{
+	return projectConfigMapData;
+}
+
+QMap<QString, QString>& ProjectManager::getModelData()
+{
+	return modelConfigMapData;
+}
 #pragma endregion project func

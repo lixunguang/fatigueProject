@@ -37,10 +37,11 @@ private:
 
 protected Q_SLOTS:
 	void importFile();
+	void readMesh(QString fileName);
 	void save();
-void saveAs();
+	void saveAs();
 	void closeProject();
-void openProject();
+	void openProject();
 	virtual void options(QAction* action);
 
 	void showFatigueDialog();
@@ -53,6 +54,10 @@ void openProject();
 	void onLabelBrowserStateChanged(int state);
 	void onPropertyCheckStateChanged(int state);
 	void onFatigueCheckStateChanged(int state);
+
+	void writeToMap(QMap<QString, QString> &mapData, QString objName, QString val, int type, int count);
+	void updateUi(QMap<QString, QString> &mapData);
+	void updateMapData(QMap<QString, QString> &mapData);
 
 protected:
 	QAction* m_actionOpenFile;

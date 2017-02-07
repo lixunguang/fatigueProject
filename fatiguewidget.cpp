@@ -51,7 +51,7 @@ void FatigueWidget::updateUi(QMap<QString,QString> &mapData)
 
 		QString val;
 		OBJECTTYPE type = type_NONE;
-		qDebug() << keyList << valList;
+
 		for (int j = 1; j < keyList.size(); j++)
 		{
 			if (keyList[j] == "name")
@@ -113,7 +113,7 @@ void FatigueWidget::writeToMap(QMap<QString, QString> &mapData, QString objName,
 	mapData[name] = nameVal;
 }
 
-void FatigueWidget::updateData(QMap<QString, QString> &mapData)
+void FatigueWidget::updateMapData(QMap<QString, QString> &mapData)
 {//From UI to Data
 	//把ui数据写入data
 	//可以约定，把objectname非空的写到mapdata里面
