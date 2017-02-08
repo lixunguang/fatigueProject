@@ -2,10 +2,14 @@
 #include <QDebug>
 #include <QLabel>
 #include <QToolBar>
+#include <QTime>
 
+#include "vtkVertex.h"
+#include "vtkCellArray.h"
 #include "vtkGenericOpenGLRenderWindow.h"
+#include "vtkMinimalStandardRandomSequence.h"
 
-
+#include "treeitem.h"
 #include "meshviewer.h"
 
 /*
@@ -53,8 +57,6 @@ MeshViewer::MeshViewer(QWidget *parent)
 
 	mapper->SetInputData(mesh->ugrid);
 
-	 
- 
 }
 
 MeshViewer::~MeshViewer()
@@ -262,12 +264,134 @@ void MeshViewer::loadMeshData(char* fileName)
 	viewReset();
 }
 
-void MeshViewer::showLabel(QTreeWidgetItem *item)
+void MeshViewer::getActorColor(double* color)
 {
-	qDebug() << "MeshViewer::showLabel";
+	vtkSmartPointer<vtkMinimalStandardRandomSequence> rs = vtkSmartPointer<vtkMinimalStandardRandomSequence>::New();
+	QTime t= QTime::currentTime();
+	qDebug() << t.secsTo(QTime(0, 0, 0));
+	rs->SetSeed(t.secsTo(QTime(0, 0, 0)));
+	
+	rs->Next(); color[0] = rs->GetValue();
+	rs->Next(); color[1] = rs->GetValue();
+	rs->Next(); color[2] = rs->GetValue();
 }
 
-void MeshViewer::hideLabel(QTreeWidgetItem *item)
+void MeshViewer::showNodeLabel(QTreeWidgetItem *item)
 {
-	qDebug() << "MeshViewer::hideLabel";
+	TreeItem *treeItem = (TreeItem*)item;
+	QString ptsStr = treeItem->getAttrData();
+	QStringList l = ptsStr.split(" ");
+
+	vtkSmartPointer<vtkActor> actor = vtkSmartPointer<vtkActor>::New();
+	double color[3];
+	this->getActorColor(&color[0]);
+
+	actor->GetProperty()->SetColor(color[0], color[1], color[2]);
+	actor->GetProperty()->SetPointSize(8);
+	 
+	vtkSmartPointer<vtkVertex> vertex = vtkSmartPointer<vtkVertex>::New();
+	vtkSmartPointer<vtkCellArray> verArray = vtkSmartPointer<vtkCellArray>::New();
+
+	int cnt = 0;
+	for each (QString p in l)
+	{
+		int id = p.toInt();
+		vertex->GetPointIds()->InsertId(cnt, id);
+		verArray->InsertNextCell(vertex);
+		cnt++;
+	}
+
+	vtkSmartPointer<vtkPolyData> pointset = vtkSmartPointer<vtkPolyData>::New();
+	pointset->SetPoints(mesh->ugrid->GetPoints());
+	pointset->SetVerts(verArray);
+
+	vtkSmartPointer<vtkPolyDataMapper> pointMapper = vtkSmartPointer<vtkPolyDataMapper>::New();
+	 
+ 	pointMapper->SetInputData(pointset);
+
+	actor->SetMapper(pointMapper);
+
+	renderer->AddActor(actor);
+	nodeActorMap[item->text(1)] = actor;
+
+	renderer->Render();
+
+	renderWindowEx();
+
 }
+
+void MeshViewer::showElemLabel(QTreeWidgetItem *item)
+{
+	TreeItem *treeItem = (TreeItem*)item;
+	QString ptsStr = treeItem->getAttrData();
+	QStringList l = ptsStr.split(" ");
+
+	vtkSmartPointer<vtkActor> actor = vtkSmartPointer<vtkActor>::New();
+	double color[3];
+	this->getActorColor(&color[0]);
+
+	actor->GetProperty()->SetColor(color[0], color[1], color[2]);
+	actor->GetProperty()->SetPointSize(8);
+
+	vtkSmartPointer<vtkCellArray> cellArray = vtkSmartPointer<vtkCellArray>::New();
+
+	int cnt = 0;
+	for each (QString p in l)
+	{
+		int id = p.toInt();
+		cellArray->InsertNextCell(mesh->ugrid->GetCell(vtkIdType(id)));
+		cnt++;
+	}
+
+	vtkSmartPointer<vtkPolyData> cellset = vtkSmartPointer<vtkPolyData>::New();
+	cellset->SetPoints(mesh->ugrid->GetPoints());
+	cellset->SetPolys(cellArray);
+
+	vtkSmartPointer<vtkPolyDataMapper> cellMapper = vtkSmartPointer<vtkPolyDataMapper>::New();
+
+	cellMapper->SetInputData(cellset);
+
+	actor->SetMapper(cellMapper);
+
+	renderer->AddActor(actor);
+	elemActorMap[item->text(1)] = actor;
+
+	renderer->Render();
+
+	renderWindowEx();
+}
+
+void MeshViewer::hideNodeLabel(QTreeWidgetItem *item)
+{
+	renderer->RemoveActor(nodeActorMap[item->text(1)]);
+
+	renderWindowEx();
+}
+
+void MeshViewer::hideElemLabel(QTreeWidgetItem *item)
+{
+	renderer->RemoveActor(elemActorMap[item->text(1)]);
+
+	renderWindowEx();
+}
+
+void MeshViewer::resetActor()
+{//mainActor
+
+	vtkActorCollection* actorCollection = renderer->GetActors();
+	actorCollection->InitTraversal();
+
+	for (vtkIdType i = 0; i < actorCollection->GetNumberOfItems(); i++)
+	{
+		vtkActor* nextActor = actorCollection->GetNextActor();
+	
+		std::string className = nextActor->GetClassName();
+
+		if (nextActor != mainActor)
+			renderer->RemoveActor(nextActor);
+	}
+
+	renderWindowEx();
+}
+
+ 

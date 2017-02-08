@@ -71,9 +71,14 @@ public slots:
 	void setBackground(const QColor color);
 	void renderWindowEx();
 
-	void showLabel(QTreeWidgetItem *item);
-	void hideLabel(QTreeWidgetItem *item);
+	void showNodeLabel(QTreeWidgetItem *item);
+	void hideNodeLabel(QTreeWidgetItem *item);
 
+	void showElemLabel(QTreeWidgetItem *item);
+	void hideElemLabel(QTreeWidgetItem *item);
+
+	void resetActor();
+	void getActorColor(double* color);
 private slots:
 	void viewTop();
 	void viewBottom();
@@ -116,5 +121,8 @@ public:
 
 	vtkSmartPointer<vtkTooltipItem> tooltip;
 	Mesh *mesh;
+
+	map<QString, vtkActor*> nodeActorMap;
+	map<QString, vtkActor*> elemActorMap;
 };
 #endif

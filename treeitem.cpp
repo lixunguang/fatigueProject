@@ -18,8 +18,13 @@ void TreeItem::setAttrData(QString& data)
 	attrData = data;
 }
 
-void TreeItem::setType(SETTYPE	type)
+QString& TreeItem::getAttrData()
 {
-	this->type = type;
+	return attrData;
+}
+
+void TreeItem::setType(SETTYPE	t)
+{
+	this->type = t;
 }
 

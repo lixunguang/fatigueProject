@@ -22,8 +22,11 @@ public slots:
 
 	void onItemPressed(QTreeWidgetItem * item, int column);
 signals:
-	void showLabel(QTreeWidgetItem* item);
-	void hideLabel(QTreeWidgetItem* item);
+	void showNodeLabel(QTreeWidgetItem* item);
+	void hideNodeLabel(QTreeWidgetItem* item);
+	void showElemLabel(QTreeWidgetItem* item);
+	void hideElemLabel(QTreeWidgetItem* item);
+	void resetActor();
 private:
 	QList<QTreeWidgetItem*> topItems;
 	QTreeWidgetItem *labelItem;

@@ -21,10 +21,10 @@ LabelViewer::LabelViewer(QWidget *parent)
 	vLayout->addWidget(tree);
 
 	QPushButton *addBtn = new QPushButton();
-	addBtn->setIcon(QIcon(QPixmap(":/res/label/label_add.png")));	
+	addBtn->setIcon(QIcon(QPixmap(":/res/label/label_add.png")));
 	connect(addBtn, SIGNAL(clicked()), this, SLOT(onAddBtn()));
 
-	QPushButton *removeBtn = new QPushButton(); 
+	QPushButton *removeBtn = new QPushButton();
 	removeBtn->setIcon(QIcon(QPixmap(":/res/label/label_remove.png")));
 	connect(removeBtn, SIGNAL(clicked()), this, SLOT(onRemoveBtn()));
 
@@ -44,12 +44,12 @@ LabelViewer::LabelViewer(QWidget *parent)
 	tree->setColumnCount(3);
 	tree->setColumnWidth(0, 60);
 	tree->setColumnWidth(2, 30);
-	tree->setRootIsDecorated(true); 
+	tree->setRootIsDecorated(true);
 
 	connect(tree, SIGNAL(itemPressed(QTreeWidgetItem *, int)), this, SLOT(onItemPressed(QTreeWidgetItem *, int)));
- 
+
 	labelItem = new TreeItem();
-	labelItem->setIcon(0, QIcon(QPixmap(":/res/label/label_visibility_off.png")));	
+	labelItem->setIcon(0, QIcon(QPixmap(":/res/label/label_visibility_off.png")));
 	labelItem->setText(1, "Labels");
 	topItems.append(labelItem);
 
@@ -79,7 +79,7 @@ LabelViewer::~LabelViewer()
 	topItems.clear();
 }
 
-void LabelViewer::onItemPressed(QTreeWidgetItem * item, int column)
+void LabelViewer::onItemPressed(QTreeWidgetItem *item, int column)
 {
 	if (column != 0)
 	{
@@ -87,52 +87,90 @@ void LabelViewer::onItemPressed(QTreeWidgetItem * item, int column)
 	}
 
 	TreeItem *_item = (TreeItem*)item;
-	QIcon icon = item->icon(0);
+	QIcon icon = _item->icon(0);
 	bool show = _item->show();
-	 
+
 	if (show)
 	{
+		emit resetActor();
+
 		_item->setShow(false);
-		emit hideLabel(_item);
 		icon.addPixmap(QPixmap(":/res/label/label_visibility_off.png"));
 
 		//hide children if item is top item
-		if (item == labelItem)
+		if (_item == labelItem)
 		{
-			int cnt = item->childCount();
+			int cnt = _item->childCount();
 			while (cnt--)
 			{
-				TreeItem *childItem = (TreeItem *)item->child(cnt);
+				TreeItem *childItem = (TreeItem *)_item->child(cnt);
 				childItem->setShow(false);
-				emit hideLabel(childItem);
+				if (childItem->type == SETTYPE_NODE)
+				{
+					emit hideNodeLabel(childItem);
+				}
+				else if (childItem->type == SETTYPE_ELEM)
+				{
+					emit hideElemLabel(childItem);
+				}
 
 				icon.addPixmap(QPixmap(":/res/label/label_visibility_off.png"));
 				childItem->setIcon(0, icon);
 			}
 		}
+		else
+		{
+
+			if (_item->type == SETTYPE_NODE)
+			{
+				emit hideNodeLabel(_item);
+			}
+			else if (_item->type == SETTYPE_ELEM)
+			{
+				emit hideElemLabel(_item);
+			}
+		}
 	}
 	else
 	{
-		_item->setShow(true);
-		emit showLabel(_item);
 		icon.addPixmap(QPixmap(":/res/label/label_visibility_on.png"));
+		_item->setShow(true);
 
 		//hide children if item is top item
-		if (item == labelItem)
+		if (_item == labelItem)
 		{
-			int cnt = item->childCount();
+			int cnt = _item->childCount();
 			while (cnt--)
 			{
-				TreeItem *childItem = (TreeItem *)item->child(cnt);
+				TreeItem *childItem = (TreeItem *)_item->child(cnt);
 				childItem->setShow(true);
-				emit showLabel(childItem);
+				if (childItem->type == SETTYPE_NODE)
+				{
+					emit showNodeLabel(childItem);
+				}
+				else if (childItem->type == SETTYPE_ELEM)
+				{
+					emit showElemLabel(childItem);
+				}
 
 				icon.addPixmap(QPixmap(":/res/label/label_visibility_on.png"));
 				childItem->setIcon(0, icon);
 			}
 		}
+		else
+		{
+			if (_item->type == SETTYPE_NODE)
+			{
+				emit showNodeLabel(_item);
+			}
+			else if (_item->type == SETTYPE_ELEM)
+			{
+				emit showElemLabel(_item);
+			}
+
+		}
 	}
-	
+
 	item->setIcon(0, icon);
 }
 
@@ -164,7 +202,7 @@ void LabelViewer::addLabel(QString &labelName, QString &attrdata, SETTYPE type)
 void LabelViewer::onAddBtn()
 {
 
-		
+
 }
 
 void LabelViewer::onRemoveBtn()

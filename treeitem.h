@@ -16,14 +16,17 @@ public:
 	{
 		return _show;
 	}
+
 	void setShow(bool show)
 	{
 		_show = show;
 	}
 
 	void setAttrData(QString& data);
+	QString& getAttrData();
+
 	void setType(SETTYPE type);
-private: 
+public:
 	bool _show;
 	QString attrData;
 	SETTYPE type;

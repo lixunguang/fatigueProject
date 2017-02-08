@@ -52,8 +52,13 @@ MainWindow::MainWindow(QWidget *parent) :RibbonWindow(parent)
 
 	this->setMinimumSize(1380, 768);
 
-	connect(labelViewer, SIGNAL(showLabel(QTreeWidgetItem *)), meshViewer, SLOT(showLabel(QTreeWidgetItem *)));
-	connect(labelViewer, SIGNAL(hideLabel(QTreeWidgetItem *)), meshViewer, SLOT(hideLabel(QTreeWidgetItem *)));
+	connect(labelViewer, SIGNAL(showNodeLabel(QTreeWidgetItem *)), meshViewer, SLOT(showNodeLabel(QTreeWidgetItem *)));
+	connect(labelViewer, SIGNAL(hideNodeLabel(QTreeWidgetItem *)), meshViewer, SLOT(hideNodeLabel(QTreeWidgetItem *)));
+	connect(labelViewer, SIGNAL(showElemLabel(QTreeWidgetItem *)), meshViewer, SLOT(showElemLabel(QTreeWidgetItem *)));
+	connect(labelViewer, SIGNAL(hideElemLabel(QTreeWidgetItem *)), meshViewer, SLOT(hideElemLabel(QTreeWidgetItem *)));
+
+	connect(labelViewer, SIGNAL(resetActor()), meshViewer, SLOT(resetActor()));
+
 }
 
 void MainWindow::createAction()
