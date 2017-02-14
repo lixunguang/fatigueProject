@@ -31,7 +31,7 @@ HighlightInteractorStyle::HighlightInteractorStyle() : vtkInteractorStyleRubberB
 {
 	this->SelectedMapper = vtkSmartPointer<vtkPolyDataMapper>::New();
 	this->SelectedActor = vtkSmartPointer<vtkActor>::New();
-	this->SelectedActor->SetMapper(SelectedMapper);
+	
 
 
 
@@ -206,13 +206,17 @@ void HighlightInteractorStyle::selectAreaPoints()
 
 		vtkPolyData* selected = glyphFilter->GetOutput();
 
-		this->SelectedMapper->SetInputData(selected);//selected polycell
-		this->SelectedMapper->ScalarVisibilityOff();
+		vtkSmartPointer<vtkPolyDataMapper> mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
+		vtkSmartPointer<vtkActor> actor = vtkSmartPointer<vtkActor>::New();
+		
+		mapper->SetInputData(selected);
+		mapper->ScalarVisibilityOff();
 
-		this->SelectedActor->GetProperty()->SetColor(1.0, 0.0, 0.0); //(R,G,B)
-		this->SelectedActor->GetProperty()->SetPointSize(3);
+		actor->GetProperty()->SetColor(1.0, 0.0, 0.0);
+		actor->GetProperty()->SetPointSize(3);
+		actor->SetMapper(mapper);
 
- 		this->CurrentRenderer->AddActor(SelectedActor);
+		this->CurrentRenderer->AddActor(actor);
  		this->GetInteractor()->GetRenderWindow()->Render();
  		this->HighlightProp(NULL);
 	}
@@ -291,13 +295,17 @@ void HighlightInteractorStyle::selectAreaCells()
 		}
 		cellset->SetPolys(va);
 
-		SelectedMapper->SetInputData(cellset);
-		SelectedMapper->ScalarVisibilityOff();
+		vtkSmartPointer<vtkPolyDataMapper> mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
+		vtkSmartPointer<vtkActor> actor = vtkSmartPointer<vtkActor>::New();
+	
+		mapper->SetInputData(cellset);
+		mapper->ScalarVisibilityOff();
 
-		SelectedActor->GetProperty()->SetColor(1.0, 0.0, 0.0);
-		SelectedActor->GetProperty()->SetPointSize(3);
+		actor->GetProperty()->SetColor(1.0, 0.0, 0.0);
+		actor->GetProperty()->SetPointSize(3);
+		actor->SetMapper(mapper);
 
-		this->CurrentRenderer->AddActor(SelectedActor);
+		this->CurrentRenderer->AddActor(actor);
 		this->GetInteractor()->GetRenderWindow()->Render();
 		this->HighlightProp(NULL);
 	}
@@ -336,6 +344,7 @@ void HighlightInteractorStyle::selectTest()
 
 		//此处可能需要反向推断point id
 		//还真是得反向推断,目前没找到好办法
+
 		this->SelectedMapper->SetInputData(selected);//selected polycell
 		this->SelectedMapper->ScalarVisibilityOff();
 
@@ -370,13 +379,17 @@ void HighlightInteractorStyle::selectSingleCell()
 
 	cellset->SetPolys(va);
 
-	this->SelectedMapper->SetInputData(cellset);
-	this->SelectedMapper->ScalarVisibilityOff();
+	vtkSmartPointer<vtkPolyDataMapper> mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
+	vtkSmartPointer<vtkActor> actor = vtkSmartPointer<vtkActor>::New();
 
-	this->SelectedActor->GetProperty()->SetColor(1.0, 0.0, 0.0); //(R,G,B)
-	this->SelectedActor->GetProperty()->SetPointSize(5);
+	mapper->SetInputData(cellset);
+	mapper->ScalarVisibilityOff();
 
-	this->GetInteractor()->GetRenderWindow()->GetRenderers()->GetFirstRenderer()->AddActor(SelectedActor);
+	actor->GetProperty()->SetColor(1.0, 0.0, 0.0);
+	actor->GetProperty()->SetPointSize(3);
+	actor->SetMapper(mapper);
+
+	this->CurrentRenderer->AddActor(actor);
 	this->GetInteractor()->GetRenderWindow()->Render();
 	this->HighlightProp(NULL);
 }
@@ -405,15 +418,18 @@ void HighlightInteractorStyle::selectSinglePoint()
 
 	pointset->SetVerts(va);
 
-	this->SelectedMapper->SetInputData(pointset);
-	this->SelectedMapper->ScalarVisibilityOff();
 
-	this->SelectedActor->GetProperty()->SetColor(1.0, 0.0, 0.0); 
-	this->SelectedActor->GetProperty()->SetPointSize(5);
+	vtkSmartPointer<vtkPolyDataMapper> mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
+	vtkSmartPointer<vtkActor> actor = vtkSmartPointer<vtkActor>::New();
 
-	this->GetInteractor()->GetRenderWindow()->GetRenderers()->GetFirstRenderer()->AddActor(SelectedActor);
+	mapper->SetInputData(pointset);
+	mapper->ScalarVisibilityOff();
+
+	actor->GetProperty()->SetColor(1.0, 0.0, 0.0);
+	actor->GetProperty()->SetPointSize(3);
+	actor->SetMapper(mapper);
+
+	this->CurrentRenderer->AddActor(actor);
 	this->GetInteractor()->GetRenderWindow()->Render();
 	this->HighlightProp(NULL);
 }
-
-//void HighlightInteractorStyle::current()
