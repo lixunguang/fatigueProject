@@ -9,6 +9,8 @@
 
 #include "mesh.h"
 #include "labelviewer.h"
+#include "mainwindow.h"
+#include "meshviewer.h"
 
 LabelViewer::LabelViewer(QWidget *parent)
 :QDockWidget(parent)
@@ -21,18 +23,37 @@ LabelViewer::LabelViewer(QWidget *parent)
 	vLayout->addWidget(tree);
 
 	QPushButton *addBtn = new QPushButton();
+ 
 	addBtn->setIcon(QIcon(QPixmap(":/res/label/label_add.png")));
 	connect(addBtn, SIGNAL(clicked()), this, SLOT(onAddBtn()));
+
+	QPushButton *addBtn2 = new QPushButton();
+	
+	addBtn2->setIcon(QIcon(QPixmap(":/res/label/label_add.png")));
+	connect(addBtn2, SIGNAL(clicked()), this, SLOT(onAddBtn2()));
 
 	QPushButton *removeBtn = new QPushButton();
 	removeBtn->setIcon(QIcon(QPixmap(":/res/label/label_remove.png")));
 	connect(removeBtn, SIGNAL(clicked()), this, SLOT(onRemoveBtn()));
 
+	selectPointBtn = new QPushButton(); selectPointBtn->setCheckable(true);
+	selectPointBtn->setToolTip("change select status ");
+	selectPointBtn->setIcon(QIcon(QPixmap(":/res/label/label_select_point.png")));
+	connect(selectPointBtn, SIGNAL(clicked()), this, SLOT(onSelectPointBtn()));
+
+	selectCellBtn = new QPushButton(); selectCellBtn->setCheckable(true);
+	selectCellBtn->setToolTip("change select status ");
+	selectCellBtn->setIcon(QIcon(QPixmap(":/res/label/label_select_cell.png")));
+	connect(selectCellBtn, SIGNAL(clicked()), this, SLOT(onSelectCellBtn()));
+
 	QSpacerItem *space = new QSpacerItem(0, 0, QSizePolicy::MinimumExpanding, QSizePolicy::Minimum);
 
 	QHBoxLayout *hLayout = new QHBoxLayout();
 	hLayout->addWidget(addBtn);
+	hLayout->addWidget(addBtn2);//todo:
 	hLayout->addWidget(removeBtn);
+	hLayout->addWidget(selectPointBtn);
+	hLayout->addWidget(selectCellBtn);
 	hLayout->addSpacerItem(space);
 
 	vLayout->addLayout(hLayout);
@@ -46,7 +67,7 @@ LabelViewer::LabelViewer(QWidget *parent)
 	tree->setColumnWidth(2, 30);
 	tree->setRootIsDecorated(true);
 
-	connect(tree, SIGNAL(itemPressed(QTreeWidgetItem *, int)), this, SLOT(onItemPressed(QTreeWidgetItem *, int)));
+	connect(tree, SIGNAL(itemPressed(QTreeWidgetItem *, int)), this, SLOT(onLabelItemPressed(QTreeWidgetItem *, int)));
 
 	labelItem = new TreeItem();
 	labelItem->setIcon(0, QIcon(QPixmap(":/res/label/label_visibility_off.png")));
@@ -79,8 +100,8 @@ LabelViewer::~LabelViewer()
 	topItems.clear();
 }
 
-void LabelViewer::onItemPressed(QTreeWidgetItem *item, int column)
-{
+void LabelViewer::onLabelItemPressed(QTreeWidgetItem *item, int column)
+{//µã»÷±êÇ©Ïî
 	if (column != 0)
 	{
 		return;
@@ -167,24 +188,23 @@ void LabelViewer::onItemPressed(QTreeWidgetItem *item, int column)
 			{
 				emit showElemLabel(_item);
 			}
-
 		}
 	}
 
 	item->setIcon(0, icon);
 }
 
-void LabelViewer::addNodeLabel(QString &labelName, QString &attrdata)
+void LabelViewer::addNodeLabel(QString &labelName, QSet<int>& attrdata)
 {
 	addLabel(labelName, attrdata, SETTYPE_NODE);
 }
 
-void LabelViewer::addElemLabel(QString &labelName, QString &attrdata)
+void LabelViewer::addElemLabel(QString &labelName, QSet<int>& attrdata)
 {
 	addLabel(labelName, attrdata, SETTYPE_ELEM);
 }
 
-void LabelViewer::addLabel(QString &labelName, QString &attrdata, SETTYPE type)
+void LabelViewer::addLabel(QString &labelName, QSet<int>& attrdata, SETTYPE type)
 {
 	QIcon icon;
 	icon.addPixmap(QPixmap(":/res/label/label_visibility_off.png"));
@@ -197,15 +217,24 @@ void LabelViewer::addLabel(QString &labelName, QString &attrdata, SETTYPE type)
 	item->setType(type);
 
 	labelItem->addChild(item);
+
+	QString varStr;
+	for each (int var in attrdata)
+	{
+		varStr += QString("%1 ").arg(var);
+	}
+	MainWindow *mainWindow = (MainWindow *) parent();
+	if (type == SETTYPE_ELEM)
+	{
+		mainWindow->projectManager.addElemLabelToModelConfig(labelName, varStr);
+	}
+	else if (type == SETTYPE_NODE)
+	{
+		mainWindow->projectManager.addNodeLabelToModelConfig(labelName, varStr);
+	}
 }
 
-void LabelViewer::onAddBtn()
-{
-
-
-}
-
-void LabelViewer::onRemoveBtn()
+void LabelViewer::add(SETTYPE labelType)
 {
 	bool ok;
 	QString text = QInputDialog::getText(this, tr("input Label name"),
@@ -214,9 +243,72 @@ void LabelViewer::onRemoveBtn()
 
 	if (ok && !text.isEmpty())
 	{
-		TreeItem *item = new TreeItem();
-		item->setText(1, "asdfsd");
+		MainWindow *mainWindow = (MainWindow *) parent();
 
-		OperationItem->addChild(item);
+		if (labelType == SETTYPE_NODE)
+		{
+			QSet<int> nodes = mainWindow->meshViewer->getSelectNodes();
+			if (nodes.empty())
+			{
+				QMessageBox::warning(mainWindow, "empty", "please select nodes first!");
+				return;
+			}
+			addNodeLabel(text, nodes);
+		}
+		else if (labelType == SETTYPE_ELEM)
+		{
+			QSet<int> elems = mainWindow->meshViewer->getSelectElems();
+			if (elems.empty())
+			{
+				QMessageBox::warning(mainWindow, "empty", "please select elements first!");
+				return;
+			}
+			addElemLabel(text, elems);
+		}
 	}
+}
+
+void LabelViewer::onAddBtn()
+{
+	add(SETTYPE_NODE);
+}
+
+void LabelViewer::onAddBtn2()
+{
+	add(SETTYPE_ELEM);
+}
+
+void LabelViewer::onRemoveBtn()
+{
+
+}
+
+void LabelViewer::onSelectPointBtn()
+{
+	if (selectPointBtn->isChecked())
+	{
+		selectPointBtn->setChecked(true);
+		emit selectStatus(Select_Type_Point);
+	}
+	else
+	{
+		selectPointBtn->setChecked(false);
+		emit selectStatus(Select_Type_None);
+	}
+	
+}
+
+void LabelViewer::onSelectCellBtn()
+{
+	if (selectCellBtn->isChecked())
+	{
+		selectCellBtn->setChecked(true);
+		emit selectStatus(Select_Type_Cell);
+	}
+	else
+	{
+		selectCellBtn->setChecked(false);
+		emit selectStatus(Select_Type_None);
+	}
+
 }

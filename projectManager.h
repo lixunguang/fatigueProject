@@ -27,6 +27,11 @@ public slots:
     void save();
 	void reset();
 
+	void addToProjectConfig();
+	void addNodeLabelToModelConfig(QString& key,QString& val);
+	void addElemLabelToModelConfig(QString& key, QString& val);
+	void addToOutputConfig();
+
 	void travelElement(QDomElement element, QMap<QString, QString> &map);
 	void projectConfigFromDomElem(QDomElement& e);
 	void modelConfigFromDomElem(QDomElement& e);
@@ -52,6 +57,8 @@ public slots:
 	QDomElement root;
 	QString projectFileName;
 	QFile projectFile;
+
+	int uniqueID;
 };
 
 #endif

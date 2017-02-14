@@ -18,16 +18,16 @@ MeshView类用用来可视化mesh
 */
 
 MeshViewer::MeshViewer(QWidget *parent)
-	:QVTKWidget2(parent)
+:QVTKWidget(parent)
 {
-	
+
 	createToolBar();
-	
+
 	renderer = vtkSmartPointer<vtkRenderer>::New();
 	renderer->SetGradientBackground(true);
 
- 	vtkRenderWindow * renw = GetRenderWindow();
-// 	renw->Print(std::cout);
+	vtkRenderWindow * renw = GetRenderWindow();
+	// 	renw->Print(std::cout);
 
 	GetRenderWindow()->AddRenderer(renderer);
 
@@ -40,17 +40,20 @@ MeshViewer::MeshViewer(QWidget *parent)
 
 	tooltip = vtkSmartPointer<vtkTooltipItem>::New();
 
-	 vtkRenderWindowInteractor* renderWindowInteractor = GetRenderWindow()->GetInteractor();
-	 
-	 vtkSmartPointer<vtkAreaPicker> areaPicker = vtkSmartPointer<vtkAreaPicker>::New();
-	 renderWindowInteractor->SetPicker(areaPicker);
-		
+	vtkRenderWindowInteractor* renderWindowInteractor = GetRenderWindow()->GetInteractor();
+
+	vtkSmartPointer<vtkAreaPicker> areaPicker = vtkSmartPointer<vtkAreaPicker>::New();
+	renderWindowInteractor->SetPicker(areaPicker);
+
 	mesh = new Mesh();
 	connect(mesh, SIGNAL(finishDataLoaded()), this, SLOT(renderWindowEx()));
+
 	style = vtkSmartPointer<HighlightInteractorStyle>::New();
 	style->SetData(mesh->ugrid);
+	style->SetMeshViewer(this);
 
 	renderWindowInteractor->SetInteractorStyle(style);
+	renderWindowInteractor->SetRenderWindow(renw);
 
 	addOrientationMarkerWidget();
 	showOrientationMarkerWidget(true);
@@ -60,7 +63,7 @@ MeshViewer::MeshViewer(QWidget *parent)
 }
 
 MeshViewer::~MeshViewer()
-{	
+{
 	qDebug() << mesh->ugrid->GetReferenceCount();
 	delete mesh;
 
@@ -89,11 +92,9 @@ void MeshViewer::createToolBar()
 	connect(action_viewBottom, SIGNAL(triggered()), this, SLOT(viewBottom()));
 	connect(action_viewFront, SIGNAL(triggered()), this, SLOT(viewFront()));
 	connect(reprsentationComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(reprsentationComboBoxIndexChanged(int)));
+
 }
-void MeshViewer::wheelEvent(QWheelEvent *e)
-{
-	QVTKWidget2::wheelEvent(e);
-}
+
 
 void MeshViewer::viewReset()
 {
@@ -179,7 +180,7 @@ void MeshViewer::addOrientationMarkerWidget()
 	OMwidget->SetOutlineColor(0.9300, 0.5700, 0.1300);
 	OMwidget->SetOrientationMarker(axes);
 	OMwidget->SetViewport(0.0, 0.0, 0.2, 0.2);
-	OMwidget->SetInteractor((vtkRenderWindowInteractor*)(GetInteractor()));
+	OMwidget->SetInteractor((vtkRenderWindowInteractor*) (GetInteractor()));
 	OMwidget->SetEnabled(1);
 	//OMwidget->InteractiveOff();
 }
@@ -210,17 +211,17 @@ void MeshViewer::renderWindowEx()
 /*
 void MeshViewer::paintEvent(QPaintEvent * event)
 {
-	
-	qDebug() << "--paintEvent--";
-	QWidget::paintEvent(event);
-	renderWindowEx();
+
+qDebug() << "--paintEvent--";
+QWidget::paintEvent(event);
+renderWindowEx();
 }
 
 void MeshViewer::paintGL()
 {
-	 
-	qDebug() << "--paintGL--";
-	QVTKWidget2::paintGL();
+
+qDebug() << "--paintGL--";
+QVTKWidget2::paintGL();
 }
 */
 void MeshViewer::reprsentationComboBoxIndexChanged(int index)
@@ -228,7 +229,7 @@ void MeshViewer::reprsentationComboBoxIndexChanged(int index)
 	mainActor->GetProperty()->EdgeVisibilityOff();
 	mainActor->GetProperty()->SetLineWidth(10);
 
-	switch(index)
+	switch (index)
 	{
 	case 0:
 		mainActor->GetProperty()->SetRepresentationToPoints();
@@ -267,10 +268,10 @@ void MeshViewer::loadMeshData(char* fileName)
 void MeshViewer::getActorColor(double* color)
 {
 	vtkSmartPointer<vtkMinimalStandardRandomSequence> rs = vtkSmartPointer<vtkMinimalStandardRandomSequence>::New();
-	QTime t= QTime::currentTime();
+	QTime t = QTime::currentTime();
 	qDebug() << t.secsTo(QTime(0, 0, 0));
 	rs->SetSeed(t.secsTo(QTime(0, 0, 0)));
-	
+
 	rs->Next(); color[0] = rs->GetValue();
 	rs->Next(); color[1] = rs->GetValue();
 	rs->Next(); color[2] = rs->GetValue();
@@ -278,9 +279,9 @@ void MeshViewer::getActorColor(double* color)
 
 void MeshViewer::showNodeLabel(QTreeWidgetItem *item)
 {
-	TreeItem *treeItem = (TreeItem*)item;
-	QString ptsStr = treeItem->getAttrData();
-	QStringList l = ptsStr.split(" ");
+	TreeItem *treeItem = (TreeItem*) item;
+	QSet<int> nodes = treeItem->getAttrData();
+
 
 	vtkSmartPointer<vtkActor> actor = vtkSmartPointer<vtkActor>::New();
 	double color[3];
@@ -288,14 +289,14 @@ void MeshViewer::showNodeLabel(QTreeWidgetItem *item)
 
 	actor->GetProperty()->SetColor(color[0], color[1], color[2]);
 	actor->GetProperty()->SetPointSize(8);
-	 
+
 	vtkSmartPointer<vtkVertex> vertex = vtkSmartPointer<vtkVertex>::New();
 	vtkSmartPointer<vtkCellArray> verArray = vtkSmartPointer<vtkCellArray>::New();
 
 	int cnt = 0;
-	for each (QString p in l)
+	for each (int id in nodes)
 	{
-		int id = p.toInt();
+
 		vertex->GetPointIds()->InsertId(cnt, id);
 		verArray->InsertNextCell(vertex);
 		cnt++;
@@ -306,8 +307,8 @@ void MeshViewer::showNodeLabel(QTreeWidgetItem *item)
 	pointset->SetVerts(verArray);
 
 	vtkSmartPointer<vtkPolyDataMapper> pointMapper = vtkSmartPointer<vtkPolyDataMapper>::New();
-	 
- 	pointMapper->SetInputData(pointset);
+
+	pointMapper->SetInputData(pointset);
 
 	actor->SetMapper(pointMapper);
 
@@ -322,9 +323,9 @@ void MeshViewer::showNodeLabel(QTreeWidgetItem *item)
 
 void MeshViewer::showElemLabel(QTreeWidgetItem *item)
 {
-	TreeItem *treeItem = (TreeItem*)item;
-	QString ptsStr = treeItem->getAttrData();
-	QStringList l = ptsStr.split(" ");
+	TreeItem *treeItem = (TreeItem*) item;
+	QSet<int> elems = treeItem->getAttrData();
+
 
 	vtkSmartPointer<vtkActor> actor = vtkSmartPointer<vtkActor>::New();
 	double color[3];
@@ -336,9 +337,8 @@ void MeshViewer::showElemLabel(QTreeWidgetItem *item)
 	vtkSmartPointer<vtkCellArray> cellArray = vtkSmartPointer<vtkCellArray>::New();
 
 	int cnt = 0;
-	for each (QString p in l)
+	for each (int id in elems)
 	{
-		int id = p.toInt();
 		cellArray->InsertNextCell(mesh->ugrid->GetCell(vtkIdType(id)));
 		cnt++;
 	}
@@ -375,6 +375,16 @@ void MeshViewer::hideElemLabel(QTreeWidgetItem *item)
 	renderWindowEx();
 }
 
+QSet<int>& MeshViewer::getSelectNodes()
+{
+	return style->getCurrentSelectNodes();
+}
+
+QSet<int>& MeshViewer::getSelectElems()
+{
+	return style->getCurrentSelectElems();
+}
+
 void MeshViewer::resetActor()
 {//mainActor
 
@@ -384,7 +394,7 @@ void MeshViewer::resetActor()
 	for (vtkIdType i = 0; i < actorCollection->GetNumberOfItems(); i++)
 	{
 		vtkActor* nextActor = actorCollection->GetNextActor();
-	
+
 		std::string className = nextActor->GetClassName();
 
 		if (nextActor != mainActor)
@@ -394,4 +404,8 @@ void MeshViewer::resetActor()
 	renderWindowEx();
 }
 
- 
+
+void MeshViewer::selectTypeChanged(Select_Type type)
+{
+	style->setSelect(type);
+}

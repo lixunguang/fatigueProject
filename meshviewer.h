@@ -6,6 +6,7 @@
 #include <QComboBox>
 
 #include "vtkDataSetMapper.h"
+#include "QVTKWidget.h"
 #include "QVTKWidget2.h"
 #include "vtkActor.h"
 #include "vtkSmartPointer.h"
@@ -57,8 +58,8 @@ struct struct_tensor
 	double zz;
 };
 
-class  MeshViewer : public QVTKWidget2
-{
+class  MeshViewer : public QVTKWidget
+{//i do not know why there have a bug when us qvtkwidget2:can not select use key "r"
 	Q_OBJECT
 public:
 	MeshViewer(QWidget *parent = 0);
@@ -76,6 +77,11 @@ public slots:
 
 	void showElemLabel(QTreeWidgetItem *item);
 	void hideElemLabel(QTreeWidgetItem *item);
+
+	QSet<int>& getSelectNodes();
+	QSet<int>& getSelectElems();
+
+	void selectTypeChanged(Select_Type type);
 
 	void resetActor();
 	void getActorColor(double* color);
@@ -98,7 +104,7 @@ private:
 
 	void createToolBar();
 protected:
-	void wheelEvent(QWheelEvent *e);
+//	void wheelEvent(QWheelEvent *e);
 //	virtual void paintGL();
 //	virtual void paintEvent(QPaintEvent * event);
 

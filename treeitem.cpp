@@ -13,12 +13,12 @@ TreeItem::~TreeItem()
 
 }
 
-void TreeItem::setAttrData(QString& data)
+void TreeItem::setAttrData(QSet<int>& data)
 {
 	attrData = data;
 }
 
-QString& TreeItem::getAttrData()
+QSet<int> & TreeItem::getAttrData()
 {
 	return attrData;
 }

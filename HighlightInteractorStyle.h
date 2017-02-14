@@ -13,11 +13,13 @@
 #include "vtkInteractorStyleRubberBandPick.h"
 
 
+#include "typedef.h"
 
 #define VTKISRBP_ORIENT 0
 #define VTKISRBP_SELECT 1
 
 // Define interaction style
+class MeshViewer;
 class HighlightInteractorStyle : public vtkInteractorStyleRubberBandPick
 {
 public:
@@ -27,26 +29,47 @@ public:
 	HighlightInteractorStyle();
 
 	virtual void OnLeftButtonUp();
-	
+	virtual void OnChar();
 	void SetData(vtkSmartPointer<vtkUnstructuredGrid> data);
 	vtkUnstructuredGrid* GetData();
 
+	void setSelect(Select_Type type);
+
+	QSet<int>& getCurrentSelectNodes()
+	{
+		return currentSelectNodes;
+	}
+	QSet<int>& getCurrentSelectElems()
+	{
+		return currentSelectElems;
+	}
+
+	void SetMeshViewer(MeshViewer*);
+
 private:
-	void selectArea(int* pos, int *prepos);
-	void selectCell();
-	void selectPoint();
+	void selectAreaPoints();
+	void selectAreaCells();
+	void selectSingleCell();
+	void selectSinglePoint();
 	void selectTest();
 	void selectCircle(int* pos, int *prepos);
-
+	void createPointsMap();
 public:
 	vtkSmartPointer<vtkUnstructuredGrid> ugrid;
 
 	vtkSmartPointer<vtkActor> SelectedActor;
 	vtkSmartPointer<vtkPolyDataMapper> SelectedMapper;
 
-
 	float circleR;
 	std::deque<int> d;
+
+	QSet<int> currentSelectNodes;
+	QSet<int> currentSelectElems;
+	QMap<int, int> nodeIdMap;
+
+	Select_Type selectType;
+
+	MeshViewer *meshViewer;
 };
 
 

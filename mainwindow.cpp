@@ -57,6 +57,8 @@ MainWindow::MainWindow(QWidget *parent) :RibbonWindow(parent)
 	connect(labelViewer, SIGNAL(showElemLabel(QTreeWidgetItem *)), meshViewer, SLOT(showElemLabel(QTreeWidgetItem *)));
 	connect(labelViewer, SIGNAL(hideElemLabel(QTreeWidgetItem *)), meshViewer, SLOT(hideElemLabel(QTreeWidgetItem *)));
 
+	connect(labelViewer, SIGNAL(selectStatus(Select_Type)), meshViewer, SLOT(selectTypeChanged(Select_Type)));
+
 	connect(labelViewer, SIGNAL(resetActor()), meshViewer, SLOT(resetActor()));
 
 }
@@ -146,12 +148,26 @@ void MainWindow::updateUi(QMap<QString, QString> &mapData)
 	//update labelViewer
 	for each (QString labelName in NodeLabel.keys())
 	{
-		labelViewer->addNodeLabel(labelName, NodeLabel[labelName]);
+		QSet<int> nodes;
+		QString nodesStr = NodeLabel[labelName];
+		QStringList sl = nodesStr.split(" ");
+		for each (QString var in sl)
+		{
+			nodes.insert(var.toInt());
+		}
+		labelViewer->addNodeLabel(labelName, nodes);
 	}
 	
 	for each (QString labelName in ElementLabel.keys())
 	{
-		labelViewer->addElemLabel(labelName, ElementLabel[labelName]);
+		QSet<int> elems;
+		QString elemStr = ElementLabel[labelName];
+		QStringList sl = elemStr.split(" ");
+		for each (QString var in sl)
+		{
+			elems.insert(var.toInt());
+		}
+		labelViewer->addElemLabel(labelName, elems);
 	}
 
 }

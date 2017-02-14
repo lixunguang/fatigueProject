@@ -17,6 +17,7 @@
 #include <string>
 using namespace std;
 
+#include "typedef.h"
 
 /*
 Mesh类用主要用来对仿真文件(输入文件,结果文件)的查看,转换. 如:
@@ -24,13 +25,7 @@ Mesh类用主要用来对仿真文件(输入文件,结果文件)的查看,转换. 如:
 2 获取结果文件或者输入文件的数据;
 
 */
-enum SETTYPE
-{
-	SETTYPE_NONE,
-	SETTYPE_NODE,
-	SETTYPE_ELEM,
-	SETTYPE_FACE,
-};
+
 
 class Mesh :public QObject
 {

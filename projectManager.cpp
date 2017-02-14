@@ -25,6 +25,7 @@ ProjectManager::ProjectManager()
 // 	root.appendChild(modelConfigElem);
 // 	root.appendChild(outputConfigElem);
 
+	uniqueID = 0;
 }
 
 ProjectManager::~ProjectManager()
@@ -94,14 +95,12 @@ void ProjectManager::travelElement(QDomElement element, QMap<QString, QString> &
 		QString attrNamestr;
 		QString attrValstr;
 
-		int count = 0;
 		for (int i = 0; i < childNodes.size(); i++)
 		{
 			elem = childNodes.at(i).toElement();
 
 			if (elem.tagName() == "Item")
 			{
-
 				QDomNamedNodeMap attrMap = elem.attributes();
 				QDomAttr attr;
 				attrNamestr = "";
@@ -116,7 +115,7 @@ void ProjectManager::travelElement(QDomElement element, QMap<QString, QString> &
 					attrValstr += attr.value();
 					attrValstr += "@";
 				}
-				keyStr = QString("%1@%2%3").arg(element.tagName()).arg(attrNamestr).arg(count++);
+				keyStr = QString("%1@%2%3").arg(element.tagName()).arg(attrNamestr).arg(uniqueID++);
 
 				map[keyStr] = attrValstr + elem.text().trimmed();//trimmed: remove space
 
@@ -124,6 +123,31 @@ void ProjectManager::travelElement(QDomElement element, QMap<QString, QString> &
 			travelElement(elem, map);
 		}
 	}
+}
+
+void ProjectManager::addToProjectConfig()
+{
+	projectConfigMapData;
+
+}
+void ProjectManager::addNodeLabelToModelConfig(QString& labelName, QString& val)
+{
+
+	QString keyStr = QString("%1@%2%3").arg("NodeLabel").arg("name").arg(uniqueID++);
+
+	modelConfigMapData[keyStr] = labelName + "@" + val;
+
+}
+void ProjectManager::addElemLabelToModelConfig(QString& labelName, QString& val)
+{
+	QString keyStr = QString("%1@%2%3").arg("ElementLabel").arg("name").arg(uniqueID++);
+
+	modelConfigMapData[keyStr] = labelName + "@" + val;
+}
+void ProjectManager::addToOutputConfig()
+{
+
+	outputConfigMapData;
 }
 
 void ProjectManager::projectConfigFromDomElem(QDomElement& e)

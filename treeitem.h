@@ -22,13 +22,13 @@ public:
 		_show = show;
 	}
 
-	void setAttrData(QString& data);
-	QString& getAttrData();
+	void setAttrData(QSet<int> &data);
+	QSet<int> & getAttrData();
 
 	void setType(SETTYPE type);
 public:
 	bool _show;
-	QString attrData;
+	QSet<int> attrData;
 	SETTYPE type;
 };
 

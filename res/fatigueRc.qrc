@@ -34,6 +34,8 @@
         <file>label_remove.png</file>
         <file>label_visibility_off.png</file>
         <file>label_visibility_on.png</file>
+        <file>label_select_cell.png</file>
+        <file>label_select_point.png</file>
     </qresource>
     <qresource prefix="/about">
         <file>about_about.png</file>

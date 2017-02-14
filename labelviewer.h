@@ -3,8 +3,10 @@
 
 #include <QTreeWidget>
 #include <QDockWidget>
+#include <QPushButton>
 
 #include "treeitem.h"
+#include "typedef.h"
 
 class  LabelViewer : public QDockWidget
 {
@@ -14,23 +16,34 @@ public:
 	~LabelViewer();
 public slots:
 	void onAddBtn();
+	void onAddBtn2();
 	void onRemoveBtn();
+	void onSelectPointBtn();
+	void onSelectCellBtn();
 
-	void addLabel(QString &labelName, QString &attrdata, SETTYPE type);
-	void addNodeLabel(QString &labelName, QString &attrdata);
-	void addElemLabel(QString &labelName, QString &attrdata);
+	void add(SETTYPE labelType);
 
-	void onItemPressed(QTreeWidgetItem * item, int column);
+	void addLabel(QString &labelName, QSet<int>& attrdata, SETTYPE type);
+	void addNodeLabel(QString &labelName, QSet<int>& attrdata);
+	void addElemLabel(QString &labelName, QSet<int>& attrdata);
+
+	void onLabelItemPressed(QTreeWidgetItem * item, int column);
 signals:
 	void showNodeLabel(QTreeWidgetItem* item);
 	void hideNodeLabel(QTreeWidgetItem* item);
 	void showElemLabel(QTreeWidgetItem* item);
 	void hideElemLabel(QTreeWidgetItem* item);
+
+	void selectStatus(Select_Type);
+
 	void resetActor();
 private:
 	QList<QTreeWidgetItem*> topItems;
 	QTreeWidgetItem *labelItem;
 	QTreeWidgetItem *OperationItem;
+
+	QPushButton *selectPointBtn;
+	QPushButton *selectCellBtn;
 };
 
 #endif

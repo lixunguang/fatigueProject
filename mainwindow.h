@@ -77,7 +77,7 @@ protected:
 	QAction* m_actionFullScreen;
 	QAction* m_actionPrintLayout;
 
-private:
+	public:
 	MeshViewer *meshViewer;
 	LabelViewer *labelViewer;
 	PropertyViewer *propViewer;

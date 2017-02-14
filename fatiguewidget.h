@@ -4,12 +4,8 @@
 #include <QWidget>
 #include <QMap>
 
-enum OBJECTTYPE
-{//2÷÷ ‰»Î£¨edit,comb
-	type_NONE,
-	type_edit,
-	type_combo,
-};
+#include "typedef.h"
+
 class  FatigueWidget : public QWidget
 {
 	Q_OBJECT

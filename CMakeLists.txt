@@ -63,6 +63,7 @@ if(${VTK_VERSION} VERSION_GREATER "6")
   treeitem.cpp
   about.cpp
 
+  typedef.h
   about.h
   analysiswidget.h
   delegate.h

@@ -15,6 +15,13 @@
 #include "vtkSelection.h"
 #include "vtkAreaPicker.h"
 #include "vtkObjectFactory.h"
+#include "vtkHardwareSelector.h"
+#include "vtkNew.h"
+#include "vtkExtractGeometry.h"
+#include "vtkTriangleFilter.h"
+#include "vtkExtractCells.h"
+#include "vtkProp3DCollection.h"
+#include "vtkGenericCell.h"
 
 #include "HighlightInteractorStyle.h"
 
@@ -26,7 +33,14 @@ HighlightInteractorStyle::HighlightInteractorStyle() : vtkInteractorStyleRubberB
 	this->SelectedActor = vtkSmartPointer<vtkActor>::New();
 	this->SelectedActor->SetMapper(SelectedMapper);
 
+
+
+	selectType = Select_Type_None;
 	circleR = 12;
+}
+void HighlightInteractorStyle::SetMeshViewer(MeshViewer *mv)
+{
+	meshViewer = mv;
 }
 
 void HighlightInteractorStyle::SetData(vtkSmartPointer<vtkUnstructuredGrid> data)
@@ -36,16 +50,54 @@ void HighlightInteractorStyle::SetData(vtkSmartPointer<vtkUnstructuredGrid> data
 
 vtkUnstructuredGrid* HighlightInteractorStyle::GetData()
 {
-	return this->ugrid; 
+	return this->ugrid;
 }
 
+void HighlightInteractorStyle::OnChar()
+{
+	qDebug() << "HighlightInteractorStyle::OnChar";
+	vtkInteractorStyleRubberBandPick::OnChar();
+}
+
+void HighlightInteractorStyle::setSelect(Select_Type type)
+{
+	selectType = type;
+	if (type ==  Select_Type_Cell || type == Select_Type_Point)
+	{
+		this->CurrentMode = VTKISRBP_SELECT;
+	}
+	else
+	{
+		this->CurrentMode = VTKISRBP_ORIENT;
+	}
+
+}
+
+#include "meshviewer.h"
 void HighlightInteractorStyle::OnLeftButtonUp()
 {
+
 	// Forward events
 	vtkInteractorStyleRubberBandPick::OnLeftButtonUp();
-	selectTest();	return;
-	selectPoint();
-	selectCell();
+	//	selectTest();	
+	//	selectSinglePoint();//单个点
+	//	selectSingleCell();//单个单元
+
+
+	if (selectType == Select_Type_Point)
+	{
+		createPointsMap();
+		meshViewer->resetActor();
+		selectAreaPoints();
+	}
+	else if (selectType == Select_Type_Cell)
+	{
+		createPointsMap();
+		meshViewer->resetActor();
+		selectAreaCells();
+	}
+
+	return;
 
 	InvokeEvent(12346);
 	if (d.size() > 4)
@@ -57,51 +109,36 @@ void HighlightInteractorStyle::OnLeftButtonUp()
 	d.push_back(pos[0]);
 	d.push_back(pos[1]);
 
-	
-	//selectPoint();
-	if (d.size() >= 4)
-	{
-		int prepos[2];
-		prepos[0] = d.at(0);
-		prepos[1] = d.at(1);
-		
-		int p[2];
-		p[0] = pos[0];
-		p[1] = pos[1];
-		selectArea(p, prepos);
-	}
-	
-	//selectCircle();
 }
 
-void HighlightInteractorStyle::selectCircle(int* pos,int *prepos)
-{
+void HighlightInteractorStyle::selectCircle(int* pos, int *prepos)
+{//test
 	vtkSmartPointer<vtkHardwareSelector> selector = vtkSmartPointer<vtkHardwareSelector>::New();
 	selector->SetRenderer(this->GetInteractor()->GetRenderWindow()->GetRenderers()->GetFirstRenderer());
 
 	float p1[3] = { 0 };
 	float p2[3] = { 0 };
-	p1[0] = (float)pos[0]; p1[1] = (float)pos[1];
-	p2[0] = (float)prepos[0]; p2[1] = (float)prepos[1];
-	double dist = sqrt(vtkMath::Distance2BetweenPoints(p1,p2));
+	p1[0] = (float) pos[0]; p1[1] = (float) pos[1];
+	p2[0] = (float) prepos[0]; p2[1] = (float) prepos[1];
+	double dist = sqrt(vtkMath::Distance2BetweenPoints(p1, p2));
 
 	std::cout << "  preposx: " << d.at(0) << "  preposy: " << d.at(1) << "  posx : " << d.at(2) << "  posy: " << d.at(3) << "  " << std::endl;
 
 	int* temp = this->Interactor->GetRenderWindow()->GetSize();
 	unsigned int windowSize[4];
-// 	windowSize[0] = (pos[0] - dist)>1 ? (pos[0] - dist):1;// temp[2];
-// 	windowSize[1] = pos[1] - dist>1 ? (pos[1] - dist) : 1;//temp[3];
-// 	windowSize[2] = pos[0] + dist>1 ? (pos[0] + dist) : 1;//temp[0];
-// 	windowSize[3] = pos[1] + dist>1 ? (pos[1] + dist) : 1;//temp[1];
+	// 	windowSize[0] = (pos[0] - dist)>1 ? (pos[0] - dist):1;// temp[2];
+	// 	windowSize[1] = pos[1] - dist>1 ? (pos[1] - dist) : 1;//temp[3];
+	// 	windowSize[2] = pos[0] + dist>1 ? (pos[0] + dist) : 1;//temp[0];
+	// 	windowSize[3] = pos[1] + dist>1 ? (pos[1] + dist) : 1;//temp[1];
 
 	windowSize[0] = pos[0] - 120;
 	windowSize[1] = pos[1];
 	windowSize[2] = pos[0];
 	windowSize[3] = pos[1] + 120;
 
-	for (int i = 0; i < 4;i++)
+	for (int i = 0; i < 4; i++)
 	{
-		if (windowSize[i]<0)
+		if (windowSize[i] < 0)
 		{
 			windowSize[i] = 1;
 		}
@@ -111,47 +148,48 @@ void HighlightInteractorStyle::selectCircle(int* pos,int *prepos)
 	selector->SetArea(pos[0] - dist, pos[1] - dist, pos[0] + dist, pos[1] + dist);
 
 	selector->SetFieldAssociation(vtkDataObject::FIELD_ASSOCIATION_POINTS);
-//	selector->SetFieldAssociation(vtkDataObject::FIELD_ASSOCIATION_CELLS);
+	//	selector->SetFieldAssociation(vtkDataObject::FIELD_ASSOCIATION_CELLS);
 
 	vtkSelection* sel = selector->Select();
 	sel->Print(std::cout);
 
 }
-#include "vtkHardwareSelector.h"
-#include "vtkNew.h"
-void HighlightInteractorStyle::selectArea(int* pos, int *prepos)
+
+void HighlightInteractorStyle::createPointsMap()
 {
-
-	float p1[3] = { 0 };
-	float p2[3] = { 0 };
-	p1[0] = (float)pos[0]; p1[1] = (float)pos[1];
-	p2[0] = (float)prepos[0]; p2[1] = (float)prepos[1];
-	double dist = sqrt(vtkMath::Distance2BetweenPoints(p1, p2));
-
-	vtkSmartPointer<vtkAreaPicker> picker = vtkSmartPointer<vtkAreaPicker>::New();
-	this->GetInteractor()->SetPicker(picker);
-	std::cout << "current pos: " << pos[0] <<"  "<< pos[1] << std::endl;
-	std::cout << "AreaPick: " << pos[0] - dist << "  " << pos[1] - dist << "  " << pos[0] + dist << "  " << pos[1] + dist << std::endl;
-//	picker->AreaPick(pos[0] - dist, pos[1] - dist, pos[0] + dist, pos[1] + dist, this->GetInteractor()->GetRenderWindow()->GetRenderers()->GetFirstRenderer());
-
-	picker->AreaPick(0,0,400,400, this->GetInteractor()->GetRenderWindow()->GetRenderers()->GetFirstRenderer());
-
-	vtkProp3DCollection *props = picker->GetProp3Ds();
-
-	std::cout << "GetNumberOfItems " << props->GetNumberOfItems() << std::endl;
-	for (vtkIdType i = 0; i < props->GetNumberOfItems(); i++)
+	if (this->CurrentMode == VTKISRBP_SELECT)
 	{
-		vtkProp3D* prop = props->GetNextProp3D();
-	 
+		currentSelectNodes.clear();
+		nodeIdMap.clear();
 
-		//std::cout << "Picked prop: " << prop << std::endl;
+		vtkPlanes* frustum = static_cast<vtkAreaPicker*>(this->GetInteractor()->GetPicker())->GetFrustum();
+
+		vtkSmartPointer<vtkExtractGeometry> extractGeometry = vtkSmartPointer<vtkExtractGeometry>::New();
+		extractGeometry->SetImplicitFunction(frustum);
+		extractGeometry->SetInputData(this->ugrid);
+		extractGeometry->Update();
+
+		//此处可能需要反向推断point id,他并没有提供所选的point id，更别说提供在inp里面的id了
+		//还真是得反向推断,目前是没找到好办法
+		vtkUnstructuredGrid *pPoints = extractGeometry->GetOutput();
+		vtkIdType num = pPoints->GetNumberOfPoints();
+
+		vtkIdType ptID;
+		for (int i = 0; i < num; i++)
+		{
+			double *tmp = pPoints->GetPoint(i);
+//			std::cout << tmp[0] << " " << tmp[1] << " " << tmp[2] << std::endl;
+			ptID = this->ugrid->FindPoint(pPoints->GetPoint(i));
+			if (ptID > 0)
+			{
+				currentSelectNodes.insert(ptID);
+				nodeIdMap[i] = ptID;
+			}
+		}
 	}
-
- 
-//	props->Print(std::cout);
 }
-#include "vtkExtractGeometry.h"
-void HighlightInteractorStyle::selectTest()
+
+void HighlightInteractorStyle::selectAreaPoints()
 {
 	if (this->CurrentMode == VTKISRBP_SELECT)
 	{
@@ -162,50 +200,170 @@ void HighlightInteractorStyle::selectTest()
 		extractGeometry->SetInputData(this->ugrid);
 		extractGeometry->Update();
 
-		vtkSmartPointer<vtkVertexGlyphFilter> glyphFilter =	vtkSmartPointer<vtkVertexGlyphFilter>::New();
+		vtkSmartPointer<vtkVertexGlyphFilter> glyphFilter = vtkSmartPointer<vtkVertexGlyphFilter>::New();
 		glyphFilter->SetInputConnection(extractGeometry->GetOutputPort());
 		glyphFilter->Update();
 
 		vtkPolyData* selected = glyphFilter->GetOutput();
-		std::cout << "Selected " << selected->GetNumberOfPoints() << " points." << std::endl;
-		std::cout << "Selected " << selected->GetNumberOfCells() << " cells." << std::endl;
 
-		this->SelectedMapper->SetInputData(selected);
+		this->SelectedMapper->SetInputData(selected);//selected polycell
 		this->SelectedMapper->ScalarVisibilityOff();
-	
+
 		this->SelectedActor->GetProperty()->SetColor(1.0, 0.0, 0.0); //(R,G,B)
+		this->SelectedActor->GetProperty()->SetPointSize(3);
+
+ 		this->CurrentRenderer->AddActor(SelectedActor);
+ 		this->GetInteractor()->GetRenderWindow()->Render();
+ 		this->HighlightProp(NULL);
+	}
+}
+
+void HighlightInteractorStyle::selectAreaCells()
+{
+	if (this->CurrentMode == VTKISRBP_SELECT)
+	{
+		currentSelectElems.clear();
+
+		vtkPlanes* frustum = static_cast<vtkAreaPicker*>(this->GetInteractor()->GetPicker())->GetFrustum();
+
+		vtkSmartPointer<vtkExtractGeometry> extractGeometry = vtkSmartPointer<vtkExtractGeometry>::New();
+		extractGeometry->SetImplicitFunction(frustum);
+		extractGeometry->SetInputData(this->ugrid);
+		extractGeometry->Update();
+
+		//此处可能需要反向推断cell id
+		//还真是得反向推断,目前是没找到好办法
+		vtkUnstructuredGrid *pCells = extractGeometry->GetOutput();
+		vtkIdType num = pCells->GetNumberOfCells();
+		QVector<int> orignal_pts;
+		vtkIdList *idList = vtkIdList::New();
+
+		for (int i = 0; i < num; i++)
+		{//每一个cell
+			orignal_pts.clear();
+
+			for (int j = 0; j < pCells->GetCell(i)->GetNumberOfPoints(); j++)
+			{//根据新节点id找到老节点id建立映射
+				//std::cout << pCells->GetCell(i)->GetPointId(j) << " --> " << nodeIdMap[pCells->GetCell(i)->GetPointId(j)]<<"   ";
+				orignal_pts.push_back(nodeIdMap[pCells->GetCell(i)->GetPointId(j)]);
+			}
+
+			//然后根据老节点，找到单元id
+			QSet<int> secondset;
+			for each (int ptid in orignal_pts)
+			{
+				QSet<int> firstset;
+
+				ugrid->GetPointCells(ptid, idList);
+				for (int i = 0; i < idList->GetNumberOfIds(); ++i)
+				{
+					firstset.insert(idList->GetId(i));
+				}
+
+				if (secondset.empty())
+				{
+					secondset = secondset.unite(firstset);
+				}
+				else
+				{
+					secondset = secondset.intersect(firstset);
+				}
+			}
+
+			//qDebug() << "cell idddd: " << secondset ;
+			currentSelectElems.unite(secondset);
+
+			secondset.clear();
+		}
+		idList->Delete();
+
+		if (currentSelectElems.empty())
+		{
+			return;
+		}
+		vtkSmartPointer<vtkPolyData> cellset = vtkSmartPointer<vtkPolyData>::New();
+		cellset->SetPoints(ugrid->GetPoints());
+
+		vtkSmartPointer<vtkCellArray> va = vtkSmartPointer<vtkCellArray>::New();
+		for each (int var in currentSelectElems)
+		{
+			va->InsertNextCell(ugrid->GetCell(var));
+		}
+		cellset->SetPolys(va);
+
+		SelectedMapper->SetInputData(cellset);
+		SelectedMapper->ScalarVisibilityOff();
+
+		SelectedActor->GetProperty()->SetColor(1.0, 0.0, 0.0);
+		SelectedActor->GetProperty()->SetPointSize(3);
+
+		this->CurrentRenderer->AddActor(SelectedActor);
+		this->GetInteractor()->GetRenderWindow()->Render();
+		this->HighlightProp(NULL);
+	}
+}
+
+void HighlightInteractorStyle::selectTest()
+{//for test
+	if (this->CurrentMode == VTKISRBP_SELECT)
+	{
+		vtkPlanes* frustum = static_cast<vtkAreaPicker*>(this->GetInteractor()->GetPicker())->GetFrustum();
+
+		vtkSmartPointer<vtkExtractGeometry> extractGeometry = vtkSmartPointer<vtkExtractGeometry>::New();
+		extractGeometry->SetImplicitFunction(frustum);
+		extractGeometry->SetInputData(this->ugrid);
+		extractGeometry->Update();
+
+		vtkSmartPointer<vtkVertexGlyphFilter> glyphFilter = vtkSmartPointer<vtkVertexGlyphFilter>::New();
+		glyphFilter->SetInputConnection(extractGeometry->GetOutputPort());
+		glyphFilter->Update();
+
+		vtkUnstructuredGrid *pcells = extractGeometry->GetOutput();
+		vtkIdType num = pcells->GetNumberOfPoints();
+
+		vtkIdType ptID;
+		for (int i = 0; i < num; i++)
+		{
+			ptID = this->ugrid->FindPoint(pcells->GetPoint(i));
+			if (ptID > 0)
+			{
+				std::cout << "ptid: " << (int) ptID << std::endl;
+			}
+		}
+
+		vtkPolyData* selected = glyphFilter->GetOutput();
+
+
+		//此处可能需要反向推断point id
+		//还真是得反向推断,目前没找到好办法
+		this->SelectedMapper->SetInputData(selected);//selected polycell
+		this->SelectedMapper->ScalarVisibilityOff();
+
+		this->SelectedActor->GetProperty()->SetColor(1.0, 0.0, 0.0);
 		this->SelectedActor->GetProperty()->SetPointSize(3);
 
 		this->CurrentRenderer->AddActor(SelectedActor);
 		this->GetInteractor()->GetRenderWindow()->Render();
 		this->HighlightProp(NULL);
-
-		return;
-
-
 	}
 }
 
-void HighlightInteractorStyle::selectCell()
+void HighlightInteractorStyle::selectSingleCell()
 {
 	int* pos = this->GetInteractor()->GetEventPosition();
 	vtkSmartPointer<vtkCellPicker> picker = vtkSmartPointer<vtkCellPicker>::New();
 	picker->SetTolerance(0.005);
 
-
 	picker->Pick(pos[0], pos[1], 0, this->GetInteractor()->GetRenderWindow()->GetRenderers()->GetFirstRenderer());
-
-	std::cout << "Cell id is: " << picker->GetCellId() << std::endl;
+	//std::cout << "Cell id is: " << picker->GetCellId() << std::endl;
 
 	if (picker->GetCellId() == -1)
 	{
 		return;
 	}
 
-
 	vtkSmartPointer<vtkPolyData> cellset = vtkSmartPointer<vtkPolyData>::New();
 	cellset->SetPoints(ugrid->GetPoints());
-
 
 	vtkSmartPointer<vtkCellArray> va = vtkSmartPointer<vtkCellArray>::New();
 	va->InsertNextCell(ugrid->GetCell(picker->GetCellId()));
@@ -218,30 +376,26 @@ void HighlightInteractorStyle::selectCell()
 	this->SelectedActor->GetProperty()->SetColor(1.0, 0.0, 0.0); //(R,G,B)
 	this->SelectedActor->GetProperty()->SetPointSize(5);
 
-
 	this->GetInteractor()->GetRenderWindow()->GetRenderers()->GetFirstRenderer()->AddActor(SelectedActor);
 	this->GetInteractor()->GetRenderWindow()->Render();
 	this->HighlightProp(NULL);
-
 }
 
-void HighlightInteractorStyle::selectPoint()
+void HighlightInteractorStyle::selectSinglePoint()
 {
 	int* pos = this->GetInteractor()->GetEventPosition();
 	vtkSmartPointer<vtkPointPicker> picker = vtkSmartPointer<vtkPointPicker>::New();
 	picker->SetTolerance(0.005);
 
-
 	picker->Pick(pos[0], pos[1], 0, this->GetInteractor()->GetRenderWindow()->GetRenderers()->GetFirstRenderer());
 
-	std::cout << "point id is: " << picker->GetPointId() << std::endl;
-	if (picker->GetPointId()==-1)
+//	std::cout << "point id is: " << picker->GetPointId() << std::endl;
+	if (picker->GetPointId() == -1)
 	{
 		return;
 	}
 	vtkSmartPointer<vtkPolyData> pointset = vtkSmartPointer<vtkPolyData>::New();
 	pointset->SetPoints(ugrid->GetPoints());
-
 
 	vtkSmartPointer<vtkVertex>  v = vtkSmartPointer<vtkVertex>::New();
 	v->GetPointIds()->SetId(0, picker->GetPointId());
@@ -254,11 +408,12 @@ void HighlightInteractorStyle::selectPoint()
 	this->SelectedMapper->SetInputData(pointset);
 	this->SelectedMapper->ScalarVisibilityOff();
 
-	this->SelectedActor->GetProperty()->SetColor(1.0, 0.0, 0.0); //(R,G,B)
+	this->SelectedActor->GetProperty()->SetColor(1.0, 0.0, 0.0); 
 	this->SelectedActor->GetProperty()->SetPointSize(5);
-
 
 	this->GetInteractor()->GetRenderWindow()->GetRenderers()->GetFirstRenderer()->AddActor(SelectedActor);
 	this->GetInteractor()->GetRenderWindow()->Render();
 	this->HighlightProp(NULL);
 }
+
+//void HighlightInteractorStyle::current()
