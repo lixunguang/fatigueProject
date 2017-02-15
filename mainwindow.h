@@ -41,7 +41,7 @@ protected Q_SLOTS:
 	void saveAs();
 	void closeProject();
 
-	void readMesh(QString fileName);
+
 
 	virtual void options(QAction* action);
 

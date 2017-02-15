@@ -113,14 +113,6 @@ void ProjectManager::travelElement(QDomElement element, QMap<QString, QString> &
 	}
 }
 
-void ProjectManager::addToProjectConfig()
-{//todo:
-	projectConfigMapData;
-	// labelbrowser
-	//property
-	//fatigue operation
-
-}
 
 void ProjectManager::addNodeLabelToModelConfig(QString& labelName, QString& val)
 {

@@ -14,6 +14,8 @@ class  LabelViewer : public QDockWidget
 public:
 	LabelViewer(QWidget *parent = 0);
 	~LabelViewer();
+	void updateUi(QMap<QString, QString> &mapData);
+
 public slots:
 	void onAddBtn();
 	void onAddBtn2();

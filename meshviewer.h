@@ -66,7 +66,9 @@ public:
 	~MeshViewer();
 
 public:
-	void loadMeshData(char* fileName);
+	void updateUi(QMap<QString, QString> &mapData);
+	void loadMeshData(QString fileName);
+	
 
 public slots:
 	void setBackground(const QColor color);

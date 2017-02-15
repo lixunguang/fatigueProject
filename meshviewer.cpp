@@ -69,6 +69,35 @@ MeshViewer::~MeshViewer()
 
 }
 
+void MeshViewer::updateUi(QMap<QString, QString> &mapData)
+{
+	QStringList projectFileName;
+
+	for each (QString key in mapData.keys())
+	{
+		QStringList keyList = key.split("@");
+		QStringList valList = mapData[key].split("@");
+
+		if (keyList[0] == "File")
+		{
+			projectFileName << valList[0];
+		}
+	}
+
+	if (!projectFileName.empty())
+	{
+		loadMeshData(projectFileName[0]);//todo:如果有多个文件？
+	}
+	
+}
+
+
+void MeshViewer::loadMeshData(QString fileName)
+{
+	mesh->loadData(fileName.toLatin1().data());
+	viewReset();
+}
+
 void MeshViewer::createToolBar()
 {
 	action_reset = new QAction(QIcon(":/res/viewer_Iso.png"), "viewReset", 0);
@@ -259,11 +288,6 @@ void MeshViewer::reprsentationComboBoxIndexChanged(int index)
 	renderWindowEx();
 }
 
-void MeshViewer::loadMeshData(char* fileName)
-{
-	mesh->loadData(fileName);
-	viewReset();
-}
 
 void MeshViewer::getActorColor(double* color)
 {

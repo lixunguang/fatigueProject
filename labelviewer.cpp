@@ -100,6 +100,52 @@ LabelViewer::~LabelViewer()
 	topItems.clear();
 }
 
+void LabelViewer::updateUi(QMap<QString, QString> &mapData)
+{
+	QMap<QString, QString> NodeLabel;
+	QMap<QString, QString> ElementLabel;
+
+	for each (QString key in mapData.keys())
+	{
+		QStringList keyList = key.split("@");
+		QStringList valList = mapData[key].split("@");
+
+		if (keyList[0] == "NodeLabel")
+		{
+			NodeLabel[valList[0]] = valList[1];
+		}
+		else if (keyList[0] == "ElementLabel")
+		{
+			ElementLabel[valList[0]] = valList[1];
+		}
+	}
+
+	// update labelViewer ui
+	for each (QString labelName in NodeLabel.keys())
+	{
+		QSet<int> nodes;
+		QString nodesStr = NodeLabel[labelName];
+		QStringList sl = nodesStr.split(" ");
+		for each (QString var in sl)
+		{
+			nodes.insert(var.toInt());
+		}
+		this->addNodeLabelToUI(labelName, nodes);
+	}
+
+	for each (QString labelName in ElementLabel.keys())
+	{
+		QSet<int> elems;
+		QString elemStr = ElementLabel[labelName];
+		QStringList sl = elemStr.split(" ");
+		for each (QString var in sl)
+		{
+			elems.insert(var.toInt());
+		}
+		this->addElemLabelToUI(labelName, elems);
+	}
+}
+
 void LabelViewer::onLabelItemPressed(QTreeWidgetItem *item, int column)
 {//µã»÷±êÇ©Ïî
 	if (column != 0)

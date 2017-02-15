@@ -27,7 +27,7 @@ public slots:
     void save();
 	void reset();
 
-	void addToProjectConfig();
+
 	void addNodeLabelToModelConfig(QString& key,QString& val);
 	void addElemLabelToModelConfig(QString& key, QString& val);
 	void addToOutputConfig();

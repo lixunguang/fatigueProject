@@ -18,28 +18,27 @@ MainWindow::MainWindow(QWidget *parent) :RibbonWindow(parent), projectManager(th
 	createAction();
 	createMenuFile();
 
-	meshViewer = new MeshViewer(this);
+
+	meshViewer = new MeshViewer(this); 
+	meshViewer->setObjectName("meshViewer");
 	setCentralWidget(meshViewer);
-
-	createRibbon();
-
-	connect(m_showFatigueDialog, SIGNAL(triggered()), this, SLOT(showFatigueDialog()));
-
-	ribbonBar()->setFrameThemeEnabled();
-
-	labelViewer = new LabelViewer(this);
+	
+	labelViewer = new LabelViewer(this); 
 	propViewer = new PropertyViewer(this);
 	opViewer = new OperationViewer(this);
-
+	
+	labelViewer->setObjectName("labelViewer");
 	labelViewer->setWindowTitle("Label Browser");
 	labelViewer->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
 	labelViewer->setMinimumWidth(80);
 
+	propViewer->setObjectName("propViewer");
 	propViewer->setWindowTitle("Properties");
 	propViewer->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
 	propViewer->setMinimumWidth(80);
 	propViewer->setMaximumHeight(150);
 
+	opViewer->setObjectName("opViewer");
 	opViewer->setWindowTitle("operation");
 	opViewer->setAllowedAreas(Qt::RightDockWidgetArea);
 	opViewer->setMinimumWidth(200);
@@ -50,17 +49,18 @@ MainWindow::MainWindow(QWidget *parent) :RibbonWindow(parent), projectManager(th
 
 	this->setOptions(OfficeStyle::Windows7Scenic);
 
+	createRibbon();
+	this->ribbonBar()->setFrameThemeEnabled();
 	this->setMinimumSize(1380, 768);
 
 	connect(labelViewer, SIGNAL(showNodeLabel(QTreeWidgetItem *)), meshViewer, SLOT(showNodeLabel(QTreeWidgetItem *)));
 	connect(labelViewer, SIGNAL(hideNodeLabel(QTreeWidgetItem *)), meshViewer, SLOT(hideNodeLabel(QTreeWidgetItem *)));
 	connect(labelViewer, SIGNAL(showElemLabel(QTreeWidgetItem *)), meshViewer, SLOT(showElemLabel(QTreeWidgetItem *)));
 	connect(labelViewer, SIGNAL(hideElemLabel(QTreeWidgetItem *)), meshViewer, SLOT(hideElemLabel(QTreeWidgetItem *)));
-
 	connect(labelViewer, SIGNAL(selectStatus(Select_Type)), meshViewer, SLOT(selectTypeChanged(Select_Type)));
-
 	connect(labelViewer, SIGNAL(resetActor()), meshViewer, SLOT(resetActor()));
 
+	connect(m_showFatigueDialog, SIGNAL(triggered()), this, SLOT(showFatigueDialog()));
 }
 
 void MainWindow::createAction()
@@ -125,65 +125,44 @@ void MainWindow::writeToMap(QMap<QString, QString> &mapData, QString objName, QS
 
 void MainWindow::updateUi(QMap<QString, QString> &mapData)
 {
-	QStringList projectFileName;
-	QMap<QString, QString> NodeLabel;
-	QMap<QString, QString> ElementLabel;
-
+	// show or hide subwindow of mainwindow
+	//from Data to UI
+	//according to object name
+	
 	for each (QString key in mapData.keys())
 	{
 		QStringList keyList = key.split("@");
 		QStringList valList = mapData[key].split("@");
 
-		if (keyList[0] == "File")
+		if (keyList[0] == "ShowView")
 		{
-			projectFileName << valList[0];
-		}
-		else if (keyList[0] == "NodeLabel")
-		{
-			NodeLabel[valList[0]] = valList[1];
-		}
-		else if (keyList[0] == "ElementLabel")
-		{
-			ElementLabel[valList[0]] = valList[1];
+			QWidget *obj = this->findChild<QWidget*>(valList[0]);
+			QString flagStr = valList[1];
+			obj->setVisible(flagStr.toInt());
 		}
 	}
-	
-	//read mesh
-	if (!projectFileName.empty())
-	{
-		readMesh(projectFileName[0]);//todo:如果有多个文件？
-	}
-
-	//update labelViewer
-	for each (QString labelName in NodeLabel.keys())
-	{
-		QSet<int> nodes;
-		QString nodesStr = NodeLabel[labelName];
-		QStringList sl = nodesStr.split(" ");
-		for each (QString var in sl)
-		{
-			nodes.insert(var.toInt());
-		}
-		labelViewer->addNodeLabelToUI(labelName, nodes);
-	}
-	
-	for each (QString labelName in ElementLabel.keys())
-	{
-		QSet<int> elems;
-		QString elemStr = ElementLabel[labelName];
-		QStringList sl = elemStr.split(" ");
-		for each (QString var in sl)
-		{
-			elems.insert(var.toInt());
-		}
-		labelViewer->addElemLabelToUI(labelName, elems);
-	}
-
 }
 
 void MainWindow::updateMapData(QMap<QString, QString> &mapData)
-{
+{//todo:这里可以改的更好看点:)
 
+	int uniqueId = 0;
+	QString key = QString("ShowView@name@%1").arg(uniqueId++);
+	QString val = QString("%1@%2").arg("meshViewer").arg(meshViewer->isVisible()?1:0);
+	  
+	mapData[key] = val;
+
+	key = QString("ShowView@name@%1").arg(uniqueId++);
+	val = QString("%1@%2").arg("labelViewer").arg(labelViewer->isVisible() ? 1 : 0);
+	mapData[key] = val;
+
+	key = QString("ShowView@name@%1").arg(uniqueId++);
+	val = QString("%1@%2").arg("propViewer").arg(propViewer->isVisible() ? 1 : 0);
+	mapData[key] = val;
+
+	key = QString("ShowView@name@%1").arg(uniqueId++);
+	val = QString("%1@%2").arg("opViewer").arg(opViewer->isVisible() ? 1 : 0);
+	mapData[key] = val;
 }
 
 void MainWindow::newProject()
@@ -217,20 +196,30 @@ void MainWindow::openProject()
 	if (fileName.isEmpty())
 		return;
 
-	projectManager.parse(fileName);
+	projectManager.parse(fileName);//解析
 	projectManager.setProjectFileName(fileName);
 	propViewer->setData(QString("open %1 file").arg(fileName));
 
-	this->updateUi(projectManager.getModelData());
+	//1 update mainwindow
+	this->updateUi(projectManager.getProjectData());
 
+	//2 update fatigur window
 	FatigueWidget *w = (FatigueWidget *)(opViewer->widget());
 	w->updateUi(projectManager.getUiData());
+
+	//3 update label browser
+	labelViewer->updateUi(projectManager.getModelData());
+
+	//4 update model window
+	meshViewer->updateUi(projectManager.getModelData());
 }
 
 void MainWindow::save()
 {
 	FatigueWidget *w = (FatigueWidget *)(opViewer->widget());
 	w->updateMapData(projectManager.getUiData());
+
+	this->updateMapData(projectManager.getProjectData());
  
 	if (projectManager.getProjectFileName().isEmpty())
 	{
@@ -240,13 +229,14 @@ void MainWindow::save()
 	{
 		projectManager.save();
 	}
-
 }
 
 void MainWindow::saveAs()
 {
 	FatigueWidget *w = (FatigueWidget *)(opViewer->widget());
 	w->updateMapData(projectManager.getUiData());
+
+	this->updateMapData(projectManager.getProjectData());
 
 	QString fileName = QFileDialog::getSaveFileName(this, tr("Save Project File"),
 		QDir::currentPath(),
@@ -258,7 +248,6 @@ void MainWindow::saveAs()
 		return;
 	}
 		
-
 	projectManager.setProjectFileName(fileName);
 	projectManager.save();
 }
@@ -279,25 +268,15 @@ QString MainWindow::importFile()
 		return "";
 	}
 
+	projectManager.reset();
+
 	QStringList sl;
 	sl << fileName;
 	projectManager.setModelFileName(sl);
 
-	readMesh(fileName);
+	meshViewer->loadMeshData(fileName);
 
 	return fileName;
-}
-
-void MainWindow::readMesh(QString fileName)
-{
-	// read mesh
-	meshViewer->loadMeshData(fileName.toLatin1().data());
-
-	projectManager.reset();
-	QStringList sl;
-	sl << fileName;
-	projectManager.setModelFileName(sl);
-
 }
 
 void MainWindow::showFatigueDialog()
