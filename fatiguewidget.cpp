@@ -7,6 +7,12 @@
 #include "analysiswidget.h"
 #include "loadWidget.h"
 
+//注意！！！！！！！！！
+//把ui数据写入data
+//可以约定，把objectname非空的写到mapdata里面
+//objectname名字加上段名，分段的目的是xml易读
+//应该clear掉原来的
+
 FatigueWidget::FatigueWidget(QWidget *parent)
 	:QWidget(parent)
 {
@@ -128,7 +134,7 @@ void FatigueWidget::updateMapData(QMap<QString, QString> &mapData)
 	{
 
 		QString objName = edit->objectName();
-		if (objectName() != "")
+		if (!objName.isEmpty())
 		{
 			writeToMap(mapData, objName, edit->text(),1,count++);
 		}
@@ -138,7 +144,7 @@ void FatigueWidget::updateMapData(QMap<QString, QString> &mapData)
 	for each (QComboBox *combo  in comboList)
 	{
 		QString objName = combo->objectName();
-		if (objectName() != "")
+		if (!objName.isEmpty())
 		{
 			writeToMap(mapData, objName, QString(combo->currentIndex()),2,count++);
 		}

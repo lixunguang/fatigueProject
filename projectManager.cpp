@@ -4,14 +4,14 @@
 #include "projectManager.h"
 
 
+
+
 ProjectManager::ProjectManager(QObject *parent)
 :doc("fatigueProject"), QObject(parent)
 {
 	QDomProcessingInstruction instruction;
 	instruction = doc.createProcessingInstruction("xml", "version=\"1.0\" encoding=\"UTF-8\"");
 	doc.appendChild(instruction);
-
-
 
 	uniqueID = 0;
 }
@@ -43,10 +43,10 @@ void ProjectManager::parse(QString &fileName)
 
 	QDomElement docElem = doc.documentElement();
 
-	QDomNode n = docElem.firstChild();
-	while (!n.isNull())
+	QDomNode node = docElem.firstChild();
+	while (!node.isNull())
 	{
-		QDomElement e = n.toElement();
+		QDomElement e = node.toElement();
 		if (!e.isNull())
 		{
 			if (e.tagName() == "ProjectConfig")
@@ -65,7 +65,7 @@ void ProjectManager::parse(QString &fileName)
 			}
 
 		}
-		n = n.nextSibling();
+		node = node.nextSibling();
 	}
 
 }
@@ -114,8 +114,11 @@ void ProjectManager::travelElement(QDomElement element, QMap<QString, QString> &
 }
 
 void ProjectManager::addToProjectConfig()
-{
+{//todo:
 	projectConfigMapData;
+	// labelbrowser
+	//property
+	//fatigue operation
 
 }
 
@@ -132,9 +135,8 @@ void ProjectManager::addElemLabelToModelConfig(QString& labelName, QString& val)
 }
 
 void ProjectManager::addToOutputConfig()
-{
-
-	outputConfigMapData;
+{//not used yet
+	
 }
 
 void ProjectManager::projectConfigFromDomElem(QDomElement& e)
@@ -189,7 +191,7 @@ void ProjectManager::xmlElemFromProjectConfig(QDomElement& projectConfigElem)
 
 		if (itemKey.startsWith("ShowView"))
 		{
-			elem.appendChild(elem);
+			sElem.appendChild(elem);
 		}
 	}
 
