@@ -13,7 +13,7 @@
 #pragma region MainWindow func
 int numargs;
 
-MainWindow::MainWindow(QWidget *parent) :RibbonWindow(parent)
+MainWindow::MainWindow(QWidget *parent) :RibbonWindow(parent), projectManager(this)
 {
 	createAction();
 	createMenuFile();
@@ -65,14 +65,23 @@ MainWindow::MainWindow(QWidget *parent) :RibbonWindow(parent)
 
 void MainWindow::createAction()
 {
+ 	QIcon iconNewProject;
+	iconNewProject.addPixmap(QPixmap(":/res/mainwin_mainwin_largeOpenFile.png"));
+	iconNewProject.addPixmap(QPixmap(":/res/mainwin_smallOpen.png"));
+	m_actionNewProject = new QAction(iconNewProject, tr("New..."), this);
+	m_actionNewProject->setShortcut(QKeySequence::New);
+	m_actionNewProject->setToolTip(tr("New"));
+	m_actionNewProject->setStatusTip(tr("New project"));
+	connect(m_actionNewProject, SIGNAL(triggered()), this, SLOT(newProject()));
+
 	QIcon iconOpen;
 	iconOpen.addPixmap(QPixmap(":/res/mainwin_mainwin_largeOpenFile.png"));
 	iconOpen.addPixmap(QPixmap(":/res/mainwin_smallOpen.png"));
-	m_actionOpenFile = new QAction(iconOpen, tr("&Open..."), this);
-	m_actionOpenFile->setShortcut(QKeySequence::Open);
-	m_actionOpenFile->setToolTip(tr("Open"));
-	m_actionOpenFile->setStatusTip(tr("Open an existing document"));
-	connect(m_actionOpenFile, SIGNAL(triggered()), this, SLOT(openProject()));
+	m_actionOpenProject = new QAction(iconOpen, tr("&Open..."), this);
+	m_actionOpenProject->setShortcut(QKeySequence::Open);
+	m_actionOpenProject->setToolTip(tr("Open"));
+	m_actionOpenProject->setStatusTip(tr("Open an existing document"));
+	connect(m_actionOpenProject, SIGNAL(triggered()), this, SLOT(openProject()));
 
 	QIcon iconImport;
 	iconImport.addPixmap(QPixmap(":/res/mainwin_mainwin_largeOpenFile.png"));
@@ -155,7 +164,7 @@ void MainWindow::updateUi(QMap<QString, QString> &mapData)
 		{
 			nodes.insert(var.toInt());
 		}
-		labelViewer->addNodeLabel(labelName, nodes);
+		labelViewer->addNodeLabelToUI(labelName, nodes);
 	}
 	
 	for each (QString labelName in ElementLabel.keys())
@@ -167,7 +176,7 @@ void MainWindow::updateUi(QMap<QString, QString> &mapData)
 		{
 			elems.insert(var.toInt());
 		}
-		labelViewer->addElemLabel(labelName, elems);
+		labelViewer->addElemLabelToUI(labelName, elems);
 	}
 
 }
@@ -177,11 +186,31 @@ void MainWindow::updateMapData(QMap<QString, QString> &mapData)
 
 }
 
+void MainWindow::newProject()
+{
+	QString fileName = QFileDialog::getSaveFileName(this, tr("New File"),
+		QDir::currentPath(),
+		tr("fatigue project Files (*.fproj)"));
+
+	if (fileName.isEmpty())
+	{
+		qDebug() << "file name is empty";
+		return;
+	}
+
+	projectManager.setProjectFileName(fileName);
+	projectManager.save();
+
+	QMessageBox::information(this, "succ", "create success，please add model to project");
+
+	//为工程文件增加模型文件
+	importFile();
+
+}
+
 void MainWindow::openProject()
 {
-	propViewer->setData(QString("openProject"));
-
-	QString fileName = QFileDialog::getOpenFileName(this, tr("Open Project File"),
+	QString fileName = QFileDialog::getOpenFileName(this, tr("Open .fproj File"),
 		QDir::currentPath(),
 		tr("fatigue project Files (*.fproj)"));
 
@@ -189,6 +218,8 @@ void MainWindow::openProject()
 		return;
 
 	projectManager.parse(fileName);
+	projectManager.setProjectFileName(fileName);
+	propViewer->setData(QString("open %1 file").arg(fileName));
 
 	this->updateUi(projectManager.getModelData());
 
@@ -209,7 +240,7 @@ void MainWindow::save()
 	{
 		projectManager.save();
 	}
-		
+
 }
 
 void MainWindow::saveAs()
@@ -237,19 +268,24 @@ void MainWindow::closeProject()
 	//todo:应该执行一些数据清理，以便于下次打开
 }
 
-void MainWindow::importFile()
+QString MainWindow::importFile()
 {
-	QString fileName = QFileDialog::getOpenFileName(this, tr("Open File..."),
+	QString fileName = QFileDialog::getOpenFileName(this, tr("add model..."),
 		QString(), tr("Ansys result (*.fil *.odb);;All Files (*)"));
 
 	if (fileName.isEmpty())
 	{
 		qDebug() << "file name is empty";
-		return;
+		return "";
 	}
+
+	QStringList sl;
+	sl << fileName;
+	projectManager.setModelFileName(sl);
 
 	readMesh(fileName);
 
+	return fileName;
 }
 
 void MainWindow::readMesh(QString fileName)
@@ -284,7 +320,8 @@ void MainWindow::createMenuFile()
 		actionFile->setToolTip(tr("Click here to see everything you can do with your document"));
 		Qtitan::RibbonSystemPopupBar* popupBar = qobject_cast<Qtitan::RibbonSystemPopupBar*>(actionFile->menu());
 
-		popupBar->addAction(m_actionOpenFile);
+		popupBar->addAction(m_actionNewProject);
+		popupBar->addAction(m_actionOpenProject);
 		popupBar->addSeparator();
 		popupBar->addAction(m_actionImportFile);
 		popupBar->addAction(m_actionSave);

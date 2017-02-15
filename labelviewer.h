@@ -23,9 +23,13 @@ public slots:
 
 	void add(SETTYPE labelType);
 
-	void addLabel(QString &labelName, QSet<int>& attrdata, SETTYPE type);
-	void addNodeLabel(QString &labelName, QSet<int>& attrdata);
-	void addElemLabel(QString &labelName, QSet<int>& attrdata);
+	void addLabelToUI(QString &labelName, QSet<int>& attrdata, SETTYPE type);
+	void addNodeLabelToUI(QString &labelName, QSet<int>& attrdata);
+	void addElemLabelToUI(QString &labelName, QSet<int>& attrdata);
+
+	void addLabelToData(QString &labelName, QSet<int>& attrdata, SETTYPE type);
+	void addNodeLabelToData(QString &labelName, QSet<int>& attrdata);
+	void addElemLabelToData(QString &labelName, QSet<int>& attrdata);
 
 	void onLabelItemPressed(QTreeWidgetItem * item, int column);
 signals:

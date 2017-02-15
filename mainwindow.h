@@ -19,11 +19,7 @@ class MainWindow :public RibbonWindow
     Q_OBJECT
 public:
 	MainWindow(QWidget *parent = 0) ;
-
-
-	~MainWindow()
-	{
-	}
+	~MainWindow(){}
 
 private:
 	void createAction();
@@ -34,23 +30,25 @@ private:
 	void createGroupTools(Qtitan::RibbonPage* page);
 	void createGroupView(Qtitan::RibbonPage* page);
 	void createGroupAbout(Qtitan::RibbonPage* aboutPage);
+public:
 
+		
 protected Q_SLOTS:
-	void importFile();
-	void readMesh(QString fileName);
+	void newProject();
+	void openProject();
+	QString importFile();
 	void save();
 	void saveAs();
 	void closeProject();
-	void openProject();
+
+	void readMesh(QString fileName);
+
 	virtual void options(QAction* action);
 
 	void showFatigueDialog();
 
 	void runPython();
-
-	void help();
-	void about();
-
+	
 	void onLabelBrowserStateChanged(int state);
 	void onPropertyCheckStateChanged(int state);
 	void onFatigueCheckStateChanged(int state);
@@ -59,8 +57,11 @@ protected Q_SLOTS:
 	void updateUi(QMap<QString, QString> &mapData);
 	void updateMapData(QMap<QString, QString> &mapData);
 
+	void help();
+	void about();
 protected:
-	QAction* m_actionOpenFile;
+	QAction* m_actionNewProject;
+	QAction* m_actionOpenProject;
 	QAction* m_actionImportFile;
 	QAction* m_actionSave;
 	QAction* m_actionSaveAs;
@@ -84,8 +85,6 @@ protected:
 	OperationViewer *opViewer;
 	
 	ProjectManager projectManager;
-
-
 };
 
 #endif

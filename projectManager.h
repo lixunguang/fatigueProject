@@ -14,7 +14,7 @@ class  ProjectManager :public QObject
 {
 	Q_OBJECT
 public:
-	ProjectManager();
+	ProjectManager(QObject *parent);
 	~ProjectManager();
 
 public slots:
@@ -54,7 +54,7 @@ public slots:
 	QMap<QString, QString> outputConfigMapData;//求解配置信息
 
 	QDomDocument doc;
-	QDomElement root;
+	
 	QString projectFileName;
 	QFile projectFile;
 

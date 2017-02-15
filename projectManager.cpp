@@ -1,29 +1,17 @@
+#include "qapplication.h"
+#include "mainwindow.h"
+
 #include "projectManager.h"
 
 
-ProjectManager::ProjectManager()
-:doc("fatigueProject")
+ProjectManager::ProjectManager(QObject *parent)
+:doc("fatigueProject"), QObject(parent)
 {
 	QDomProcessingInstruction instruction;
 	instruction = doc.createProcessingInstruction("xml", "version=\"1.0\" encoding=\"UTF-8\"");
 	doc.appendChild(instruction);
 
-	root = doc.createElement("Project");
-	root.setAttribute("Version", "1.0");
-	doc.appendChild(root);
 
-// 	QDomElement projectConfigElem = doc.createElement("projectConfig");
-// 	domElemFromProjectConfig(projectConfigElem);
-// 
-// 	QDomElement modelConfigElem = doc.createElement("ModelConfig");
-// 	domElemFromModelConfig(modelConfigElem);
-// 
-// 	QDomElement outputConfigElem = doc.createElement("OutputConfig");
-// 	domElemFromOutputConfig(outputConfigElem);
-// 
-// 	root.appendChild(projectConfigElem);
-// 	root.appendChild(modelConfigElem);
-// 	root.appendChild(outputConfigElem);
 
 	uniqueID = 0;
 }
@@ -130,20 +118,19 @@ void ProjectManager::addToProjectConfig()
 	projectConfigMapData;
 
 }
+
 void ProjectManager::addNodeLabelToModelConfig(QString& labelName, QString& val)
 {
-
-	QString keyStr = QString("%1@%2%3").arg("NodeLabel").arg("name").arg(uniqueID++);
-
+	QString keyStr = QString("%1@%2@%3").arg("NodeLabel").arg("name").arg(uniqueID++);
 	modelConfigMapData[keyStr] = labelName + "@" + val;
-
 }
+
 void ProjectManager::addElemLabelToModelConfig(QString& labelName, QString& val)
 {
-	QString keyStr = QString("%1@%2%3").arg("ElementLabel").arg("name").arg(uniqueID++);
-
+	QString keyStr = QString("%1@%2@%3").arg("ElementLabel").arg("name").arg(uniqueID++);
 	modelConfigMapData[keyStr] = labelName + "@" + val;
 }
+
 void ProjectManager::addToOutputConfig()
 {
 
@@ -167,6 +154,7 @@ void ProjectManager::outputConfigFromDomElem(QDomElement& e)
 
 void ProjectManager::xmlElemFromProjectConfig(QDomElement& projectConfigElem)
 {
+
 	QSet<QString> keys;
 	for each (QString itemKey in projectConfigMapData.keys())
 	{
@@ -209,6 +197,7 @@ void ProjectManager::xmlElemFromProjectConfig(QDomElement& projectConfigElem)
 
 void ProjectManager::xmlElemFromModelConfig(QDomElement& modelConfigElem)
 {
+	
 	//构建section 部分 ex. ModelConfig File NodeLabel ElementLabel,etc
 	QSet<QString> keys;
 	for each (QString itemKey in modelConfigMapData.keys())
@@ -260,6 +249,7 @@ void ProjectManager::xmlElemFromModelConfig(QDomElement& modelConfigElem)
 
 void ProjectManager::xmlElemFromOutputConfig(QDomElement& outputConfigElem)
 {
+	
 	QSet<QString> keys;
 	for each (QString itemKey in outputConfigMapData.keys())
 	{
@@ -330,8 +320,12 @@ void ProjectManager::xmlElemFromOutputConfig(QDomElement& outputConfigElem)
 	}
 
 }
+
 void ProjectManager::setProjectFileName(QString fileName)
 {
+	MainWindow* mw = (MainWindow*) parent();
+	mw->setWindowTitle(qApp->applicationName() + " | " + fileName);
+ 
     projectFileName = fileName;
 }
 
@@ -362,31 +356,47 @@ QString ProjectManager::getProjectFileName()
 
 void ProjectManager::save()
 {
-
+	projectFile.close();
 	projectFile.setFileName(projectFileName);
-	if (!projectFile.open(QIODevice::ReadWrite | QIODevice::Text))
+	if (!projectFile.open(QIODevice::Truncate|QIODevice::ReadWrite | QIODevice::Text))
 	{
 		qDebug() << (tr("Failed to open file for writing."));
 		return;
 	}
+	QDomElement projectElem = doc.elementsByTagName("Project").at(0).toElement();
+	if (projectElem.isNull())
+	{
+		projectElem = doc.createElement("Project");
+		projectElem.setAttribute("Version", "1.0");
+		doc.appendChild(projectElem);
+	}
+	else
+	{
+		QDomNode oldProjectConfigElem = projectElem.elementsByTagName("ProjectConfig").at(0);
+		projectElem.removeChild(oldProjectConfigElem);
 
-	QDomElement projectConfigElem = doc.createElement("projectConfig");
+		QDomNode oldModelConfigElem = projectElem.elementsByTagName("ModelConfig").at(0);
+		projectElem.removeChild(oldModelConfigElem);
+
+		QDomNode oldOutputConfigElem = projectElem.elementsByTagName("OutputConfig").at(0);
+		projectElem.removeChild(oldOutputConfigElem);
+	}
+
+	QDomElement projectConfigElem = doc.createElement("ProjectConfig");
 	xmlElemFromProjectConfig(projectConfigElem);
+	QDomNode node = projectElem.appendChild(projectConfigElem);
 
 	QDomElement modelConfigElem = doc.createElement("ModelConfig");
 	xmlElemFromModelConfig(modelConfigElem);
+	node = projectElem.appendChild(modelConfigElem);
 
 	QDomElement outputConfigElem = doc.createElement("OutputConfig");
 	xmlElemFromOutputConfig(outputConfigElem);
-
-	root.appendChild(projectConfigElem);
-	root.appendChild(modelConfigElem);
-	root.appendChild(outputConfigElem);
+	node = projectElem.appendChild(outputConfigElem);
 
 	QTextStream stream(&projectFile);
 	stream << doc.toString();
-
-
+	projectFile.close();
 }
 
 QMap<QString,QString>& ProjectManager::getUiData()

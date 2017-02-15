@@ -194,18 +194,20 @@ void LabelViewer::onLabelItemPressed(QTreeWidgetItem *item, int column)
 	item->setIcon(0, icon);
 }
 
-void LabelViewer::addNodeLabel(QString &labelName, QSet<int>& attrdata)
+void LabelViewer::addNodeLabelToUI(QString &labelName, QSet<int>& attrdata)
 {
-	addLabel(labelName, attrdata, SETTYPE_NODE);
+	addLabelToUI(labelName, attrdata, SETTYPE_NODE);
 }
 
-void LabelViewer::addElemLabel(QString &labelName, QSet<int>& attrdata)
+void LabelViewer::addElemLabelToUI(QString &labelName, QSet<int>& attrdata)
 {
-	addLabel(labelName, attrdata, SETTYPE_ELEM);
+	addLabelToUI(labelName, attrdata, SETTYPE_ELEM);
 }
 
-void LabelViewer::addLabel(QString &labelName, QSet<int>& attrdata, SETTYPE type)
+
+void LabelViewer::addLabelToUI(QString &labelName, QSet<int>& attrdata, SETTYPE type)
 {
+	//界面上增加
 	QIcon icon;
 	icon.addPixmap(QPixmap(":/res/label/label_visibility_off.png"));
 
@@ -218,6 +220,21 @@ void LabelViewer::addLabel(QString &labelName, QSet<int>& attrdata, SETTYPE type
 
 	labelItem->addChild(item);
 
+
+}
+void LabelViewer::addNodeLabelToData(QString &labelName, QSet<int>& attrdata)
+{
+
+}
+
+void LabelViewer::addElemLabelToData(QString &labelName, QSet<int>& attrdata)
+{
+
+}
+
+void LabelViewer::addLabelToData(QString &labelName, QSet<int>& attrdata, SETTYPE type)
+{
+	//ModelConfigmap 这个内部数据结构里面增加
 	QString varStr;
 	for each (int var in attrdata)
 	{
@@ -253,7 +270,8 @@ void LabelViewer::add(SETTYPE labelType)
 				QMessageBox::warning(mainWindow, "empty", "please select nodes first!");
 				return;
 			}
-			addNodeLabel(text, nodes);
+			addNodeLabelToUI(text, nodes);
+			addLabelToData(text, nodes, SETTYPE_NODE);
 		}
 		else if (labelType == SETTYPE_ELEM)
 		{
@@ -263,7 +281,8 @@ void LabelViewer::add(SETTYPE labelType)
 				QMessageBox::warning(mainWindow, "empty", "please select elements first!");
 				return;
 			}
-			addElemLabel(text, elems);
+			addElemLabelToUI(text, elems);
+			addLabelToData(text, elems, SETTYPE_ELEM);
 		}
 	}
 }

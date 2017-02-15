@@ -8,8 +8,6 @@
     <ModelConfig>
         <File>
             <Item>d:\model\Crane_Support.fil</Item>
-            <Item>d:\model\Crane_Support1.fil</Item>
-            <Item>d:\model\Crane_Support2.fil</Item>
         </File>
         <NodeLabel>
             <Item name="xxx0">14 15 16 17 18 </Item>
@@ -19,7 +17,7 @@
             <Item name="xxx2"> 5 200 30</Item >
             <Item name="xxx4">102 135 183</Item >
         </ElementLabel>
-    </ModelConfig>`
+    </ModelConfig>
     <OutputConfig>
         <File>
             <Item>c:\cube.input</Item>
