@@ -32,12 +32,15 @@ HighlightInteractorStyle::HighlightInteractorStyle() : vtkInteractorStyleRubberB
 	this->SelectedMapper = vtkSmartPointer<vtkPolyDataMapper>::New();
 	this->SelectedActor = vtkSmartPointer<vtkActor>::New();
 	
-
-
-
 	selectType = Select_Type_None;
 	circleR = 12;
 }
+
+HighlightInteractorStyle::~HighlightInteractorStyle()
+{
+
+}
+
 void HighlightInteractorStyle::SetMeshViewer(MeshViewer *mv)
 {
 	meshViewer = mv;
@@ -163,7 +166,6 @@ void HighlightInteractorStyle::createPointsMap()
 		nodeIdMap.clear();
 
 		vtkPlanes* frustum = static_cast<vtkAreaPicker*>(this->GetInteractor()->GetPicker())->GetFrustum();
-
 		vtkSmartPointer<vtkExtractGeometry> extractGeometry = vtkSmartPointer<vtkExtractGeometry>::New();
 		extractGeometry->SetImplicitFunction(frustum);
 		extractGeometry->SetInputData(this->ugrid);
@@ -237,6 +239,7 @@ void HighlightInteractorStyle::selectAreaCells()
 
 		//此处可能需要反向推断cell id
 		//还真是得反向推断,目前是没找到好办法
+		//在其他的引擎，比如occ，proe里面也发现了类似的问题：不能从下往上找
 		vtkUnstructuredGrid *pCells = extractGeometry->GetOutput();
 		vtkIdType num = pCells->GetNumberOfCells();
 		QVector<int> orignal_pts;
@@ -274,7 +277,6 @@ void HighlightInteractorStyle::selectAreaCells()
 				}
 			}
 
-			//qDebug() << "cell idddd: " << secondset ;
 			currentSelectElems.unite(secondset);
 
 			secondset.clear();

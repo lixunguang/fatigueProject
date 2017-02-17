@@ -64,16 +64,17 @@ void MeshViewer::loadMeshData(QString fileName)
 
 	vtkRenderWindowInteractor *renderWindowInteractor = renderWindow->GetInteractor();
 
-	vtkSmartPointer<vtkAreaPicker> areaPicker = vtkSmartPointer<vtkAreaPicker>::New();
+	vtkAreaPicker *areaPicker = vtkAreaPicker::New();
 	renderWindowInteractor->SetPicker(areaPicker);
+	areaPicker->Delete();
 
-	HighlightInteractorStyle* style_ = HighlightInteractorStyle::New();
-	style_->SetData(mesh->ugrid);
-	style_->SetMeshViewer(this);
-	style = style_;
-	renderWindowInteractor->SetInteractorStyle(style_);
+	HighlightInteractorStyle* style = HighlightInteractorStyle::New();
+	style->SetData(mesh->ugrid);
+	style->SetMeshViewer(this);
+	renderWindowInteractor->SetInteractorStyle(style);
 
-	style_->Delete();
+	style->Delete();
+
 	mapper->Delete();
 
 	viewReset();
@@ -85,6 +86,10 @@ void MeshViewer::reset()
 	//todo: 销毁哪些数据呢？
 	vtkRenderWindow * renderWindow = this->GetRenderWindow();
 	vtkRenderer * renderer = renderWindow->GetRenderers()->GetFirstRenderer();
+
+	this->resetActor();
+	renderWindow->Render();
+
 	if (renderer)
 	{
 		vtkActorCollection* actorCollection = renderer->GetActors();
@@ -341,6 +346,9 @@ void MeshViewer::reprsentationComboBoxIndexChanged(int index)
 	mainActor->GetProperty()->EdgeVisibilityOff();
 	mainActor->GetProperty()->SetLineWidth(10);
 
+	vtkRenderWindow * renderWindow = this->GetRenderWindow();
+	vtkRenderWindowInteractor *renderWindowInteractor = renderWindow->GetInteractor();
+	HighlightInteractorStyle* style = (HighlightInteractorStyle*) renderWindowInteractor->GetInteractorStyle();
 	switch (index)
 	{
 	case 0:
@@ -371,7 +379,6 @@ void MeshViewer::reprsentationComboBoxIndexChanged(int index)
 	renderWindowEx();
 }
 
-
 void MeshViewer::getActorColor(double* color)
 {
 	vtkSmartPointer<vtkMinimalStandardRandomSequence> rs = vtkSmartPointer<vtkMinimalStandardRandomSequence>::New();
@@ -388,7 +395,6 @@ void MeshViewer::showNodeLabel(QTreeWidgetItem *item)
 {
 	TreeItem *treeItem = (TreeItem*) item;
 	QSet<int> nodes = treeItem->getAttrData();
-
 
 	vtkSmartPointer<vtkActor> actor = vtkSmartPointer<vtkActor>::New();
 	double color[3];
@@ -492,15 +498,24 @@ void MeshViewer::hideElemLabel(QTreeWidgetItem *item)
 
 QSet<int>& MeshViewer::getSelectNodes()
 {
+	vtkRenderWindow * renderWindow = this->GetRenderWindow();
+	vtkRenderWindowInteractor *renderWindowInteractor = renderWindow->GetInteractor();
+	HighlightInteractorStyle* style = (HighlightInteractorStyle*) renderWindowInteractor->GetInteractorStyle();
 	return style->getCurrentSelectNodes();
 }
 
 QSet<int>& MeshViewer::getSelectElems()
 {
+	vtkRenderWindow * renderWindow = this->GetRenderWindow();
+	vtkRenderWindowInteractor *renderWindowInteractor = renderWindow->GetInteractor();
+	HighlightInteractorStyle* style = (HighlightInteractorStyle*) renderWindowInteractor->GetInteractorStyle();
 	return style->getCurrentSelectElems();
 }
 
 void MeshViewer::selectTypeChanged(Select_Type type)
 {
+	vtkRenderWindow * renderWindow = this->GetRenderWindow();
+	vtkRenderWindowInteractor *renderWindowInteractor = renderWindow->GetInteractor();
+	HighlightInteractorStyle* style = (HighlightInteractorStyle*) renderWindowInteractor->GetInteractorStyle();
 	style->setSelect(type);
 }

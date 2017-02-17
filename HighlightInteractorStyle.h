@@ -27,6 +27,7 @@ public:
 	vtkTypeMacro(HighlightInteractorStyle, vtkInteractorStyleRubberBandPick);
 
 	HighlightInteractorStyle();
+	~HighlightInteractorStyle();
 
 	virtual void OnLeftButtonUp();
 	virtual void OnChar();

@@ -124,8 +124,6 @@ public:
 	vtkOrientationMarkerWidget * OMwidget;
 	vtkActor* mainActor;
 
-	HighlightInteractorStyle* style;
-	vtkSmartPointer<vtkTooltipItem> tooltip;
 
 	Mesh *mesh;
 
