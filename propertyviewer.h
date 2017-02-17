@@ -14,7 +14,7 @@ public:
 public:
 	void setData(QString& strData);
 	void setData(QMap<QString, QString> &mapData);
-
+	void reset();
 private:
 	QTextEdit *nodeEdit;
 };

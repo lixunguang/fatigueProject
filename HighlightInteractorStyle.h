@@ -30,7 +30,7 @@ public:
 
 	virtual void OnLeftButtonUp();
 	virtual void OnChar();
-	void SetData(vtkSmartPointer<vtkUnstructuredGrid> data);
+	void SetData(vtkUnstructuredGrid* data);
 	vtkUnstructuredGrid* GetData();
 
 	void setSelect(Select_Type type);
@@ -55,7 +55,7 @@ private:
 	void selectCircle(int* pos, int *prepos);
 	void createPointsMap();
 public:
-	vtkSmartPointer<vtkUnstructuredGrid> ugrid;
+	vtkUnstructuredGrid* ugrid;
 
 	vtkSmartPointer<vtkActor> SelectedActor;
 	vtkSmartPointer<vtkPolyDataMapper> SelectedMapper;

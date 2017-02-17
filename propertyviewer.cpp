@@ -41,3 +41,8 @@ void PropertyViewer::setData(QMap<QString, QString> &mapData)
 {//比如接受一个字典
 	qDebug() << mapData;
 }
+
+void PropertyViewer::reset()
+{
+	nodeEdit->clear();
+}

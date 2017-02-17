@@ -8,6 +8,7 @@
 #include "vtkCellArray.h"
 #include "vtkGenericOpenGLRenderWindow.h"
 #include "vtkMinimalStandardRandomSequence.h"
+#include "vtkRendererCollection.h"
 
 #include "treeitem.h"
 #include "meshviewer.h"
@@ -20,53 +21,116 @@ MeshView类用用来可视化mesh
 MeshViewer::MeshViewer(QWidget *parent)
 :QVTKWidget(parent)
 {
+	mainActor = NULL;
+	mesh = NULL;
 
 	createToolBar();
-
-	renderer = vtkSmartPointer<vtkRenderer>::New();
-	renderer->SetGradientBackground(true);
-
-	vtkRenderWindow * renw = GetRenderWindow();
-	// 	renw->Print(std::cout);
-
-	GetRenderWindow()->AddRenderer(renderer);
-
-	mapper = vtkSmartPointer<vtkDataSetMapper>::New();
-
-	mainActor = vtkSmartPointer<vtkActor>::New();
-	mainActor->SetMapper(mapper);
-
-	renderer->AddActor(mainActor);
-
-	tooltip = vtkSmartPointer<vtkTooltipItem>::New();
-
-	vtkRenderWindowInteractor* renderWindowInteractor = GetRenderWindow()->GetInteractor();
-
-	vtkSmartPointer<vtkAreaPicker> areaPicker = vtkSmartPointer<vtkAreaPicker>::New();
-	renderWindowInteractor->SetPicker(areaPicker);
-
-	mesh = new Mesh();
-	connect(mesh, SIGNAL(finishDataLoaded()), this, SLOT(renderWindowEx()));
-
-	style = vtkSmartPointer<HighlightInteractorStyle>::New();
-	style->SetData(mesh->ugrid);
-	style->SetMeshViewer(this);
-
-	renderWindowInteractor->SetInteractorStyle(style);
-	renderWindowInteractor->SetRenderWindow(renw);
+	//tooltip = vtkSmartPointer<vtkTooltipItem>::New();
 
 	addOrientationMarkerWidget();
 	showOrientationMarkerWidget(true);
-
-	mapper->SetInputData(mesh->ugrid);
-
 }
 
 MeshViewer::~MeshViewer()
 {
-	qDebug() << mesh->ugrid->GetReferenceCount();
-	delete mesh;
+	if (mesh)
+	{
+		delete mesh;
+		mesh = NULL;
+	}
+}
 
+void MeshViewer::loadMeshData(QString fileName)
+{
+	mesh = new Mesh();
+	connect(mesh, SIGNAL(finishDataLoaded()), this, SLOT(renderWindowEx()));
+
+	mesh->loadData(fileName.toLatin1().data());
+
+	vtkDataSetMapper* mapper = vtkDataSetMapper::New();
+	mapper->SetInputData(mesh->ugrid);//之前是1个，一下变成3个
+
+	vtkActor* mainActor_ = vtkActor::New();
+
+	mainActor = mainActor_;
+	mainActor_->SetMapper(mapper);
+
+	vtkRenderer *renderer = vtkRenderer::New();
+	renderer->SetGradientBackground(true);
+	renderer->AddActor(mainActor_);
+
+	vtkRenderWindow * renderWindow = this->GetRenderWindow();//从这里开始建立opengl和render的关系,注意renderwindow可以有多个render
+	renderWindow->AddRenderer(renderer);
+
+	vtkRenderWindowInteractor *renderWindowInteractor = renderWindow->GetInteractor();
+
+	vtkSmartPointer<vtkAreaPicker> areaPicker = vtkSmartPointer<vtkAreaPicker>::New();
+	renderWindowInteractor->SetPicker(areaPicker);
+
+	HighlightInteractorStyle* style_ = HighlightInteractorStyle::New();
+	style_->SetData(mesh->ugrid);
+	style_->SetMeshViewer(this);
+	style = style_;
+	renderWindowInteractor->SetInteractorStyle(style_);
+
+	style_->Delete();
+	mapper->Delete();
+
+	viewReset();
+}
+
+void MeshViewer::reset()
+{
+	//ref resetactor
+	//todo: 销毁哪些数据呢？
+	vtkRenderWindow * renderWindow = this->GetRenderWindow();
+	vtkRenderer * renderer = renderWindow->GetRenderers()->GetFirstRenderer();
+	if (renderer)
+	{
+		vtkActorCollection* actorCollection = renderer->GetActors();
+		actorCollection->InitTraversal();
+
+		for (vtkIdType i = 0; i < actorCollection->GetNumberOfItems(); i++)
+		{
+			vtkActor* nextActor = actorCollection->GetNextActor();
+			renderer->RemoveActor(nextActor);
+			renderWindow->Render();
+			nextActor->Delete();
+		}
+		renderWindow->RemoveRenderer(renderer);
+		
+	}
+
+	mainActor = NULL;
+
+	if (mesh)
+	{
+		delete mesh;
+		mesh = NULL;
+	}
+
+}
+
+void MeshViewer::resetActor()
+{//mainActor
+	//ref reset
+	vtkRenderWindow * renderWindow = this->GetRenderWindow();
+	vtkRenderer * renderer = renderWindow->GetRenderers()->GetFirstRenderer();
+
+	vtkActorCollection* actorCollection = renderer->GetActors();
+	actorCollection->InitTraversal();
+
+	for (vtkIdType i = 0; i < actorCollection->GetNumberOfItems(); i++)
+	{
+		vtkActor* nextActor = actorCollection->GetNextActor();
+
+		std::string className = nextActor->GetClassName();
+
+		if (nextActor != mainActor)
+			renderer->RemoveActor(nextActor);
+	}
+
+	renderWindowEx();
 }
 
 void MeshViewer::updateUi(QMap<QString, QString> &mapData)
@@ -88,14 +152,11 @@ void MeshViewer::updateUi(QMap<QString, QString> &mapData)
 	{
 		loadMeshData(projectFileName[0]);//todo:如果有多个文件？
 	}
-	
-}
+	else
+	{
+		qDebug() << "error,no model file in project file.";
+	}
 
-
-void MeshViewer::loadMeshData(QString fileName)
-{
-	mesh->loadData(fileName.toLatin1().data());
-	viewReset();
 }
 
 void MeshViewer::createToolBar()
@@ -127,6 +188,9 @@ void MeshViewer::createToolBar()
 
 void MeshViewer::viewReset()
 {
+	vtkRenderWindow * renderWindow = this->GetRenderWindow();
+	vtkRenderer * renderer = renderWindow->GetRenderers()->GetFirstRenderer();
+
 	renderer->GetActiveCamera()->SetPosition(0, 0, 1);
 	renderer->GetActiveCamera()->SetViewUp(0, 1, 0);
 	renderer->GetActiveCamera()->SetFocalPoint(0, 0, 0);
@@ -138,6 +202,8 @@ void MeshViewer::viewReset()
 
 void MeshViewer::viewLeft()
 {
+	vtkRenderWindow * renderWindow = this->GetRenderWindow();
+	vtkRenderer * renderer = renderWindow->GetRenderers()->GetFirstRenderer();
 	renderer->GetActiveCamera()->SetPosition(0, 0, -1);
 	renderer->GetActiveCamera()->SetViewUp(0, 1, 0);
 	renderer->GetActiveCamera()->SetFocalPoint(0, 0, 0);
@@ -149,6 +215,8 @@ void MeshViewer::viewLeft()
 
 void MeshViewer::viewRight()
 {
+	vtkRenderWindow * renderWindow = this->GetRenderWindow();
+	vtkRenderer * renderer = renderWindow->GetRenderers()->GetFirstRenderer();
 	renderer->GetActiveCamera()->SetPosition(0, 0, 1);
 	renderer->GetActiveCamera()->SetViewUp(0, 1, 0);
 	renderer->GetActiveCamera()->SetFocalPoint(0, 0, 0);
@@ -160,6 +228,8 @@ void MeshViewer::viewRight()
 
 void MeshViewer::viewTop()
 {
+	vtkRenderWindow * renderWindow = this->GetRenderWindow();
+	vtkRenderer * renderer = renderWindow->GetRenderers()->GetFirstRenderer();
 	renderer->GetActiveCamera()->SetPosition(0, 1, 0);
 	renderer->GetActiveCamera()->SetViewUp(0, 0, 1);
 	renderer->GetActiveCamera()->SetFocalPoint(0, 0, 0);
@@ -171,6 +241,8 @@ void MeshViewer::viewTop()
 
 void MeshViewer::viewBottom()
 {
+	vtkRenderWindow * renderWindow = this->GetRenderWindow();
+	vtkRenderer * renderer = renderWindow->GetRenderers()->GetFirstRenderer();
 	renderer->GetActiveCamera()->SetPosition(0, -1, 0);
 	renderer->GetActiveCamera()->SetViewUp(0, 0, 1);
 	renderer->GetActiveCamera()->SetFocalPoint(0, 0, 0);
@@ -182,6 +254,8 @@ void MeshViewer::viewBottom()
 
 void MeshViewer::viewFront()
 {
+	vtkRenderWindow * renderWindow = this->GetRenderWindow();
+	vtkRenderer * renderer = renderWindow->GetRenderers()->GetFirstRenderer();
 	renderer->GetActiveCamera()->SetPosition(1, 0, 0);
 	renderer->GetActiveCamera()->SetViewUp(0, 0, 1);
 	renderer->GetActiveCamera()->SetFocalPoint(0, 0, 0);
@@ -193,6 +267,8 @@ void MeshViewer::viewFront()
 
 void MeshViewer::viewBack()
 {
+	vtkRenderWindow * renderWindow = this->GetRenderWindow();
+	vtkRenderer * renderer = renderWindow->GetRenderers()->GetFirstRenderer();
 	renderer->GetActiveCamera()->SetPosition(-1, 0, 0);
 	renderer->GetActiveCamera()->SetViewUp(0, 0, 1);
 	renderer->GetActiveCamera()->SetFocalPoint(0, 0, 0);
@@ -222,6 +298,8 @@ void MeshViewer::showOrientationMarkerWidget(bool isShow)
 
 void MeshViewer::setBackground(const QColor color)
 {
+	vtkRenderWindow * renderWindow = this->GetRenderWindow();
+	vtkRenderer * renderer = renderWindow->GetRenderers()->GetFirstRenderer();
 	if (!color.isValid())
 	{
 		return;
@@ -233,9 +311,14 @@ void MeshViewer::setBackground(const QColor color)
 
 void MeshViewer::renderWindowEx()
 {
+	vtkRenderWindow * renderWindow = this->GetRenderWindow();
+	vtkRenderer * renderer = renderWindow->GetRenderers()->GetFirstRenderer();
 	//qDebug()<<"renderWindowEx--";
+	if (renderer)
+	{
+		renderer->GetRenderWindow()->Render();
+	}
 
-	renderer->GetRenderWindow()->Render();
 }
 /*
 void MeshViewer::paintEvent(QPaintEvent * event)
@@ -336,6 +419,8 @@ void MeshViewer::showNodeLabel(QTreeWidgetItem *item)
 
 	actor->SetMapper(pointMapper);
 
+	vtkRenderWindow * renderWindow = this->GetRenderWindow();
+	vtkRenderer * renderer = renderWindow->GetRenderers()->GetFirstRenderer();
 	renderer->AddActor(actor);
 	nodeActorMap[item->text(1)] = actor;
 
@@ -377,6 +462,8 @@ void MeshViewer::showElemLabel(QTreeWidgetItem *item)
 
 	actor->SetMapper(cellMapper);
 
+	vtkRenderWindow * renderWindow = this->GetRenderWindow();
+	vtkRenderer * renderer = renderWindow->GetRenderers()->GetFirstRenderer();
 	renderer->AddActor(actor);
 	elemActorMap[item->text(1)] = actor;
 
@@ -387,6 +474,8 @@ void MeshViewer::showElemLabel(QTreeWidgetItem *item)
 
 void MeshViewer::hideNodeLabel(QTreeWidgetItem *item)
 {
+	vtkRenderWindow * renderWindow = this->GetRenderWindow();
+	vtkRenderer * renderer = renderWindow->GetRenderers()->GetFirstRenderer();
 	renderer->RemoveActor(nodeActorMap[item->text(1)]);
 
 	renderWindowEx();
@@ -394,6 +483,8 @@ void MeshViewer::hideNodeLabel(QTreeWidgetItem *item)
 
 void MeshViewer::hideElemLabel(QTreeWidgetItem *item)
 {
+	vtkRenderWindow * renderWindow = this->GetRenderWindow();
+	vtkRenderer * renderer = renderWindow->GetRenderers()->GetFirstRenderer();
 	renderer->RemoveActor(elemActorMap[item->text(1)]);
 
 	renderWindowEx();
@@ -408,26 +499,6 @@ QSet<int>& MeshViewer::getSelectElems()
 {
 	return style->getCurrentSelectElems();
 }
-
-void MeshViewer::resetActor()
-{//mainActor
-
-	vtkActorCollection* actorCollection = renderer->GetActors();
-	actorCollection->InitTraversal();
-
-	for (vtkIdType i = 0; i < actorCollection->GetNumberOfItems(); i++)
-	{
-		vtkActor* nextActor = actorCollection->GetNextActor();
-
-		std::string className = nextActor->GetClassName();
-
-		if (nextActor != mainActor)
-			renderer->RemoveActor(nextActor);
-	}
-
-	renderWindowEx();
-}
-
 
 void MeshViewer::selectTypeChanged(Select_Type type)
 {

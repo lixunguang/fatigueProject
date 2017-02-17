@@ -107,14 +107,21 @@ void MainWindow::createAction()
 	m_actionSaveAs->setStatusTip(tr("Open an existing document"));
 	connect(m_actionSaveAs, SIGNAL(triggered()), this, SLOT(saveAs()));
 
+	QIcon iconReset;
+	iconReset.addPixmap(QPixmap(":/res/mainwin_mainwin_largeOpenFile.png"));
+	iconReset.addPixmap(QPixmap(":/res/mainwin_smallOpen.png"));
+	m_actionReset = new QAction(iconReset, tr("&Reset"), this);
+	m_actionReset->setToolTip(tr("Reset"));
+	m_actionReset->setStatusTip(tr("clear data for next load"));
+	connect(m_actionReset, SIGNAL(triggered()), this, SLOT(closeProject()));
+
 	QIcon iconClose;
 	iconClose.addPixmap(QPixmap(":/res/mainwin_largeOpenFile.png"));
 	iconClose.addPixmap(QPixmap(":/res/mainwin_smallOpen.png"));
 	m_actionCloseFile = new QAction(iconClose, tr("&Close"), this);
-	m_actionCloseFile->setShortcut(QKeySequence::Save);
 	m_actionCloseFile->setToolTip(tr("Save"));
 	m_actionCloseFile->setStatusTip(tr("Save the active document"));
-	connect(m_actionCloseFile, SIGNAL(triggered()), this, SLOT(closeProject()));
+	connect(m_actionCloseFile, SIGNAL(triggered()), qApp, SLOT(quit()));
 
 }
 
@@ -254,7 +261,32 @@ void MainWindow::saveAs()
 
 void MainWindow::closeProject()
 {
-	//todo:应该执行一些数据清理，以便于下次打开
+	//0 reset project manage 
+	projectManager.reset();
+	//1 reset mainwindow
+	this->reset();
+
+	//2 reset fatigur window
+	//FatigueWidget *w = (FatigueWidget *) (opViewer->widget());
+	//w->updateUi(projectManager.getUiData());
+
+	//3 reset label browser
+	labelViewer->reset();
+
+	//4 reset model window
+ 	propViewer->reset();
+
+	//5 reset mesh Viewer
+	meshViewer->reset();
+}
+
+void MainWindow::reset()
+{//show all window, may be other operation
+
+	labelViewer->show();
+	propViewer->show();
+	opViewer->show();
+	meshViewer->show();
 }
 
 QString MainWindow::importFile()
@@ -305,6 +337,7 @@ void MainWindow::createMenuFile()
 		popupBar->addAction(m_actionImportFile);
 		popupBar->addAction(m_actionSave);
 		popupBar->addAction(m_actionSaveAs);
+		popupBar->addAction(m_actionReset);
 		popupBar->addSeparator();
 		popupBar->addAction(m_actionCloseFile);
 	}

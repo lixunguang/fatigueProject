@@ -40,7 +40,7 @@ protected Q_SLOTS:
 	void save();
 	void saveAs();
 	void closeProject();
-
+	void reset();//重置应用程序
 
 
 	virtual void options(QAction* action);
@@ -66,7 +66,7 @@ protected:
 	QAction* m_actionSave;
 	QAction* m_actionSaveAs;
 	QAction* m_actionCloseFile;
-
+	QAction *m_actionReset;
 	QAction* m_showFatigueDialog;
 
 	

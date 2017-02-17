@@ -68,7 +68,7 @@ public:
 public:
 	void updateUi(QMap<QString, QString> &mapData);
 	void loadMeshData(QString fileName);
-	
+	void reset();
 
 public slots:
 	void setBackground(const QColor color);
@@ -111,12 +111,6 @@ protected:
 //	virtual void paintEvent(QPaintEvent * event);
 
 public:
- 	vtkOrientationMarkerWidget * OMwidget;
- 	vtkSmartPointer<vtkRenderer>		renderer;
- 	vtkSmartPointer<vtkActor>			mainActor;
- 	vtkSmartPointer<vtkDataSetMapper>	mapper;
-	vtkSmartPointer<HighlightInteractorStyle> style;
-
  	QAction *action_reset;
  	QAction *action_viewTop;
  	QAction *action_viewBottom;
@@ -127,7 +121,12 @@ public:
  	QAction *action_viewMore;
  	QComboBox *reprsentationComboBox; 
 
+	vtkOrientationMarkerWidget * OMwidget;
+	vtkActor* mainActor;
+
+	HighlightInteractorStyle* style;
 	vtkSmartPointer<vtkTooltipItem> tooltip;
+
 	Mesh *mesh;
 
 	map<QString, vtkActor*> nodeActorMap;

@@ -19,14 +19,15 @@ public:
 
 public slots:
 	// project manager
+	void parse(QString &filePath);
+
     void setProjectFileName(QString fileName);
 	void setModelFileName(QStringList &fileNames);
 	QString getProjectFileName();
+	QStringList getModelFileName();
 
-	void parse(QString &filePath);
     void save();
 	void reset();
-
 
 	void addNodeLabelToModelConfig(QString& key,QString& val);
 	void addElemLabelToModelConfig(QString& key, QString& val);
@@ -57,6 +58,7 @@ private:
 	
 	QString projectFileName;
 	QFile projectFile;
+
 
 	int uniqueID;//内部数据使用的唯一id
 };

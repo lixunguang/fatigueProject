@@ -63,11 +63,40 @@ void ProjectManager::parse(QString &fileName)
 			{
 				outputConfigFromDomElem(e);
 			}
-
 		}
 		node = node.nextSibling();
 	}
 
+}
+
+void ProjectManager::setProjectFileName(QString fileName)
+{
+	MainWindow* mw = (MainWindow*) parent();
+	mw->setWindowTitle(qApp->applicationName() + " | " + fileName);
+
+	projectFileName = fileName;
+}
+
+QString ProjectManager::getProjectFileName()
+{
+	return projectFileName;
+}
+
+QStringList ProjectManager::getModelFileName()
+{//"File@0",d:\model\Crane_Support.fil
+	QStringList modelFileName;
+
+	for each (QString itemKey in modelConfigMapData.keys())
+	{
+		QStringList valList = modelConfigMapData[itemKey].split("@");
+
+		if (itemKey.startsWith("File"))
+		{
+			modelFileName << valList[0];
+		}
+	}
+
+	return modelFileName;
 }
 
 
@@ -139,6 +168,7 @@ void ProjectManager::projectConfigFromDomElem(QDomElement& e)
 void ProjectManager::modelConfigFromDomElem(QDomElement& e)
 {
 	travelElement(e, modelConfigMapData);
+
 }
 
 void ProjectManager::outputConfigFromDomElem(QDomElement& e)
@@ -312,15 +342,6 @@ void ProjectManager::xmlElemFromOutputConfig(QDomElement& outputConfigElem)
 			loadElem.appendChild(elem);
 		}
 	}
-
-}
-
-void ProjectManager::setProjectFileName(QString fileName)
-{
-	MainWindow* mw = (MainWindow*) parent();
-	mw->setWindowTitle(qApp->applicationName() + " | " + fileName);
- 
-    projectFileName = fileName;
 }
 
 void ProjectManager::setModelFileName(QStringList &fileNames)
@@ -338,14 +359,12 @@ void ProjectManager::setModelFileName(QStringList &fileNames)
 
 void ProjectManager::reset()
 {
-	//提示保存
-	//清理数据
+	projectFile.close();
+	projectFileName = "";
+	projectConfigMapData.clear();
+	modelConfigMapData.clear();
+	outputConfigMapData.clear();
 
-}
-
-QString ProjectManager::getProjectFileName()
-{
-	return projectFileName;
 }
 
 void ProjectManager::save()

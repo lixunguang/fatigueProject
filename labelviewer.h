@@ -15,7 +15,7 @@ public:
 	LabelViewer(QWidget *parent = 0);
 	~LabelViewer();
 	void updateUi(QMap<QString, QString> &mapData);
-
+	void reset();
 public slots:
 	void onAddBtn();
 	void onAddBtn2();

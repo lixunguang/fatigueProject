@@ -52,8 +52,6 @@ Mesh::Mesh()
 	ugrid = vtkSmartPointer<vtkUnstructuredGrid>::New();
 	qDebug() << ugrid->GetReferenceCount();
 
-	vtkSmartPointer<vtkUnstructuredGrid> x = ugrid;
-	qDebug() << ugrid->GetReferenceCount();
 
 	datafun = vdm_DataFunBegin();
 	lman = vdm_LManBegin();
@@ -61,6 +59,19 @@ Mesh::Mesh()
 	gridfun = vis_GridFunBegin();
 }
 
+Mesh::~Mesh()
+{//如何保证ugrid被析构呢？
+
+	vis_GridFunEnd(gridfun);
+	vis_ModelEnd(model);
+	vdm_LManEnd(lman);
+	if (datafun->obj)
+	{
+		CloseVKISupportFile(datafun);
+	}
+
+	qDebug() << ugrid->GetReferenceCount();
+}
 void Mesh::setFileName(char *fileName)
 {
 
@@ -90,7 +101,7 @@ void Mesh::setFileName(char *fileName)
 
 void Mesh::readMesh()
 {
-	vtkPoints *pts = vtkPoints::New();
+	vtkSmartPointer<vtkPoints> pts = vtkSmartPointer<vtkPoints>::New();;
 	pts->Allocate(n_nodes);
 	pts->SetNumberOfPoints(n_nodes);
 
@@ -371,18 +382,6 @@ void Mesh::loadData(char *fileName)
 	emit finishDataLoaded();
 }
 
-Mesh::~Mesh()
-{
-
-	vis_GridFunEnd(gridfun);
-	vis_ModelEnd(model);
-	vdm_LManEnd(lman);
-	if (datafun->obj)
-	{
-		CloseVKISupportFile(datafun);
-	}
-
-}
 
 
 void Mesh::ReadVKISupportFile(Vchar *fileName, vdm_DataFun *datafun)

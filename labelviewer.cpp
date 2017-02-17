@@ -85,19 +85,23 @@ LabelViewer::LabelViewer(QWidget *parent)
 
 LabelViewer::~LabelViewer()
 {
+	reset();
+}
+
+void LabelViewer::reset()
+{
 	QTreeWidgetItem *item;
 	for each (item in topItems)
 	{
 		int cnt = item->childCount();
 		while (cnt--)
 		{
-			TreeItem *childItem = (TreeItem *)item->child(cnt);
+			TreeItem *childItem = (TreeItem *) item->child(cnt);
 			delete childItem;
 		}
-		delete item;
 	}
 
-	topItems.clear();
+
 }
 
 void LabelViewer::updateUi(QMap<QString, QString> &mapData)

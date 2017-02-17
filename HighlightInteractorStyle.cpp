@@ -43,7 +43,7 @@ void HighlightInteractorStyle::SetMeshViewer(MeshViewer *mv)
 	meshViewer = mv;
 }
 
-void HighlightInteractorStyle::SetData(vtkSmartPointer<vtkUnstructuredGrid> data)
+void HighlightInteractorStyle::SetData(vtkUnstructuredGrid* data)
 {
 	this->ugrid = data;
 }
@@ -83,7 +83,7 @@ void HighlightInteractorStyle::OnLeftButtonUp()
 	//	selectSinglePoint();//单个点
 	//	selectSingleCell();//单个单元
 
-
+	qDebug() << "HighlightInteractorStyle::OnLeftButtonUp";
 	if (selectType == Select_Type_Point)
 	{
 		createPointsMap();
