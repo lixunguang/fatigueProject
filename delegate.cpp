@@ -5,12 +5,12 @@
 #include <QDebug>
 
 #include "delegate.h"
+#include "mainwindow.h"
 
 Delegate::Delegate(QObject *parent)
 :QStyledItemDelegate(parent)
 {
 	table = (Table *)parent;
-
 }
 
 Delegate::~Delegate()
@@ -20,43 +20,41 @@ Delegate::~Delegate()
 
 QWidget *Delegate::createEditor(QWidget * parent, const QStyleOptionViewItem & option, const QModelIndex & index) const
 {
-	if (index.column() == 1)
+	if (index.column() == 0)
 	{
-		//caseNames = GLOBAL_CM.getCaseName()
-			//#print 'createEditor', caseNames
-		QComboBox* comb = (QComboBox*)parent;
-		comb->addItems(QStringList("caseNames"));
+	}
+	else if (index.column() == 1)
+	{
+		MainWindow *mw = MainWindow::getMainWindow();
+		QStringList caseNames = mw->getOpViewer()->getCaseManager()->getCaseName();
+
+		QComboBox* comb = new QComboBox(parent);
+		comb->addItems(caseNames);
 		return comb;
 	}
 	else
 	{
-		return (QLineEdit*)parent;
+		return new QLineEdit(parent);
 	}
 	
 }
 
 void Delegate::setEditorData(QWidget * editor, const QModelIndex & index) const
 {
-//#set val
-	
 	QString text = table->model->modelData()[index.row()];
-	QStringList l = text.split('##');
-	if (index.column() == 1)
+	QStringList li = text.split("##");
+	if (index.column() == 0)
+	{
+	}
+	else if (index.column() == 1)
 	{
 		QComboBox* control = (QComboBox*)editor;
-		//caseNames = GLOBAL_CM.getCaseName()
-		if (l[index.column()] != "" )
-		{
-		//	control->setCurrentIndex(caseNames.index(l[index.column()]));
-			control->setCurrentIndex(1);
-		}
-		
+
 	}
 	else
 	{
 		QLineEdit* control = (QLineEdit*)editor;
-		//control->setText(l[index.column()]);
-		control->setText("xx");
+		control->setText("1");
 	}
 	
 }
@@ -64,20 +62,20 @@ void Delegate::setEditorData(QWidget * editor, const QModelIndex & index) const
 void Delegate::setModelData(QWidget * editor, QAbstractItemModel * model, const QModelIndex & index) const
 {
 	QString ori_text = table->model->modelData_()[index.row()];
-	QStringList l = ori_text.split('##');
+	QStringList li = ori_text.split("##");
 	if (index.column() == 1)
 	{
-		QComboBox* control = (QComboBox*)editor;
-		l[index.column()] = QString(control->currentText());
+		QComboBox* control = (QComboBox*) editor;
+		li[index.column()] = QString(control->currentText());
 	}
 	else
 	{
-		QLineEdit* control = (QLineEdit*)editor;
-		l[index.column()] = QString(control->text());
+		QLineEdit* control = (QLineEdit*) editor;
+		li[index.column()] = QString(control->text());
 	}
 	
-	QString	s = '##';
-	//s = s.join(l);
+	QString	s;
+	s = li.join("##");
 
 	table->model->modelData_()[index.row()] = s;
 }

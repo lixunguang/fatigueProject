@@ -1,6 +1,5 @@
 #include "table.h"
 
-
 #include <QGroupBox>
 #include <QTableView>
 #include <QHBoxLayout>
@@ -9,6 +8,7 @@
 #include <QDebug>
 #include <QSpacerItem>
 #include <QModelIndex>
+#include <QHeaderView>
 
 #include <model.h>
 #include <delegate.h>
@@ -22,21 +22,21 @@ Table::Table(QString type, QWidget *parent)
 	QVBoxLayout *grpLayout = new QVBoxLayout(grp);
 
 	QPushButton *toolAddBtn = new QPushButton("add");
-	QPushButton *toolRemoveBtn = new QPushButton("remove");
+//	QPushButton *toolRemoveBtn = new QPushButton("remove");
 	QPushButton *toolUpBtn = new QPushButton("up");
 	QPushButton *toolDownBtn = new QPushButton("down");
 	QHBoxLayout *toolLayout = new QHBoxLayout();
 
 	toolLayout->addWidget(toolAddBtn);
-	toolLayout->addWidget(toolRemoveBtn);
+//	toolLayout->addWidget(toolRemoveBtn);
 	toolLayout->addWidget(toolUpBtn);
 	toolLayout->addWidget(toolDownBtn);
 
 	QSpacerItem *spacer = new QSpacerItem(100, 5, QSizePolicy::Minimum);
 	toolLayout->addSpacerItem(spacer);
 
-	table = new QTableView();
-	model = new Model(type);
+	table = new QTableView(this);
+	model = new Model(type,this);
 
 	table->setModel(model);
 
@@ -48,11 +48,13 @@ Table::Table(QString type, QWidget *parent)
 
 	this->setLayout(layout);
 
+	QHeaderView *headerView = table->verticalHeader();
 	//#tool button  clicked
-	//self.connect(self._toolAddBtn, qtc.SIGNAL('clicked()'), self.onAddClicked);
-	//self.connect(self._table.verticalHeader(), qtc.SIGNAL('sectionClicked(int)'), self.onRemove);
-	//self.connect(self._toolUpBtn, qtc.SIGNAL('clicked()'), self.onUpClicked);
-	//self.connect(self._toolDownBtn, qtc.SIGNAL('clicked()'), self.onDownClicked);
+	connect(toolAddBtn, SIGNAL(clicked()), this, SLOT(onAddClicked()));
+
+	connect(headerView, SIGNAL(sectionClicked(int)), this, SLOT(onRemove(int)));
+	connect(toolUpBtn, SIGNAL(clicked()), this, SLOT(onUpClicked()));
+	connect(toolDownBtn, SIGNAL(clicked()), this, SLOT(onDownClicked()));
 }
 
 Table::~Table()
@@ -65,27 +67,23 @@ void Table::setText(QString text)
 	grp->setTitle(text);
 }
 
-
 QString Table::text()
 {
 	return grp->title();
 }
 
-
 void Table::onAddClicked()
 {
 	int cnt = model->modelData().size();
-	model->insertColumns(cnt, 1, QModelIndex());
+	model->insertRows(cnt, 1, QModelIndex());
 
 }
-
 
 void Table::onRemove(int idx)
 {
 	model->removeRows(idx, 1, QModelIndex());
 
 }
-
 
 void Table::onUpClicked()
 {
@@ -106,17 +104,16 @@ void Table::onUpClicked()
 		model->moveRows(QModelIndex(), r,1, QModelIndex(),r1 );
 }
 
-
-
-
 void Table::onDownClicked()
 {
-	/*QModelIndex midx = table->currentIndex();
+
+	QModelIndex midx = table->currentIndex();
 	int r = midx.row();
 
-	int r1 = r + 1;
+	int cnt = model->modelData_().size();
 
-	if (r1 <= model->modelData().size()) - 1)
+	int r1 = r+1;
+	if (r <= cnt)
 	{
 	}
 	else
@@ -124,33 +121,6 @@ void Table::onDownClicked()
 		r1 = r;
 	}
 
-
-	if (r1 <= model->modelData().size() - 1 && r1 != r)
-	{
-		model->beginMoveRows(qtc.QModelIndex(), r1, r1, qtc.QModelIndex(), r);
-		//#change
-		first = model->modelData()[r];
-		second = model->modelData()[r1];
-		model->modelData()[r] = second;
-		model->modelData()[r1] = first;
-
-		model->endMoveRows();
-	}
-	*/
-
-	QModelIndex midx = table->currentIndex();
-	int r = midx.row();
-
-	int r1 = 0;
-	if (r - 1 >= 0)
-	{
-		r1 = r - 1;
-	}
-	else
-	{
-		r1 = 0;
-	}
-
-	if (r > 0 && r1 != r)
-		model->moveRows(QModelIndex(), r, 1, QModelIndex(), r1);
+	if (r1 <=cnt-1 && r1 != r)
+		model->moveRows(QModelIndex(), r1, 1, QModelIndex(), r);
 }

@@ -2,6 +2,7 @@
 #include <QLabel>
 #include <QStringList>
 #include <QPushButton>
+#include <QTextEdit>
 
 #include "loadwidget.h"
 
@@ -16,14 +17,14 @@ LoadWidget::LoadWidget(QWidget *parent)
 	QLabel* loadTypeLabel = new QLabel("Loading Type:    ");
 	loadTypeCombo = new QComboBox();
 	QStringList items;
-	items << "Duty Cycle" << "Loading Hidstory" << "Superimposed";
+	items << "Duty Cycle" << "Loading History" << "Superimposed";
 	loadTypeCombo->addItems(items);// #todo
 	loadTypeHBox->addWidget(loadTypeLabel);
 	loadTypeHBox->addWidget(loadTypeCombo);
 
 	QHBoxLayout* loadEventHBox = new QHBoxLayout();
 	QLabel* loadEventLabel = new QLabel("Loading Events:      ");
-	loadEventEdit = new QLineEdit();
+	loadEventEdit = new QTextEdit();
 	QPushButton* loadEventBtn = new QPushButton("...");
 	loadEventHBox->addWidget(loadEventLabel);
 	loadEventHBox->addWidget(loadEventEdit);
@@ -33,7 +34,6 @@ LoadWidget::LoadWidget(QWidget *parent)
 	grpLoadVBox->addLayout(loadEventHBox);
 	QSpacerItem *spacer = new QSpacerItem(100, 300, QSizePolicy::Minimum);
 	grpLoadVBox->addSpacerItem(spacer);
-
 
 	grpLoad->setLayout(grpLoadVBox);
 	layout->addWidget(grpLoad);
@@ -46,7 +46,7 @@ LoadWidget::LoadWidget(QWidget *parent)
 	loadEventDialog_super = new LoadEventDialog("Superimposed", this);
 //#
 	connect(loadEventBtn, SIGNAL(clicked()), this, SLOT(showLoadEventWidget()));
-	//connect(loadTypeCombo, SIGNAL("currentIndexChanged(QString)"),this, typeChanged);
+	connect(loadTypeCombo, SIGNAL(currentIndexChanged(const QString & )), this, SLOT(typeChanged(const QString &)));
 
 }
 
@@ -70,13 +70,15 @@ void LoadWidget::showLoadEventWidget()
 		loadEventDialog = loadEventDialog_super;
 	}
 
-
 	if (QDialog::Accepted == loadEventDialog->exec())
 	{
-		QStringList l = loadEventDialog->tabwidget->model->modelData_();
-		l.append(" events");
-		loadEventEdit->setText(l.join(""));
+		QStringList sl = loadEventDialog->tabwidget->model->modelData_();
+		sl.append(QString("%1 events").arg(sl.size()));
+		loadEventEdit->setText(sl.join("\n"));
 	}
+}
 
-
+void LoadWidget::typeChanged(const QString &  str)
+{
+	qDebug() << "LoadWidget::typeChanged " << str;
 }

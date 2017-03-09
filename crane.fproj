@@ -28,7 +28,7 @@
         <AnalisisDefSection>
             <Item name="AnalisisDefSection_pathEdit" type="1">c:\aaaa.mat</Item>
             <Item name="AnalisisDefSection_meanStressCombo" type="2">2</Item>
-            <Item name="AnalisisDefSection_inFluenceFactorsEdit" type="1">1,0,2.0,1.0,1.0,6.0</Item>
+            <Item name="AnalisisDefSection_inFluenceFactorsEdit" type="1">1.0,2.0,1.0,1.0,6.0</Item>
             <Item name="AnalisisDefSection_weldCombo" type="2">3</Item>
             <Item name="AnalisisDefSection_sdNumCombo" type="2">2</Item >
         </AnalisisDefSection>
@@ -38,7 +38,7 @@
         </RainFlowSection>
         <EntitySection>
             <Item name="EntitySection_entityTypeCombo" type="2">1</Item> 
-            <Item name="EntitySection_entityNumEdit" type="1">28</Item>
+            <Item name="EntitySection_entityNumEdit" type="3"> </Item>
         </EntitySection>
         <CaseSection>
         </CaseSection> 

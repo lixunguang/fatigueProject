@@ -4,7 +4,6 @@
 #include <QMessageBox>
 #include <QDesktopServices>
 
-
 #include "stdio.h"
 
 #include "mainwindow.h"
@@ -18,7 +17,7 @@ MainWindow::MainWindow(QWidget *parent) :RibbonWindow(parent), projectManager(th
 	createAction();
 	createMenuFile();
 
-
+	this->setObjectName("fatigueMainwindow");
 	meshViewer = new MeshViewer(this); 
 	meshViewer->setObjectName("meshViewer");
 	setCentralWidget(meshViewer);
@@ -61,6 +60,9 @@ MainWindow::MainWindow(QWidget *parent) :RibbonWindow(parent), projectManager(th
 	connect(labelViewer, SIGNAL(resetActor()), meshViewer, SLOT(resetActor()));
 
 	connect(m_showFatigueDialog, SIGNAL(triggered()), this, SLOT(showFatigueDialog()));
+
+ 
+
 }
 
 void MainWindow::createAction()

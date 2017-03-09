@@ -290,14 +290,20 @@ void LabelViewer::addLabelToData(QString &labelName, QSet<int>& attrdata, SETTYP
 	{
 		varStr += QString("%1 ").arg(var);
 	}
-	MainWindow *mainWindow = (MainWindow *) parent();
+
+	//todo:实际上，一个对象如果非要和另外一个对象打交道，类似这样的问题应该这样来解决
+	//1）在创建这个对象时，记录另外一个对象的指针，或者2）发送消息，这样可以降低耦合性
+	//如果要写可重用的对象，那么一定是这样的
+	//项目中，这样的写法是不是坏味道呢？
+
+	MainWindow *mw = MainWindow::getMainWindow();
 	if (type == SETTYPE_ELEM)
 	{
-		mainWindow->projectManager.addElemLabelToModelConfig(labelName, varStr);
+		mw->getProjectManager()->addElemLabelToModelConfig(labelName, varStr);
 	}
 	else if (type == SETTYPE_NODE)
 	{
-		mainWindow->projectManager.addNodeLabelToModelConfig(labelName, varStr);
+		mw->getProjectManager()->addNodeLabelToModelConfig(labelName, varStr);
 	}
 }
 
@@ -310,14 +316,14 @@ void LabelViewer::add(SETTYPE labelType)
 
 	if (ok && !text.isEmpty())
 	{
-		MainWindow *mainWindow = (MainWindow *) parent();
+		MainWindow *mw = MainWindow::getMainWindow();
 
 		if (labelType == SETTYPE_NODE)
 		{
-			QSet<int> nodes = mainWindow->meshViewer->getSelectNodes();
+			QSet<int> nodes = mw->getMeshViewer()->getSelectNodes();
 			if (nodes.empty())
 			{
-				QMessageBox::warning(mainWindow, "empty", "please select nodes first!");
+				QMessageBox::warning(mw, "empty", "please select nodes first!");
 				return;
 			}
 			addNodeLabelToUI(text, nodes);
@@ -325,10 +331,10 @@ void LabelViewer::add(SETTYPE labelType)
 		}
 		else if (labelType == SETTYPE_ELEM)
 		{
-			QSet<int> elems = mainWindow->meshViewer->getSelectElems();
+			QSet<int> elems = mw->getMeshViewer()->getSelectElems();
 			if (elems.empty())
 			{
-				QMessageBox::warning(mainWindow, "empty", "please select elements first!");
+				QMessageBox::warning(mw, "empty", "please select elements first!");
 				return;
 			}
 			addElemLabelToUI(text, elems);

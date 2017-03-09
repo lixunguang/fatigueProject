@@ -12,7 +12,8 @@ public:
 	InfluenceFactorDialog(QWidget *parent = 0);
 	~InfluenceFactorDialog();
 
-//public slots:
+public:
+	void updateUi(QString uiText);
 
 
 public:

@@ -2,6 +2,7 @@
 #include <QVBoxLayout>
 #include <QPushButton>
 #include <QDebug>
+#include <QTextEdit>
 
 #include "fatiguewidget.h"
 #include "analysiswidget.h"
@@ -9,9 +10,9 @@
 
 //注意！！！！！！！！！
 //把ui数据写入data
-//可以约定，把objectname非空的写到mapdata里面
+//约定: 把objectname非空的写到mapdata里面
 //objectname名字加上段名，分段的目的是xml易读
-//应该clear掉原来的
+
 
 FatigueWidget::FatigueWidget(QWidget *parent)
 	:QWidget(parent)
@@ -34,12 +35,15 @@ FatigueWidget::FatigueWidget(QWidget *parent)
 	connect(finishBtn, SIGNAL(clicked()), this, SLOT(writeToFile()));
 
 	this->setLayout(layout);
+
 }
 
 FatigueWidget::~FatigueWidget()
 {
 
 }
+
+
 
 void FatigueWidget::writeToFile()
 {
@@ -75,6 +79,10 @@ void FatigueWidget::updateUi(QMap<QString,QString> &mapData)
 				{
 					type = type_combo;
 				}
+				else if (valList[j - 1].toInt() == 3)
+				{
+					type = type_text;
+				}
 				else
 				{
 					qDebug() << valList[j].toInt() << "OBJECTTYPE ERROR" << valList;
@@ -82,7 +90,7 @@ void FatigueWidget::updateUi(QMap<QString,QString> &mapData)
 			}
 		}
 
-		if (type == type_edit)
+		if (type == type_edit )
 		{
 			QLineEdit *obj = this->findChild<QLineEdit *>(val);
 			if (!obj)
@@ -90,6 +98,15 @@ void FatigueWidget::updateUi(QMap<QString,QString> &mapData)
 				qDebug() << "can't find object: " << val;
 			}
 			obj->setText(valList[valList.size()-1]);
+		}
+		if ( type == type_text)
+		{
+			QTextEdit *obj = this->findChild<QTextEdit *>(val);
+			if (!obj)
+			{
+				qDebug() << "can't find object: " << val;
+			}
+			obj->setText(valList[valList.size() - 1]);
 		}
 		else if (type == type_combo)
 		{
@@ -124,7 +141,7 @@ void FatigueWidget::updateMapData(QMap<QString, QString> &mapData)
 	//把ui数据写入data
 	//可以约定，把objectname非空的写到mapdata里面
 	//objectname名字加上段名，分段的目的是xml易读
-	//应该clear掉原来的
+
 
 	mapData.clear();
 
@@ -152,3 +169,4 @@ void FatigueWidget::updateMapData(QMap<QString, QString> &mapData)
 
 
 }
+

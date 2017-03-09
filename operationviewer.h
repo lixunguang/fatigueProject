@@ -2,6 +2,8 @@
 #define OPERATIONVIEW_H_
 
 #include <QDockWidget>
+#include <casemanager.h>
+
 #include "fatiguewidget.h"
 
 class  OperationViewer : public QDockWidget
@@ -11,8 +13,12 @@ public:
 	OperationViewer(QWidget *parent = 0);
 	~OperationViewer();
 
-private:
+public:
 	FatigueWidget *fatigueWidget;
+	CaseManager *getCaseManager();
+
+private:
+	CaseManager caseManager;
 };
 
 #endif

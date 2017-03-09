@@ -25,10 +25,9 @@ MeshViewer::MeshViewer(QWidget *parent)
 	mesh = NULL;
 
 	createToolBar();
-	//tooltip = vtkSmartPointer<vtkTooltipItem>::New();
 
 	addOrientationMarkerWidget();
-	showOrientationMarkerWidget(true);
+	selectType = Select_Type_None;
 }
 
 MeshViewer::~MeshViewer()
@@ -54,7 +53,8 @@ void MeshViewer::loadMeshData(QString fileName)
 
 	mainActor = mainActor_;
 	mainActor_->SetMapper(mapper);
-
+	//mainActor->VisibilityOff();
+	
 	vtkRenderer *renderer = vtkRenderer::New();
 	renderer->SetGradientBackground(true);
 	renderer->AddActor(mainActor_);
@@ -64,6 +64,41 @@ void MeshViewer::loadMeshData(QString fileName)
 
 	vtkRenderWindowInteractor *renderWindowInteractor = renderWindow->GetInteractor();
 
+	OMwidget->SetInteractor(renderWindowInteractor);
+	OMwidget->SetEnabled(1);
+	OMwidget->InteractiveOff();
+
+/*
+ 	vtkLineWidget *line = vtkLineWidget::New();
+ 	line->SetPoint1(-4258.4668, -44591.0078, 1926.40979);
+ 	line->SetPoint2(0, 0, 0);//0, -44360.1211, 4050.34229
+ 	line->SetInteractor(renderWindowInteractor);
+	
+ 	line->SetEnabled(1);
+ 	line->Delete();
+
+ 	vtkProperty *prop = line->GetLineProperty();
+ 	prop->SetColor(1.0, 1.0, 0.0);
+// 
+// 	vtkMyCallback *callback = vtkMyCallback::New();
+// 	line->AddObserver(vtkCommand::AnyEvent, callback);
+// 	callback->Delete();
+ 
+	double d1[3] = { -4258.4668, -44591.0078, 1926.40979 };
+	double d2[3] = { 0, -44360.1211, 4050.34229 };
+ 
+
+ 
+	vtkSmartPointer<vtkAngleRepresentation3D> rep = vtkSmartPointer<vtkAngleRepresentation3D>::New();
+	rep->ArcVisibilityOff();
+
+	//angleWidget->SetEnabled(1);
+ 
+// 	vtkMyCallback *callback2 = vtkMyCallback::New();
+// 	distanceWidget->AddObserver(vtkCommand::AnyEvent, callback2);
+// 	callback2->Delete();
+*/
+
 	vtkAreaPicker *areaPicker = vtkAreaPicker::New();
 	renderWindowInteractor->SetPicker(areaPicker);
 	areaPicker->Delete();
@@ -71,19 +106,19 @@ void MeshViewer::loadMeshData(QString fileName)
 	HighlightInteractorStyle* style = HighlightInteractorStyle::New();
 	style->SetData(mesh->ugrid);
 	style->SetMeshViewer(this);
+
+	//style->SetInteractor(renderWindowInteractor);//以下这两句等效？
 	renderWindowInteractor->SetInteractorStyle(style);
 
 	style->Delete();
-
 	mapper->Delete();
 
 	viewReset();
+
 }
 
 void MeshViewer::reset()
 {
-	//ref resetactor
-	//todo: 销毁哪些数据呢？
 	vtkRenderWindow * renderWindow = this->GetRenderWindow();
 	vtkRenderer * renderer = renderWindow->GetRenderers()->GetFirstRenderer();
 
@@ -103,7 +138,6 @@ void MeshViewer::reset()
 			nextActor->Delete();
 		}
 		renderWindow->RemoveRenderer(renderer);
-		
 	}
 
 	mainActor = NULL;
@@ -189,7 +223,6 @@ void MeshViewer::createToolBar()
 	connect(reprsentationComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(reprsentationComboBoxIndexChanged(int)));
 
 }
-
 
 void MeshViewer::viewReset()
 {
@@ -290,14 +323,6 @@ void MeshViewer::addOrientationMarkerWidget()
 	OMwidget->SetOutlineColor(0.9300, 0.5700, 0.1300);
 	OMwidget->SetOrientationMarker(axes);
 	OMwidget->SetViewport(0.0, 0.0, 0.2, 0.2);
-	OMwidget->SetInteractor((vtkRenderWindowInteractor*) (GetInteractor()));
-	OMwidget->SetEnabled(1);
-	//OMwidget->InteractiveOff();
-}
-
-void MeshViewer::showOrientationMarkerWidget(bool isShow)
-{
-	OMwidget->SetEnabled(isShow);
 
 }
 
@@ -318,29 +343,14 @@ void MeshViewer::renderWindowEx()
 {
 	vtkRenderWindow * renderWindow = this->GetRenderWindow();
 	vtkRenderer * renderer = renderWindow->GetRenderers()->GetFirstRenderer();
-	//qDebug()<<"renderWindowEx--";
+
 	if (renderer)
 	{
 		renderer->GetRenderWindow()->Render();
 	}
 
 }
-/*
-void MeshViewer::paintEvent(QPaintEvent * event)
-{
 
-qDebug() << "--paintEvent--";
-QWidget::paintEvent(event);
-renderWindowEx();
-}
-
-void MeshViewer::paintGL()
-{
-
-qDebug() << "--paintGL--";
-QVTKWidget2::paintGL();
-}
-*/
 void MeshViewer::reprsentationComboBoxIndexChanged(int index)
 {
 	mainActor->GetProperty()->EdgeVisibilityOff();
@@ -393,8 +403,10 @@ void MeshViewer::getActorColor(double* color)
 
 void MeshViewer::showNodeLabel(QTreeWidgetItem *item)
 {
+	setSelectType(Select_Type_Point);
+
 	TreeItem *treeItem = (TreeItem*) item;
-	QSet<int> nodes = treeItem->getAttrData();
+	currentNodes += treeItem->getAttrData();
 
 	vtkSmartPointer<vtkActor> actor = vtkSmartPointer<vtkActor>::New();
 	double color[3];
@@ -407,9 +419,8 @@ void MeshViewer::showNodeLabel(QTreeWidgetItem *item)
 	vtkSmartPointer<vtkCellArray> verArray = vtkSmartPointer<vtkCellArray>::New();
 
 	int cnt = 0;
-	for each (int id in nodes)
+	for each (int id in currentNodes)
 	{
-
 		vertex->GetPointIds()->InsertId(cnt, id);
 		verArray->InsertNextCell(vertex);
 		cnt++;
@@ -420,10 +431,10 @@ void MeshViewer::showNodeLabel(QTreeWidgetItem *item)
 	pointset->SetVerts(verArray);
 
 	vtkSmartPointer<vtkPolyDataMapper> pointMapper = vtkSmartPointer<vtkPolyDataMapper>::New();
-
 	pointMapper->SetInputData(pointset);
 
 	actor->SetMapper(pointMapper);
+
 
 	vtkRenderWindow * renderWindow = this->GetRenderWindow();
 	vtkRenderer * renderer = renderWindow->GetRenderers()->GetFirstRenderer();
@@ -431,16 +442,14 @@ void MeshViewer::showNodeLabel(QTreeWidgetItem *item)
 	nodeActorMap[item->text(1)] = actor;
 
 	renderer->Render();
-
-	renderWindowEx();
-
 }
 
 void MeshViewer::showElemLabel(QTreeWidgetItem *item)
 {
-	TreeItem *treeItem = (TreeItem*) item;
-	QSet<int> elems = treeItem->getAttrData();
+	setSelectType(Select_Type_Point);
 
+	TreeItem *treeItem = (TreeItem*) item;
+	currentElems += treeItem->getAttrData();
 
 	vtkSmartPointer<vtkActor> actor = vtkSmartPointer<vtkActor>::New();
 	double color[3];
@@ -452,7 +461,7 @@ void MeshViewer::showElemLabel(QTreeWidgetItem *item)
 	vtkSmartPointer<vtkCellArray> cellArray = vtkSmartPointer<vtkCellArray>::New();
 
 	int cnt = 0;
-	for each (int id in elems)
+	for each (int id in currentElems)
 	{
 		cellArray->InsertNextCell(mesh->ugrid->GetCell(vtkIdType(id)));
 		cnt++;
@@ -463,7 +472,6 @@ void MeshViewer::showElemLabel(QTreeWidgetItem *item)
 	cellset->SetPolys(cellArray);
 
 	vtkSmartPointer<vtkPolyDataMapper> cellMapper = vtkSmartPointer<vtkPolyDataMapper>::New();
-
 	cellMapper->SetInputData(cellset);
 
 	actor->SetMapper(cellMapper);
@@ -474,12 +482,13 @@ void MeshViewer::showElemLabel(QTreeWidgetItem *item)
 	elemActorMap[item->text(1)] = actor;
 
 	renderer->Render();
-
-	renderWindowEx();
 }
 
 void MeshViewer::hideNodeLabel(QTreeWidgetItem *item)
 {
+	TreeItem *treeItem = (TreeItem*) item;
+	currentNodes -= treeItem->getAttrData();
+ 
 	vtkRenderWindow * renderWindow = this->GetRenderWindow();
 	vtkRenderer * renderer = renderWindow->GetRenderers()->GetFirstRenderer();
 	renderer->RemoveActor(nodeActorMap[item->text(1)]);
@@ -489,6 +498,9 @@ void MeshViewer::hideNodeLabel(QTreeWidgetItem *item)
 
 void MeshViewer::hideElemLabel(QTreeWidgetItem *item)
 {
+	TreeItem *treeItem = (TreeItem*) item;
+	currentElems -= treeItem->getAttrData();
+
 	vtkRenderWindow * renderWindow = this->GetRenderWindow();
 	vtkRenderer * renderer = renderWindow->GetRenderers()->GetFirstRenderer();
 	renderer->RemoveActor(elemActorMap[item->text(1)]);
@@ -496,26 +508,72 @@ void MeshViewer::hideElemLabel(QTreeWidgetItem *item)
 	renderWindowEx();
 }
 
-QSet<int>& MeshViewer::getSelectNodes()
+QSet<int> MeshViewer::getSelectNodes()
 {
-	vtkRenderWindow * renderWindow = this->GetRenderWindow();
-	vtkRenderWindowInteractor *renderWindowInteractor = renderWindow->GetInteractor();
-	HighlightInteractorStyle* style = (HighlightInteractorStyle*) renderWindowInteractor->GetInteractorStyle();
-	return style->getCurrentSelectNodes();
+	QSet<int> res = currentNodes;
+
+	vtkRenderWindowInteractor *renderWindowInteractor = this->GetInteractor();
+	if (this->mesh != NULL)
+	{
+		HighlightInteractorStyle* style = (HighlightInteractorStyle*) renderWindowInteractor->GetInteractorStyle();
+ 
+		res += style->getCurrentSelectNodes();
+	}
+
+	return res;
 }
 
-QSet<int>& MeshViewer::getSelectElems()
+QSet<int> MeshViewer::getSelectElems()
 {
-	vtkRenderWindow * renderWindow = this->GetRenderWindow();
-	vtkRenderWindowInteractor *renderWindowInteractor = renderWindow->GetInteractor();
-	HighlightInteractorStyle* style = (HighlightInteractorStyle*) renderWindowInteractor->GetInteractorStyle();
-	return style->getCurrentSelectElems();
+	QSet<int> res = currentElems;
+
+	vtkRenderWindowInteractor *renderWindowInteractor = this->GetInteractor();
+	if (this->mesh != NULL)
+	{
+		HighlightInteractorStyle* style = (HighlightInteractorStyle*) renderWindowInteractor->GetInteractorStyle();
+		res += style->getCurrentSelectElems();
+	}
+
+	return res;
+}
+
+void MeshViewer::getSecletion(Select_Type type, QList<int>& s)
+{//for convenience
+ 
+	if (type == Select_Type_Point)
+	{
+		s.append(getSelectNodes().toList());
+	}
+	else if (type == Select_Type_Cell)
+	{
+		s.append(getSelectElems().toList());
+	}
 }
 
 void MeshViewer::selectTypeChanged(Select_Type type)
 {
 	vtkRenderWindow * renderWindow = this->GetRenderWindow();
 	vtkRenderWindowInteractor *renderWindowInteractor = renderWindow->GetInteractor();
+
+	setSelectType(type);
+	currentElems.clear();
+	currentNodes.clear();
+
 	HighlightInteractorStyle* style = (HighlightInteractorStyle*) renderWindowInteractor->GetInteractorStyle();
+	style->getCurrentSelectNodes().clear();
+ 	style->getCurrentSelectElems().clear();
 	style->setSelect(type);
+
+	resetActor();
+
+}
+
+void MeshViewer::setSelectType(Select_Type type)
+{
+	selectType = type;
+}
+
+Select_Type MeshViewer::getSelectType()
+{
+	return selectType;
 }

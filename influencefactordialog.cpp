@@ -64,3 +64,16 @@ InfluenceFactorDialog::~InfluenceFactorDialog()
 
 }
 
+void InfluenceFactorDialog::updateUi(QString uiText)
+{
+	QStringList li = uiText.split(',');
+	if (li.size()==5)
+	{
+		NotchEdit->setText(li[0]);
+		SurfaceEdit->setText(li[1]);
+		SizeEdit->setText(li[2]);
+		LoadEdit->setText(li[3]);
+		OtherhEdit->setText(li[4]);
+	}
+
+}

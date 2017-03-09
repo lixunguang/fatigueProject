@@ -71,7 +71,7 @@ void ProjectManager::parse(QString &fileName)
 
 void ProjectManager::setProjectFileName(QString fileName)
 {
-	MainWindow* mw = (MainWindow*) parent();
+	MainWindow *mw = MainWindow::getMainWindow();
 	mw->setWindowTitle(qApp->applicationName() + " | " + fileName);
 
 	projectFileName = fileName;

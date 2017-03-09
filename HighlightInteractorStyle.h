@@ -36,14 +36,8 @@ public:
 
 	void setSelect(Select_Type type);
 
-	QSet<int>& getCurrentSelectNodes()
-	{
-		return currentSelectNodes;
-	}
-	QSet<int>& getCurrentSelectElems()
-	{
-		return currentSelectElems;
-	}
+	QSet<int>& getCurrentSelectNodes();
+	QSet<int>& getCurrentSelectElems();
 
 	void SetMeshViewer(MeshViewer*);
 

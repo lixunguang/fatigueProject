@@ -4,9 +4,11 @@
 #include "QWidget.h"
 #include "qfiledialog.h"
 #include "QLineEdit.h"
+#include "QTextEdit.h"
 #include "QLabel.h"
 #include "QComboBox.h"
 #include "QGroupBox.h"
+#include <QVector>
 
 #include "influencefactordialog.h"
 
@@ -17,18 +19,18 @@ public:
 	AnalysisWidget(QWidget *parent = 0);
 	~AnalysisWidget();
 
- 
-
 public slots:
-void entityTypeChanged(int index);
-void algorithmChanged(int index);
-void showStressUi();
-void showBwiUi();
-void showStrainUi();
+	void entityTypeChanged(int index);
+	void algorithmChanged(int index);
+	void showStressUi();
+	void showBwiUi();
+	void showStrainUi();
 
-void showInfuenceFactor();
-void showFileDialog();
-void writeToFile(QString fileName);
+	void showInfuenceFactor();
+	void showFileDialog();
+	void writeToFile(QString fileName);
+
+	void updateSecletion();
 
 private:
 	InfluenceFactorDialog* influenceFactorDialog;
@@ -54,7 +56,7 @@ private:
 	QLabel* entityTypeLabel;
 	QComboBox* entityTypeCombo;
 	QLabel* entityNumLabel;
-	QLineEdit* entityNumEdit;
+	QTextEdit* entityNumEdit;
 	QPushButton*entityNumBtn;
 
 	QLineEdit *inFluenceFactorsEdit;

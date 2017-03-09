@@ -13,6 +13,9 @@
 #include "operationviewer.h"
 #include "projectManager.h"
 #include "fatiguewidget.h"
+#include "qwidget.h"
+#include "QApplication.h"
+
 
 class MainWindow :public RibbonWindow
 {
@@ -31,8 +34,37 @@ private:
 	void createGroupView(Qtitan::RibbonPage* page);
 	void createGroupAbout(Qtitan::RibbonPage* aboutPage);
 public:
+	static MainWindow* getMainWindow()
+	{
+		foreach(QWidget *widget, QApplication::allWidgets())
+		if (widget->objectName().compare("fatigueMainwindow") == 0)
+		{
+			return (MainWindow*) widget;
+		}
+		return NULL;
+	}
+public:
+	MeshViewer *getMeshViewer()
+	{
+		return meshViewer;
+	}
+	LabelViewer *getLabelViewer()
+	{
+		return labelViewer;
+	}
+	PropertyViewer *getPropViewer()
+	{
+		return propViewer;
+	}
+	OperationViewer *getOpViewer()
+	{
+		return opViewer;
+	}
 
-		
+	ProjectManager *getProjectManager()
+	{
+		return &projectManager;
+	}
 protected Q_SLOTS:
 	void newProject();
 	void openProject();
@@ -78,13 +110,14 @@ protected:
 	QAction* m_actionFullScreen;
 	QAction* m_actionPrintLayout;
 
-	public:
+public:
 	MeshViewer *meshViewer;
 	LabelViewer *labelViewer;
 	PropertyViewer *propViewer;
 	OperationViewer *opViewer;
 	
 	ProjectManager projectManager;
+ 
 };
 
 #endif

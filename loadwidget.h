@@ -17,6 +17,7 @@ public:
 
 public slots:
 	void showLoadEventWidget();
+	void typeChanged(const QString &  str);
 private:
 	LoadEventDialog *loadEventDialog;
 	LoadEventDialog *loadEventDialog_duty;
@@ -24,7 +25,7 @@ private:
 	LoadEventDialog *loadEventDialog_super;
  
 	QComboBox* loadTypeCombo;
-	QLineEdit* loadEventEdit;
+	QTextEdit* loadEventEdit;
 
 };
 

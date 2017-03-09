@@ -80,10 +80,13 @@ public slots:
 	void showElemLabel(QTreeWidgetItem *item);
 	void hideElemLabel(QTreeWidgetItem *item);
 
-	QSet<int>& getSelectNodes();
-	QSet<int>& getSelectElems();
+	QSet<int> getSelectNodes();
+	QSet<int> getSelectElems();
+	void getSecletion(Select_Type type, QList<int>& s);
 
 	void selectTypeChanged(Select_Type type);
+	void setSelectType(Select_Type type);
+	Select_Type getSelectType();
 
 	void resetActor();
 	void getActorColor(double* color);
@@ -101,14 +104,12 @@ private slots:
 
 
 private:
-	void showOrientationMarkerWidget(bool isShow);
 	void addOrientationMarkerWidget();
-
 	void createToolBar();
-protected:
-//	void wheelEvent(QWheelEvent *e);
-//	virtual void paintGL();
-//	virtual void paintEvent(QPaintEvent * event);
+
+// signals:
+// 	void finishSelectNodes(QSet<int> nodes);
+// 	void finishSelectElems(QSet<int> elems);
 
 public:
  	QAction *action_reset;
@@ -129,5 +130,9 @@ public:
 
 	map<QString, vtkActor*> nodeActorMap;
 	map<QString, vtkActor*> elemActorMap;
+
+	Select_Type selectType;
+	QSet<int> currentNodes;
+	QSet<int> currentElems;
 };
 #endif

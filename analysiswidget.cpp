@@ -10,6 +10,7 @@
 #include <QDebug>
 
 #include "analysiswidget.h"
+#include "mainwindow.h"
 
 AnalysisWidget::AnalysisWidget(QWidget *parent)
 :QWidget(parent)
@@ -141,7 +142,7 @@ AnalysisWidget::AnalysisWidget(QWidget *parent)
 	entityTypeHBox->addWidget(entityTypeCombo);
 
 	entityNumLabel = new QLabel("Selected Entities             ");
-	entityNumEdit = new QLineEdit();
+	entityNumEdit = new QTextEdit();
 	entityNumEdit->setObjectName("EntitySection_entityNumEdit");
 	entityNumEdit->setReadOnly(true);
 
@@ -163,10 +164,9 @@ AnalysisWidget::AnalysisWidget(QWidget *parent)
 	influenceFactorDialog = new InfluenceFactorDialog(this);
 	fileDialog = new QFileDialog(this, "select material file");
 
-
-		//signals
-		//1 algorithm clicked, change ui
-		connect(algorithmCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(algorithmChanged(int)));
+//signals
+//1 algorithm clicked, change ui
+	connect(algorithmCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(algorithmChanged(int)));
 //2 path selector dialog
 	connect(inFluenceFactorsBtn, SIGNAL(clicked()), this, SLOT(showInfuenceFactor()));
 //3 influence ui
@@ -175,8 +175,7 @@ AnalysisWidget::AnalysisWidget(QWidget *parent)
 	connect(entityTypeCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(entityTypeChanged(int)));
 	
 //5 entity Selection clicked
-	//mesh = GLOBAL_MH
-	//connect(entityNumBtn, SIGNAL(clicked()), mesh, SLOT(getSecletion()));
+	connect(entityNumBtn, SIGNAL(clicked()), this, SLOT(updateSecletion()));
 }
 
 AnalysisWidget::~AnalysisWidget()
@@ -184,9 +183,45 @@ AnalysisWidget::~AnalysisWidget()
 
 }
 
+void AnalysisWidget::updateSecletion()
+{//todo:是不是有更好的方法来传递对象地址呢
+	//消息的传递要不通过信号机制，要不就是成员变量机制
+
+	MainWindow *mw = MainWindow::getMainWindow();
+	QList<int> li;
+	QString str;
+
+	if (entityTypeCombo->currentText() == "Node")
+	{
+		mw->getMeshViewer()->getSecletion(Select_Type_Point,li);
+		str.append("nodes: ");
+	}
+	else if (entityTypeCombo->currentText() == "Element")
+	{
+		mw->getMeshViewer()->getSecletion(Select_Type_Cell, li);
+		str.append("cells: ");
+	}
+
+	if (li.size()== 0)
+	{
+		str.append(" no selected");
+		entityNumEdit->setText(str);
+		return;
+	}
+
+	for each (int l  in li)
+	{
+		str.append(QString("%1 ").arg(l));
+	}
+
+	entityNumEdit->setText(str);
+}
+
 void AnalysisWidget::showInfuenceFactor()
 {
 	QString resStr;
+	influenceFactorDialog->updateUi(inFluenceFactorsEdit->text());
+
 	if (QDialog::Accepted == influenceFactorDialog->exec())
 	{
 		resStr = QString("%1,%2,%3,%4,%5").arg(influenceFactorDialog->NotchEdit->text())
@@ -199,8 +234,6 @@ void AnalysisWidget::showInfuenceFactor()
 	}
 
 }
-
-
 
 void AnalysisWidget::showFileDialog()
 {
@@ -218,7 +251,7 @@ void AnalysisWidget::showFileDialog()
 
 void AnalysisWidget::entityTypeChanged(int index)
 {
-	//mesh._meshType = entityTypeCombo.currentText()
+	updateSecletion();
 }
 
 
@@ -263,7 +296,7 @@ void AnalysisWidget::showStressUi()
 	weldLabel->hide();
 	weldCombo->hide();
 	sdNumLabel->hide();
-		sdNumCombo->hide();
+	sdNumCombo->hide();
 }
 
 void AnalysisWidget::showBwiUi()

@@ -62,6 +62,7 @@ if(${VTK_VERSION} VERSION_GREATER "6")
   delegate.cpp
   treeitem.cpp
   about.cpp
+  casemanager.cpp
 
   typedef.h
   about.h
@@ -83,6 +84,7 @@ if(${VTK_VERSION} VERSION_GREATER "6")
   ribbonwindow.h
   table.h
   treeitem.h
+  casemanager.cpp
 
   )
 

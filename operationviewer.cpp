@@ -5,7 +5,7 @@
 
 
 OperationViewer::OperationViewer(QWidget *parent)
-	:QDockWidget(parent)
+	:QDockWidget(parent),  caseManager(this)
 {
 	this->setFeatures(QDockWidget::NoDockWidgetFeatures);
 
@@ -17,3 +17,9 @@ OperationViewer::~OperationViewer()
 {
 
 }
+
+CaseManager *OperationViewer::getCaseManager()
+{
+	return &caseManager;
+}
+

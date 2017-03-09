@@ -20,6 +20,8 @@ public:
 	void writeToMap(QMap<QString, QString> &mapData, QString objName , QString val,int type,int count);
 	void updateUi(QMap<QString, QString> &mapData);
 	void updateMapData(QMap<QString, QString> &mapData);
+
+
 };
 
 #endif

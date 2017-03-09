@@ -17,8 +17,8 @@ public :
 	int	columnCount(const QModelIndex & parent = QModelIndex())const;
 	QVariant data(const QModelIndex & index, int role = Qt::DisplayRole)const;
 	bool setData(const QModelIndex & index, const QVariant & value, int role = Qt::EditRole);
-	QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole);
-	Qt::ItemFlags flags(const QModelIndex & index);
+	QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole)const;
+	Qt::ItemFlags flags(const QModelIndex & index)const;
 	bool removeRows(int row, int count, const QModelIndex &parent = QModelIndex());
     bool insertRows(int row, int count, const QModelIndex & parent = QModelIndex());
 	virtual bool moveRows(const QModelIndex & sourceParent, int sourceColumn, int count, const QModelIndex & destinationParent, int destinationChild);

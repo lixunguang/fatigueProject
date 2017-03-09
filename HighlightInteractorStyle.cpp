@@ -34,6 +34,7 @@ HighlightInteractorStyle::HighlightInteractorStyle() : vtkInteractorStyleRubberB
 	
 	selectType = Select_Type_None;
 	circleR = 12;
+
 }
 
 HighlightInteractorStyle::~HighlightInteractorStyle()
@@ -76,6 +77,16 @@ void HighlightInteractorStyle::setSelect(Select_Type type)
 
 }
 
+QSet<int>& HighlightInteractorStyle::getCurrentSelectNodes()
+{
+	return currentSelectNodes;
+}
+
+QSet<int>& HighlightInteractorStyle::getCurrentSelectElems()
+{
+	return currentSelectElems;
+}
+
 #include "meshviewer.h"
 void HighlightInteractorStyle::OnLeftButtonUp()
 {
@@ -92,12 +103,14 @@ void HighlightInteractorStyle::OnLeftButtonUp()
 		createPointsMap();
 		meshViewer->resetActor();
 		selectAreaPoints();
+		currentSelectElems.clear();
 	}
 	else if (selectType == Select_Type_Cell)
 	{
 		createPointsMap();
 		meshViewer->resetActor();
 		selectAreaCells();
+		currentSelectNodes.clear();
 	}
 
 	return;

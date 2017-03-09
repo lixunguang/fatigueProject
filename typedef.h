@@ -7,6 +7,7 @@ enum OBJECTTYPE
 	type_NONE,
 	type_edit,
 	type_combo,
+	type_text,
 };
 
 enum Select_Type
