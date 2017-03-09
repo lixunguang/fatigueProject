@@ -1,6 +1,6 @@
 
 #include <QDebug>
-#include "qstringlist.h"
+#include <QStringList>
 
 #include "model.h"
 

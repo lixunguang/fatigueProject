@@ -7,8 +7,8 @@
 #include "fatiguewidget.h"
 #include "analysiswidget.h"
 #include "loadWidget.h"
-
-//注意！！！！！！！！！
+#include "mainwindow.h"
+//注意:
 //把ui数据写入data
 //约定: 把objectname非空的写到mapdata里面
 //objectname名字加上段名，分段的目的是xml易读
@@ -23,6 +23,7 @@ FatigueWidget::FatigueWidget(QWidget *parent)
 	AnalysisWidget *analysisWidget = new AnalysisWidget();
 	LoadWidget *loadWidget = new LoadWidget();
 
+	filePathEdit = new QLineEdit("c:\\solve.xml");
 	QPushButton *finishBtn = new QPushButton("write to file");
 	
 	tab->addTab(analysisWidget, "analysis settings");
@@ -30,6 +31,7 @@ FatigueWidget::FatigueWidget(QWidget *parent)
 
 
 	layout->addWidget(tab);
+	layout->addWidget(filePathEdit);
 	layout->addWidget(finishBtn);
 
 	connect(finishBtn, SIGNAL(clicked()), this, SLOT(writeToFile()));
@@ -43,12 +45,6 @@ FatigueWidget::~FatigueWidget()
 
 }
 
-
-
-void FatigueWidget::writeToFile()
-{
-	qDebug() << "FatigueWidget::writeToFile";
-}
 
 void FatigueWidget::updateUi(QMap<QString,QString> &mapData)
 {   //from Data to UI
@@ -170,3 +166,14 @@ void FatigueWidget::updateMapData(QMap<QString, QString> &mapData)
 
 }
 
+
+void FatigueWidget::writeToFile()
+{
+	QString filePath = filePathEdit->text();
+	if (filePath.isEmpty())
+	{
+		return;
+	}
+	MainWindow *mw = MainWindow::getMainWindow();
+	mw->getProjectManager()->saveAsSolveFile(filePath);
+}

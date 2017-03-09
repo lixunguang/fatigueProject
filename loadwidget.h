@@ -3,7 +3,6 @@
 
 #include <QComboBox>
 #include <QLineEdit>
-
 #include <QDebug>
 
 #include "loadeventdialog.h"

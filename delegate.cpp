@@ -22,6 +22,7 @@ QWidget *Delegate::createEditor(QWidget * parent, const QStyleOptionViewItem & o
 {
 	if (index.column() == 0)
 	{
+		return NULL;
 	}
 	else if (index.column() == 1)
 	{

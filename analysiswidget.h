@@ -1,13 +1,13 @@
 #ifndef analysiswidget_H_
 #define analysiswidget_H_
 
-#include "QWidget.h"
-#include "qfiledialog.h"
-#include "QLineEdit.h"
-#include "QTextEdit.h"
-#include "QLabel.h"
-#include "QComboBox.h"
-#include "QGroupBox.h"
+#include <QWidget>
+#include <QFileDialog>
+#include <QLineEdit>
+#include <QTextEdit>
+#include <QLabel>
+#include <QComboBox>
+#include <QGroupBox>
 #include <QVector>
 
 #include "influencefactordialog.h"

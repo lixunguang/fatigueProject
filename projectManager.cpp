@@ -368,7 +368,7 @@ void ProjectManager::reset()
 }
 
 void ProjectManager::save()
-{
+{//save all project config
 	projectFile.close();
 	projectFile.setFileName(projectFileName);
 	if (!projectFile.open(QIODevice::Truncate|QIODevice::ReadWrite | QIODevice::Text))
@@ -410,6 +410,11 @@ void ProjectManager::save()
 	QTextStream stream(&projectFile);
 	stream << doc.toString();
 	projectFile.close();
+}
+
+void ProjectManager::saveAsSolveFile(QString &filePath)
+{//保存为求解使用的文件
+	qDebug() << "ProjectManager::saveAsSolveFile";
 }
 
 QMap<QString,QString>& ProjectManager::getUiData()

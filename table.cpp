@@ -10,8 +10,8 @@
 #include <QModelIndex>
 #include <QHeaderView>
 
-#include <model.h>
-#include <delegate.h>
+#include "model.h"
+#include "delegate.h"
 
 Table::Table(QString type, QWidget *parent)
 :QWidget(parent)

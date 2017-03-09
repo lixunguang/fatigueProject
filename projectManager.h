@@ -26,7 +26,8 @@ public slots:
 	QString getProjectFileName();
 	QStringList getModelFileName();
 
-    void save();
+	void save();
+	void saveAsSolveFile(QString &filePath);
 	void reset();
 
 	void addNodeLabelToModelConfig(QString& key,QString& val);

@@ -3,6 +3,8 @@
 #define MAINWINDOW_H
 
 #include <QDebug>
+#include <QWidget>
+#include <QApplication>
 
 #include "Python.h"
 
@@ -13,9 +15,6 @@
 #include "operationviewer.h"
 #include "projectManager.h"
 #include "fatiguewidget.h"
-#include "qwidget.h"
-#include "QApplication.h"
-
 
 class MainWindow :public RibbonWindow
 {

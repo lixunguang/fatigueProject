@@ -1,8 +1,8 @@
 #ifndef InfluenceFactorDialog_H_
 #define InfluenceFactorDialog_H_
 
-#include "QDialog.h"
-#include "QLineEdit.h"
+#include <QDialog>
+#include <QLineEdit>
 
 
 class  InfluenceFactorDialog : public QDialog
