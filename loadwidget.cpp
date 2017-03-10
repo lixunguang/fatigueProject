@@ -80,5 +80,6 @@ void LoadWidget::showLoadEventWidget()
 
 void LoadWidget::typeChanged(const QString &  str)
 {
-	qDebug() << "LoadWidget::typeChanged " << str;
+	loadEventEdit->clear();
+
 }

@@ -20,7 +20,7 @@ if(${VTK_VERSION} VERSION_GREATER "6" )
   # Instruct CMake to run moc automatically when needed.
   MESSAGE("VERSION_GREATER 6")
   set(CMAKE_AUTOMOC ON)
-find_package(Qt5 COMPONENTS Core Gui OpenGL WebKit WebKitWidgets Xml )
+find_package(Qt5 COMPONENTS Core Gui OpenGL WebKit  Xml )
 else()
   MESSAGE("VERSION_GREATER 4")
   find_package(Qt4 REQUIRED)
@@ -49,7 +49,7 @@ if(${VTK_VERSION} VERSION_GREATER "6")
   mesh.cpp
   meshviewer.cpp
   highlightinteractorstyle.cpp
-  labelviewer.cpp
+  objectviewer.cpp
   propertyviewer.cpp
   operationviewer.cpp
   fatiguewidget.cpp
@@ -71,7 +71,7 @@ if(${VTK_VERSION} VERSION_GREATER "6")
   fatiguewidget.h
   HighlightInteractorStyle.h
   influencefactordialog.h
-  labelviewer.h
+  objectviewer.h
   loadeventdialog.h
   loadwidget.h
   mainwindow.h
@@ -93,7 +93,7 @@ if(${VTK_VERSION} VERSION_GREATER "6")
   ${UI_FILES}
   ${QRC_SOURCES}
   )
-  qt5_use_modules(fatigueProject Core Gui Widgets OpenGL Xml WebKit WebKitWidgets)
+  qt5_use_modules(fatigueProject Core Gui Widgets OpenGL Xml)
   target_link_libraries(fatigueProject ${VTK_LIBRARIES})
 
  

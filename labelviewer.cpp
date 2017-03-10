@@ -8,11 +8,11 @@
 #include <QDebug>
 
 #include "mesh.h"
-#include "labelviewer.h"
+#include "objectviewer.h"
 #include "mainwindow.h"
 #include "meshviewer.h"
 
-LabelViewer::LabelViewer(QWidget *parent)
+ObjectViewer::ObjectViewer(QWidget *parent)
 :QDockWidget(parent)
 {
 	QVBoxLayout *vLayout = new QVBoxLayout();
@@ -83,12 +83,12 @@ LabelViewer::LabelViewer(QWidget *parent)
 	tree->addTopLevelItems(topItems);
 }
 
-LabelViewer::~LabelViewer()
+ObjectViewer::~ObjectViewer()
 {
 	reset();
 }
 
-void LabelViewer::reset()
+void ObjectViewer::reset()
 {
 	QTreeWidgetItem *item;
 	for each (item in topItems)
@@ -104,7 +104,7 @@ void LabelViewer::reset()
 
 }
 
-void LabelViewer::updateUi(QMap<QString, QString> &mapData)
+void ObjectViewer::updateUi(QMap<QString, QString> &mapData)
 {
 	QMap<QString, QString> NodeLabel;
 	QMap<QString, QString> ElementLabel;
@@ -124,7 +124,7 @@ void LabelViewer::updateUi(QMap<QString, QString> &mapData)
 		}
 	}
 
-	// update labelViewer ui
+	// update objectViewer ui
 	for each (QString labelName in NodeLabel.keys())
 	{
 		QSet<int> nodes;
@@ -150,7 +150,7 @@ void LabelViewer::updateUi(QMap<QString, QString> &mapData)
 	}
 }
 
-void LabelViewer::onLabelItemPressed(QTreeWidgetItem *item, int column)
+void ObjectViewer::onLabelItemPressed(QTreeWidgetItem *item, int column)
 {//点击标签项
 	if (column != 0)
 	{
@@ -244,18 +244,18 @@ void LabelViewer::onLabelItemPressed(QTreeWidgetItem *item, int column)
 	item->setIcon(0, icon);
 }
 
-void LabelViewer::addNodeLabelToUI(QString &labelName, QSet<int>& attrdata)
+void ObjectViewer::addNodeLabelToUI(QString &labelName, QSet<int>& attrdata)
 {
 	addLabelToUI(labelName, attrdata, SETTYPE_NODE);
 }
 
-void LabelViewer::addElemLabelToUI(QString &labelName, QSet<int>& attrdata)
+void ObjectViewer::addElemLabelToUI(QString &labelName, QSet<int>& attrdata)
 {
 	addLabelToUI(labelName, attrdata, SETTYPE_ELEM);
 }
 
 
-void LabelViewer::addLabelToUI(QString &labelName, QSet<int>& attrdata, SETTYPE type)
+void ObjectViewer::addLabelToUI(QString &labelName, QSet<int>& attrdata, SETTYPE type)
 {
 	//界面上增加
 	QIcon icon;
@@ -272,17 +272,17 @@ void LabelViewer::addLabelToUI(QString &labelName, QSet<int>& attrdata, SETTYPE 
 
 
 }
-void LabelViewer::addNodeLabelToData(QString &labelName, QSet<int>& attrdata)
+void ObjectViewer::addNodeLabelToData(QString &labelName, QSet<int>& attrdata)
 {
 
 }
 
-void LabelViewer::addElemLabelToData(QString &labelName, QSet<int>& attrdata)
+void ObjectViewer::addElemLabelToData(QString &labelName, QSet<int>& attrdata)
 {
 
 }
 
-void LabelViewer::addLabelToData(QString &labelName, QSet<int>& attrdata, SETTYPE type)
+void ObjectViewer::addLabelToData(QString &labelName, QSet<int>& attrdata, SETTYPE type)
 {
 	//ModelConfigmap 这个内部数据结构里面增加
 	QString varStr;
@@ -307,7 +307,7 @@ void LabelViewer::addLabelToData(QString &labelName, QSet<int>& attrdata, SETTYP
 	}
 }
 
-void LabelViewer::add(SETTYPE labelType)
+void ObjectViewer::add(SETTYPE labelType)
 {
 	bool ok;
 	QString text = QInputDialog::getText(this, tr("input Label name"),
@@ -343,22 +343,22 @@ void LabelViewer::add(SETTYPE labelType)
 	}
 }
 
-void LabelViewer::onAddBtn()
+void ObjectViewer::onAddBtn()
 {
 	add(SETTYPE_NODE);
 }
 
-void LabelViewer::onAddBtn2()
+void ObjectViewer::onAddBtn2()
 {
 	add(SETTYPE_ELEM);
 }
 
-void LabelViewer::onRemoveBtn()
+void ObjectViewer::onRemoveBtn()
 {
 
 }
 
-void LabelViewer::onSelectPointBtn()
+void ObjectViewer::onSelectPointBtn()
 {
 	if (selectPointBtn->isChecked())
 	{
@@ -373,7 +373,7 @@ void LabelViewer::onSelectPointBtn()
 	
 }
 
-void LabelViewer::onSelectCellBtn()
+void ObjectViewer::onSelectCellBtn()
 {
 	if (selectCellBtn->isChecked())
 	{

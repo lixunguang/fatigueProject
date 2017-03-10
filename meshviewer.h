@@ -7,7 +7,7 @@
 
 #include "vtkDataSetMapper.h"
 #include "QVTKWidget.h"
-#include "QVTKWidget2.h"
+//#include "QVTKWidget2.h"
 #include "vtkActor.h"
 #include "vtkSmartPointer.h"
 #include "vtkDataSet.h"

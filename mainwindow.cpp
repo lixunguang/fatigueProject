@@ -22,14 +22,14 @@ MainWindow::MainWindow(QWidget *parent) :RibbonWindow(parent), projectManager(th
 	meshViewer->setObjectName("meshViewer");
 	setCentralWidget(meshViewer);
 	
-	labelViewer = new LabelViewer(this); 
+	objectViewer = new ObjectViewer(this);
 	propViewer = new PropertyViewer(this);
 	opViewer = new OperationViewer(this);
 	
-	labelViewer->setObjectName("labelViewer");
-	labelViewer->setWindowTitle("Label Browser");
-	labelViewer->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
-	labelViewer->setMinimumWidth(80);
+	objectViewer->setObjectName("objectViewer");
+	objectViewer->setWindowTitle("Label Browser");
+	objectViewer->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
+	objectViewer->setMinimumWidth(80);
 
 	propViewer->setObjectName("propViewer");
 	propViewer->setWindowTitle("Properties");
@@ -42,7 +42,7 @@ MainWindow::MainWindow(QWidget *parent) :RibbonWindow(parent), projectManager(th
 	opViewer->setAllowedAreas(Qt::RightDockWidgetArea);
 	opViewer->setMinimumWidth(200);
 
-	this->addDockWidget(Qt::LeftDockWidgetArea, labelViewer);
+	this->addDockWidget(Qt::LeftDockWidgetArea, objectViewer);
 	this->addDockWidget(Qt::LeftDockWidgetArea, propViewer);
 	this->addDockWidget(Qt::RightDockWidgetArea, opViewer);
 
@@ -52,12 +52,12 @@ MainWindow::MainWindow(QWidget *parent) :RibbonWindow(parent), projectManager(th
 	this->ribbonBar()->setFrameThemeEnabled();
 	this->setMinimumSize(1380, 768);
 
-	connect(labelViewer, SIGNAL(showNodeLabel(QTreeWidgetItem *)), meshViewer, SLOT(showNodeLabel(QTreeWidgetItem *)));
-	connect(labelViewer, SIGNAL(hideNodeLabel(QTreeWidgetItem *)), meshViewer, SLOT(hideNodeLabel(QTreeWidgetItem *)));
-	connect(labelViewer, SIGNAL(showElemLabel(QTreeWidgetItem *)), meshViewer, SLOT(showElemLabel(QTreeWidgetItem *)));
-	connect(labelViewer, SIGNAL(hideElemLabel(QTreeWidgetItem *)), meshViewer, SLOT(hideElemLabel(QTreeWidgetItem *)));
-	connect(labelViewer, SIGNAL(selectStatus(Select_Type)), meshViewer, SLOT(selectTypeChanged(Select_Type)));
-	connect(labelViewer, SIGNAL(resetActor()), meshViewer, SLOT(resetActor()));
+	connect(objectViewer, SIGNAL(showNodeLabel(QTreeWidgetItem *)), meshViewer, SLOT(showNodeLabel(QTreeWidgetItem *)));
+	connect(objectViewer, SIGNAL(hideNodeLabel(QTreeWidgetItem *)), meshViewer, SLOT(hideNodeLabel(QTreeWidgetItem *)));
+	connect(objectViewer, SIGNAL(showElemLabel(QTreeWidgetItem *)), meshViewer, SLOT(showElemLabel(QTreeWidgetItem *)));
+	connect(objectViewer, SIGNAL(hideElemLabel(QTreeWidgetItem *)), meshViewer, SLOT(hideElemLabel(QTreeWidgetItem *)));
+	connect(objectViewer, SIGNAL(selectStatus(Select_Type)), meshViewer, SLOT(selectTypeChanged(Select_Type)));
+	connect(objectViewer, SIGNAL(resetActor()), meshViewer, SLOT(resetActor()));
 
 	connect(m_showFatigueDialog, SIGNAL(triggered()), this, SLOT(showFatigueDialog()));
 
@@ -162,7 +162,7 @@ void MainWindow::updateMapData(QMap<QString, QString> &mapData)
 	mapData[key] = val;
 
 	key = QString("ShowView@name@%1").arg(uniqueId++);
-	val = QString("%1@%2").arg("labelViewer").arg(labelViewer->isVisible() ? 1 : 0);
+	val = QString("%1@%2").arg("objectViewer").arg(objectViewer->isVisible() ? 1 : 0);
 	mapData[key] = val;
 
 	key = QString("ShowView@name@%1").arg(uniqueId++);
@@ -217,7 +217,7 @@ void MainWindow::openProject()
 	w->updateUi(projectManager.getUiData());
 
 	//3 update label browser
-	labelViewer->updateUi(projectManager.getModelData());
+	objectViewer->updateUi(projectManager.getModelData());
 
 	//4 update model window
 	meshViewer->updateUi(projectManager.getModelData());
@@ -272,8 +272,8 @@ void MainWindow::closeProject()
 	//FatigueWidget *w = (FatigueWidget *) (opViewer->widget());
 	//w->updateUi(projectManager.getUiData());
 
-	//3 reset label browser
-	labelViewer->reset();
+	//3 reset object browser
+	objectViewer->reset();
 
 	//4 reset model window
  	propViewer->reset();
@@ -285,7 +285,7 @@ void MainWindow::closeProject()
 void MainWindow::reset()
 {//show all window, may be other operation
 
-	labelViewer->show();
+	objectViewer->show();
 	propViewer->show();
 	opViewer->show();
 	meshViewer->show();
@@ -495,13 +495,13 @@ void MainWindow::onLabelBrowserStateChanged(int state)
 {
 	if (state == Qt::Unchecked)
 	{
-		this->removeDockWidget(labelViewer);
+		this->removeDockWidget(objectViewer);
 		this->update();
 	}
 	else
 	{
-		this->addDockWidget(Qt::LeftDockWidgetArea, labelViewer);
-		labelViewer->setVisible(true);
+		this->addDockWidget(Qt::LeftDockWidgetArea, objectViewer);
+		objectViewer->setVisible(true);
 	}
 }
 

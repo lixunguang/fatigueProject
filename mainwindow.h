@@ -11,7 +11,7 @@
 #include "ribbonwindow.h"
 #include "meshviewer.h"
 #include "propertyviewer.h"
-#include "labelviewer.h"
+#include "objectviewer.h"
 #include "operationviewer.h"
 #include "projectManager.h"
 #include "fatiguewidget.h"
@@ -47,9 +47,9 @@ public:
 	{
 		return meshViewer;
 	}
-	LabelViewer *getLabelViewer()
+	ObjectViewer *getObjectViewer()
 	{
-		return labelViewer;
+		return objectViewer;
 	}
 	PropertyViewer *getPropViewer()
 	{
@@ -111,7 +111,7 @@ protected:
 
 public:
 	MeshViewer *meshViewer;
-	LabelViewer *labelViewer;
+	ObjectViewer *objectViewer;
 	PropertyViewer *propViewer;
 	OperationViewer *opViewer;
 	
