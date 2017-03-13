@@ -32,7 +32,7 @@ HighlightInteractorStyle::HighlightInteractorStyle() : vtkInteractorStyleRubberB
 	this->SelectedMapper = vtkSmartPointer<vtkPolyDataMapper>::New();
 	this->SelectedActor = vtkSmartPointer<vtkActor>::New();
 	
-	selectType = Select_Type_None;
+	selectType = SelectType_None;
 	circleR = 12;
 
 }
@@ -63,10 +63,10 @@ void HighlightInteractorStyle::OnChar()
 	vtkInteractorStyleRubberBandPick::OnChar();
 }
 
-void HighlightInteractorStyle::setSelect(Select_Type type)
+void HighlightInteractorStyle::setSelect(SelectType type)
 {
 	selectType = type;
-	if (type ==  Select_Type_Cell || type == Select_Type_Point)
+	if (type ==  SelectType_Cell || type == SelectType_Point)
 	{
 		this->CurrentMode = VTKISRBP_SELECT;
 	}
@@ -98,14 +98,14 @@ void HighlightInteractorStyle::OnLeftButtonUp()
 	//	selectSingleCell();//单个单元
 
 	qDebug() << "HighlightInteractorStyle::OnLeftButtonUp";
-	if (selectType == Select_Type_Point)
+	if (selectType == SelectType_Point)
 	{
 		createPointsMap();
 		meshViewer->resetActor();
 		selectAreaPoints();
 		currentSelectElems.clear();
 	}
-	else if (selectType == Select_Type_Cell)
+	else if (selectType == SelectType_Cell)
 	{
 		createPointsMap();
 		meshViewer->resetActor();

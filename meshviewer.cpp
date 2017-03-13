@@ -27,7 +27,7 @@ MeshViewer::MeshViewer(QWidget *parent)
 	createToolBar();
 
 	addOrientationMarkerWidget();
-	selectType = Select_Type_None;
+	selectType = SelectType_None;
 }
 
 MeshViewer::~MeshViewer()
@@ -403,7 +403,7 @@ void MeshViewer::getActorColor(double* color)
 
 void MeshViewer::showNodeLabel(QTreeWidgetItem *item)
 {
-	setSelectType(Select_Type_Point);
+	setSelectType(SelectType_Point);
 
 	TreeItem *treeItem = (TreeItem*) item;
 	currentNodes += treeItem->getAttrData();
@@ -446,7 +446,7 @@ void MeshViewer::showNodeLabel(QTreeWidgetItem *item)
 
 void MeshViewer::showElemLabel(QTreeWidgetItem *item)
 {
-	setSelectType(Select_Type_Point);
+	setSelectType(SelectType_Point);
 
 	TreeItem *treeItem = (TreeItem*) item;
 	currentElems += treeItem->getAttrData();
@@ -537,20 +537,20 @@ QSet<int> MeshViewer::getSelectElems()
 	return res;
 }
 
-void MeshViewer::getSecletion(Select_Type type, QList<int>& s)
+void MeshViewer::getSecletion(SelectType type, QList<int>& s)
 {//for convenience
  
-	if (type == Select_Type_Point)
+	if (type == SelectType_Point)
 	{
 		s.append(getSelectNodes().toList());
 	}
-	else if (type == Select_Type_Cell)
+	else if (type == SelectType_Cell)
 	{
 		s.append(getSelectElems().toList());
 	}
 }
 
-void MeshViewer::selectTypeChanged(Select_Type type)
+void MeshViewer::selectTypeChanged(SelectType type)
 {
 	vtkRenderWindow * renderWindow = this->GetRenderWindow();
 	vtkRenderWindowInteractor *renderWindowInteractor = renderWindow->GetInteractor();
@@ -568,12 +568,12 @@ void MeshViewer::selectTypeChanged(Select_Type type)
 
 }
 
-void MeshViewer::setSelectType(Select_Type type)
+void MeshViewer::setSelectType(SelectType type)
 {
 	selectType = type;
 }
 
-Select_Type MeshViewer::getSelectType()
+SelectType MeshViewer::getSelectType()
 {
 	return selectType;
 }

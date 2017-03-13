@@ -193,12 +193,12 @@ void AnalysisWidget::updateSecletion()
 
 	if (entityTypeCombo->currentText() == "Node")
 	{
-		mw->getMeshViewer()->getSecletion(Select_Type_Point,li);
+		mw->getMeshViewer()->getSecletion(SelectType_Point,li);
 		str.append("nodes: ");
 	}
 	else if (entityTypeCombo->currentText() == "Element")
 	{
-		mw->getMeshViewer()->getSecletion(Select_Type_Cell, li);
+		mw->getMeshViewer()->getSecletion(SelectType_Cell, li);
 		str.append("cells: ");
 	}
 

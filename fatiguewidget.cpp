@@ -49,14 +49,14 @@ FatigueWidget::~FatigueWidget()
 void FatigueWidget::updateUi(QMap<QString,QString> &mapData)
 {   //from Data to UI
 	//according to object name
-	
+	//把数据整理为一个结构，然后再显示
 	for each (QString key in mapData.keys())
 	{
 		QStringList keyList = key.split("@");
 		QStringList valList = mapData[key].split("@");
 
 		QString val;
-		OBJECTTYPE type = type_NONE;
+		ObjType type = ObjType_NONE;
 
 		for (int j = 1; j < keyList.size(); j++)
 		{
@@ -69,15 +69,15 @@ void FatigueWidget::updateUi(QMap<QString,QString> &mapData)
 			{
 				if (valList[j-1].toInt() == 1)
 				{
-					type = type_edit;
+					type = ObjType_edit;
 				}
 				else if (valList[j-1].toInt() == 2)
 				{
-					type = type_combo;
+					type = ObjType_combo;
 				}
 				else if (valList[j - 1].toInt() == 3)
 				{
-					type = type_text;
+					type = ObjType_text;
 				}
 				else
 				{
@@ -86,7 +86,7 @@ void FatigueWidget::updateUi(QMap<QString,QString> &mapData)
 			}
 		}
 
-		if (type == type_edit )
+		if (type == ObjType_edit)
 		{
 			QLineEdit *obj = this->findChild<QLineEdit *>(val);
 			if (!obj)
@@ -95,7 +95,7 @@ void FatigueWidget::updateUi(QMap<QString,QString> &mapData)
 			}
 			obj->setText(valList[valList.size()-1]);
 		}
-		if ( type == type_text)
+		if (type == ObjType_text)
 		{
 			QTextEdit *obj = this->findChild<QTextEdit *>(val);
 			if (!obj)
@@ -104,7 +104,7 @@ void FatigueWidget::updateUi(QMap<QString,QString> &mapData)
 			}
 			obj->setText(valList[valList.size() - 1]);
 		}
-		else if (type == type_combo)
+		else if (type == ObjType_combo)
 		{
 			QComboBox *obj = this->findChild<QComboBox *>(val);
 			if (!obj)

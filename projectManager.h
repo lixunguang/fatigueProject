@@ -1,6 +1,7 @@
 #ifndef PROJECTMANAGER_H_
 #define PROJECTMANAGER_H_
 
+#include "typedef.h"
 #include <QObject>
 #include <QString>
 #include <QDomDocument>
@@ -9,6 +10,7 @@
 #include <QMap>
 #include <QTextStream>
 #include <QDebug>
+
 
 class  ProjectManager :public QObject
 {
@@ -43,7 +45,7 @@ public slots:
 	void xmlElemFromModelConfig(QDomElement &e);
 	void xmlElemFromOutputConfig(QDomElement &e);
 
-	QMap<QString, QString>& getUiData();
+	QMap<QString, QString>& getSolverData();
 	QMap<QString, QString>& getProjectData();
 	QMap<QString, QString>& getModelData();
  

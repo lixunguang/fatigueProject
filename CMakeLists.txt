@@ -20,7 +20,7 @@ if(${VTK_VERSION} VERSION_GREATER "6" )
   # Instruct CMake to run moc automatically when needed.
   MESSAGE("VERSION_GREATER 6")
   set(CMAKE_AUTOMOC ON)
-find_package(Qt5 COMPONENTS Core Gui OpenGL WebKit  Xml )
+find_package(Qt5 COMPONENTS Core Gui OpenGL  Xml )
 else()
   MESSAGE("VERSION_GREATER 4")
   find_package(Qt4 REQUIRED)
@@ -79,7 +79,7 @@ if(${VTK_VERSION} VERSION_GREATER "6")
   meshviewer.h
   model.h
   operationviewer.h
-  projectManager.h
+  projectmanager.h
   propertyviewer.h
   ribbonwindow.h
   table.h

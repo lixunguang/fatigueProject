@@ -22,35 +22,36 @@ ObjectViewer::ObjectViewer(QWidget *parent)
 	QTreeWidget *tree = new QTreeWidget();
 	vLayout->addWidget(tree);
 
-	QPushButton *addBtn = new QPushButton();
- 
-	addBtn->setIcon(QIcon(QPixmap(":/res/label/label_add.png")));
-	connect(addBtn, SIGNAL(clicked()), this, SLOT(onAddBtn()));
+	QPushButton *addNodeLabelBtn = new QPushButton();
+	addNodeLabelBtn->setToolTip("add a node label ");
+	addNodeLabelBtn->setIcon(QIcon(QPixmap(":/res/label/label_add.png")));
+	connect(addNodeLabelBtn, SIGNAL(clicked()), this, SLOT(onAddNodeLabelBtn()));
 
-	QPushButton *addBtn2 = new QPushButton();
-	
-	addBtn2->setIcon(QIcon(QPixmap(":/res/label/label_add.png")));
-	connect(addBtn2, SIGNAL(clicked()), this, SLOT(onAddBtn2()));
+	QPushButton *addElemLabelBtn = new QPushButton();
+	addElemLabelBtn->setToolTip("add an elem label ");
+	addElemLabelBtn->setIcon(QIcon(QPixmap(":/res/label/label_add.png")));
+	connect(addElemLabelBtn, SIGNAL(clicked()), this, SLOT(onAddElemLabelBtn()));
 
 	QPushButton *removeBtn = new QPushButton();
+	addElemLabelBtn->setToolTip("remove selected label ");
 	removeBtn->setIcon(QIcon(QPixmap(":/res/label/label_remove.png")));
 	connect(removeBtn, SIGNAL(clicked()), this, SLOT(onRemoveBtn()));
 
 	selectPointBtn = new QPushButton(); selectPointBtn->setCheckable(true);
-	selectPointBtn->setToolTip("change select status ");
+	selectPointBtn->setToolTip("change status to select node");
 	selectPointBtn->setIcon(QIcon(QPixmap(":/res/label/label_select_point.png")));
 	connect(selectPointBtn, SIGNAL(clicked()), this, SLOT(onSelectPointBtn()));
 
 	selectCellBtn = new QPushButton(); selectCellBtn->setCheckable(true);
-	selectCellBtn->setToolTip("change select status ");
+	selectCellBtn->setToolTip("change status to select elem ");
 	selectCellBtn->setIcon(QIcon(QPixmap(":/res/label/label_select_cell.png")));
 	connect(selectCellBtn, SIGNAL(clicked()), this, SLOT(onSelectCellBtn()));
 
 	QSpacerItem *space = new QSpacerItem(0, 0, QSizePolicy::MinimumExpanding, QSizePolicy::Minimum);
 
 	QHBoxLayout *hLayout = new QHBoxLayout();
-	hLayout->addWidget(addBtn);
-	hLayout->addWidget(addBtn2);//todo:
+	hLayout->addWidget(addNodeLabelBtn);
+	hLayout->addWidget(addElemLabelBtn);
 	hLayout->addWidget(removeBtn);
 	hLayout->addWidget(selectPointBtn);
 	hLayout->addWidget(selectCellBtn);
@@ -101,18 +102,19 @@ void ObjectViewer::reset()
 		}
 	}
 
-
 }
 
-void ObjectViewer::updateUi(QMap<QString, QString> &mapData)
+void ObjectViewer::updateUi(ProjectManager &projectManager)
 {
 	QMap<QString, QString> NodeLabel;
 	QMap<QString, QString> ElementLabel;
 
-	for each (QString key in mapData.keys())
+	//get model data
+	QMap<QString, QString> labelData = projectManager.getModelData();
+	for each (QString key in labelData.keys())
 	{
 		QStringList keyList = key.split("@");
-		QStringList valList = mapData[key].split("@");
+		QStringList valList = labelData[key].split("@");
 
 		if (keyList[0] == "NodeLabel")
 		{
@@ -124,7 +126,7 @@ void ObjectViewer::updateUi(QMap<QString, QString> &mapData)
 		}
 	}
 
-	// update labelViewer ui
+	// update label
 	for each (QString labelName in NodeLabel.keys())
 	{
 		QSet<int> nodes;
@@ -148,7 +150,12 @@ void ObjectViewer::updateUi(QMap<QString, QString> &mapData)
 		}
 		this->addElemLabelToUI(labelName, elems);
 	}
+
+	//update solve config
+	QMap<QString, QString> solverData = projectManager.getSolverData();
 }
+
+
 
 void ObjectViewer::onLabelItemPressed(QTreeWidgetItem *item, int column)
 {//点击标签项
@@ -176,11 +183,11 @@ void ObjectViewer::onLabelItemPressed(QTreeWidgetItem *item, int column)
 			{
 				TreeItem *childItem = (TreeItem *)_item->child(cnt);
 				childItem->setShow(false);
-				if (childItem->type == SETTYPE_NODE)
+				if (childItem->type == SetType_NODE)
 				{
 					emit hideNodeLabel(childItem);
 				}
-				else if (childItem->type == SETTYPE_ELEM)
+				else if (childItem->type == SetType_ELEM)
 				{
 					emit hideElemLabel(childItem);
 				}
@@ -192,11 +199,11 @@ void ObjectViewer::onLabelItemPressed(QTreeWidgetItem *item, int column)
 		else
 		{
 
-			if (_item->type == SETTYPE_NODE)
+			if (_item->type == SetType_NODE)
 			{
 				emit hideNodeLabel(_item);
 			}
-			else if (_item->type == SETTYPE_ELEM)
+			else if (_item->type == SetType_ELEM)
 			{
 				emit hideElemLabel(_item);
 			}
@@ -215,11 +222,11 @@ void ObjectViewer::onLabelItemPressed(QTreeWidgetItem *item, int column)
 			{
 				TreeItem *childItem = (TreeItem *)_item->child(cnt);
 				childItem->setShow(true);
-				if (childItem->type == SETTYPE_NODE)
+				if (childItem->type == SetType_NODE)
 				{
 					emit showNodeLabel(childItem);
 				}
-				else if (childItem->type == SETTYPE_ELEM)
+				else if (childItem->type == SetType_ELEM)
 				{
 					emit showElemLabel(childItem);
 				}
@@ -230,11 +237,11 @@ void ObjectViewer::onLabelItemPressed(QTreeWidgetItem *item, int column)
 		}
 		else
 		{
-			if (_item->type == SETTYPE_NODE)
+			if (_item->type == SetType_NODE)
 			{
 				emit showNodeLabel(_item);
 			}
-			else if (_item->type == SETTYPE_ELEM)
+			else if (_item->type == SetType_ELEM)
 			{
 				emit showElemLabel(_item);
 			}
@@ -246,16 +253,16 @@ void ObjectViewer::onLabelItemPressed(QTreeWidgetItem *item, int column)
 
 void ObjectViewer::addNodeLabelToUI(QString &labelName, QSet<int>& attrdata)
 {
-	addLabelToUI(labelName, attrdata, SETTYPE_NODE);
+	addLabelToUI(labelName, attrdata, SetType_NODE);
 }
 
 void ObjectViewer::addElemLabelToUI(QString &labelName, QSet<int>& attrdata)
 {
-	addLabelToUI(labelName, attrdata, SETTYPE_ELEM);
+	addLabelToUI(labelName, attrdata, SetType_ELEM);
 }
 
 
-void ObjectViewer::addLabelToUI(QString &labelName, QSet<int>& attrdata, SETTYPE type)
+void ObjectViewer::addLabelToUI(QString &labelName, QSet<int>& attrdata, SetType type)
 {
 	//界面上增加
 	QIcon icon;
@@ -269,9 +276,8 @@ void ObjectViewer::addLabelToUI(QString &labelName, QSet<int>& attrdata, SETTYPE
 	item->setType(type);
 
 	labelItem->addChild(item);
-
-
 }
+
 void ObjectViewer::addNodeLabelToData(QString &labelName, QSet<int>& attrdata)
 {
 
@@ -282,7 +288,7 @@ void ObjectViewer::addElemLabelToData(QString &labelName, QSet<int>& attrdata)
 
 }
 
-void ObjectViewer::addLabelToData(QString &labelName, QSet<int>& attrdata, SETTYPE type)
+void ObjectViewer::addLabelToData(QString &labelName, QSet<int>& attrdata, SetType type)
 {
 	//ModelConfigmap 这个内部数据结构里面增加
 	QString varStr;
@@ -297,17 +303,17 @@ void ObjectViewer::addLabelToData(QString &labelName, QSet<int>& attrdata, SETTY
 	//项目中，这样的写法是不是坏味道呢？
 
 	MainWindow *mw = MainWindow::getMainWindow();
-	if (type == SETTYPE_ELEM)
+	if (type == SetType_ELEM)
 	{
 		mw->getProjectManager()->addElemLabelToModelConfig(labelName, varStr);
 	}
-	else if (type == SETTYPE_NODE)
+	else if (type == SetType_NODE)
 	{
 		mw->getProjectManager()->addNodeLabelToModelConfig(labelName, varStr);
 	}
 }
 
-void ObjectViewer::add(SETTYPE labelType)
+void ObjectViewer::add(SetType labelType)
 {
 	bool ok;
 	QString text = QInputDialog::getText(this, tr("input Label name"),
@@ -318,7 +324,7 @@ void ObjectViewer::add(SETTYPE labelType)
 	{
 		MainWindow *mw = MainWindow::getMainWindow();
 
-		if (labelType == SETTYPE_NODE)
+		if (labelType == SetType_NODE)
 		{
 			QSet<int> nodes = mw->getMeshViewer()->getSelectNodes();
 			if (nodes.empty())
@@ -327,9 +333,9 @@ void ObjectViewer::add(SETTYPE labelType)
 				return;
 			}
 			addNodeLabelToUI(text, nodes);
-			addLabelToData(text, nodes, SETTYPE_NODE);
+			addLabelToData(text, nodes, SetType_NODE);
 		}
-		else if (labelType == SETTYPE_ELEM)
+		else if (labelType == SetType_ELEM)
 		{
 			QSet<int> elems = mw->getMeshViewer()->getSelectElems();
 			if (elems.empty())
@@ -338,19 +344,19 @@ void ObjectViewer::add(SETTYPE labelType)
 				return;
 			}
 			addElemLabelToUI(text, elems);
-			addLabelToData(text, elems, SETTYPE_ELEM);
+			addLabelToData(text, elems, SetType_ELEM);
 		}
 	}
 }
 
-void ObjectViewer::onAddBtn()
+void ObjectViewer::onAddNodeLabelBtn()
 {
-	add(SETTYPE_NODE);
+	add(SetType_NODE);
 }
 
-void ObjectViewer::onAddBtn2()
+void ObjectViewer::onAddElemLabelBtn()
 {
-	add(SETTYPE_ELEM);
+	add(SetType_ELEM);
 }
 
 void ObjectViewer::onRemoveBtn()
@@ -363,12 +369,12 @@ void ObjectViewer::onSelectPointBtn()
 	if (selectPointBtn->isChecked())
 	{
 		selectPointBtn->setChecked(true);
-		emit selectStatus(Select_Type_Point);
+		emit selectStatus(SelectType_Point);
 	}
 	else
 	{
 		selectPointBtn->setChecked(false);
-		emit selectStatus(Select_Type_None);
+		emit selectStatus(SelectType_None);
 	}
 	
 }
@@ -378,12 +384,12 @@ void ObjectViewer::onSelectCellBtn()
 	if (selectCellBtn->isChecked())
 	{
 		selectCellBtn->setChecked(true);
-		emit selectStatus(Select_Type_Cell);
+		emit selectStatus(SelectType_Cell);
 	}
 	else
 	{
 		selectCellBtn->setChecked(false);
-		emit selectStatus(Select_Type_None);
+		emit selectStatus(SelectType_None);
 	}
 
 }

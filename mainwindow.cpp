@@ -27,7 +27,7 @@ MainWindow::MainWindow(QWidget *parent) :RibbonWindow(parent), projectManager(th
 	opViewer = new OperationViewer(this);
 	
 	objectViewer->setObjectName("objectViewer");
-	objectViewer->setWindowTitle("Label Browser");
+	objectViewer->setWindowTitle("Object Browser");
 	objectViewer->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
 	objectViewer->setMinimumWidth(80);
 
@@ -56,7 +56,7 @@ MainWindow::MainWindow(QWidget *parent) :RibbonWindow(parent), projectManager(th
 	connect(objectViewer, SIGNAL(hideNodeLabel(QTreeWidgetItem *)), meshViewer, SLOT(hideNodeLabel(QTreeWidgetItem *)));
 	connect(objectViewer, SIGNAL(showElemLabel(QTreeWidgetItem *)), meshViewer, SLOT(showElemLabel(QTreeWidgetItem *)));
 	connect(objectViewer, SIGNAL(hideElemLabel(QTreeWidgetItem *)), meshViewer, SLOT(hideElemLabel(QTreeWidgetItem *)));
-	connect(objectViewer, SIGNAL(selectStatus(Select_Type)), meshViewer, SLOT(selectTypeChanged(Select_Type)));
+	connect(objectViewer, SIGNAL(selectStatus(SelectType)), meshViewer, SLOT(selectTypeChanged(SelectType)));
 	connect(objectViewer, SIGNAL(resetActor()), meshViewer, SLOT(resetActor()));
 
 	connect(m_showFatigueDialog, SIGNAL(triggered()), this, SLOT(showFatigueDialog()));
@@ -212,12 +212,12 @@ void MainWindow::openProject()
 	//1 update mainwindow
 	this->updateUi(projectManager.getProjectData());
 
-	//2 update fatigur window
+	//2 update fatigue window
 	FatigueWidget *w = (FatigueWidget *)(opViewer->widget());
-	w->updateUi(projectManager.getUiData());
+	w->updateUi(projectManager.getSolverData());
 
 	//3 update label browser
-	objectViewer->updateUi(projectManager.getModelData());
+	objectViewer->updateUi(projectManager);
 
 	//4 update model window
 	meshViewer->updateUi(projectManager.getModelData());
@@ -226,7 +226,7 @@ void MainWindow::openProject()
 void MainWindow::save()
 {
 	FatigueWidget *w = (FatigueWidget *)(opViewer->widget());
-	w->updateMapData(projectManager.getUiData());
+	w->updateMapData(projectManager.getSolverData());
 
 	this->updateMapData(projectManager.getProjectData());
  
@@ -243,7 +243,7 @@ void MainWindow::save()
 void MainWindow::saveAs()
 {
 	FatigueWidget *w = (FatigueWidget *)(opViewer->widget());
-	w->updateMapData(projectManager.getUiData());
+	w->updateMapData(projectManager.getSolverData());
 
 	this->updateMapData(projectManager.getProjectData());
 
@@ -268,7 +268,7 @@ void MainWindow::closeProject()
 	//1 reset mainwindow
 	this->reset();
 
-	//2 reset fatigur window
+	//2 reset fatigue window
 	//FatigueWidget *w = (FatigueWidget *) (opViewer->widget());
 	//w->updateUi(projectManager.getUiData());
 
@@ -365,7 +365,6 @@ void MainWindow::createRibbon()
 
 void MainWindow::createGroupTools(Qtitan::RibbonPage* page)
 {
-
 	//²ÄÁÏ
 	if (Qtitan::RibbonGroup* materialGroup = page->addGroup(tr("&material Tools")))
 	{

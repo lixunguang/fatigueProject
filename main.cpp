@@ -4,8 +4,6 @@
 #include <Python.h>
 
 #include "mainwindow.h"
-//#include "HighlightInteractorStyle.h"
-
 
 extern int numargs;
 

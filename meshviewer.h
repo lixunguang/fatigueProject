@@ -82,11 +82,11 @@ public slots:
 
 	QSet<int> getSelectNodes();
 	QSet<int> getSelectElems();
-	void getSecletion(Select_Type type, QList<int>& s);
+	void getSecletion(SelectType type, QList<int>& s);
 
-	void selectTypeChanged(Select_Type type);
-	void setSelectType(Select_Type type);
-	Select_Type getSelectType();
+	void selectTypeChanged(SelectType type);
+	void setSelectType(SelectType type);
+	SelectType getSelectType();
 
 	void resetActor();
 	void getActorColor(double* color);
@@ -131,7 +131,7 @@ public:
 	map<QString, vtkActor*> nodeActorMap;
 	map<QString, vtkActor*> elemActorMap;
 
-	Select_Type selectType;
+	SelectType selectType;
 	QSet<int> currentNodes;
 	QSet<int> currentElems;
 };

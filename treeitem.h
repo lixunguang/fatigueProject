@@ -25,11 +25,11 @@ public:
 	void setAttrData(QSet<int> &data);
 	QSet<int> & getAttrData();
 
-	void setType(SETTYPE type);
+	void setType(SetType type);
 public:
 	bool _show;
 	QSet<int> attrData;
-	SETTYPE type;
+	SetType type;
 };
 
 #endif

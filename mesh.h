@@ -57,8 +57,8 @@ public:
 	long getMaxNode();
 
 public:
-	SETTYPE getDatasetType(char *datasetName);
-	vdm_Dataset *getDataset(char *attrVal,SETTYPE setType);
+	SetType getDatasetType(char *datasetName);
+	vdm_Dataset *getDataset(char *attrVal, SetType setType);
 
 protected:
 	Vint suftst(Vchar inputfile[], Vchar suffix[]);

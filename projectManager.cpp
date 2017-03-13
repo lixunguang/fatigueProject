@@ -417,7 +417,7 @@ void ProjectManager::saveAsSolveFile(QString &filePath)
 	qDebug() << "ProjectManager::saveAsSolveFile";
 }
 
-QMap<QString,QString>& ProjectManager::getUiData()
+QMap<QString,QString>& ProjectManager::getSolverData()
 {
 	return outputConfigMapData;
 }

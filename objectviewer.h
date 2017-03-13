@@ -7,6 +7,7 @@
 
 #include "treeitem.h"
 #include "typedef.h"
+#include "projectManager.h"
 
 class  ObjectViewer : public QDockWidget
 {
@@ -14,25 +15,33 @@ class  ObjectViewer : public QDockWidget
 public:
 	ObjectViewer(QWidget *parent = 0);
 	~ObjectViewer();
-	void updateUi(QMap<QString, QString> &mapData);
+
+public:
+	void updateUi(ProjectManager &projectManager);
 	void reset();
+public:
+	void addLabelToUI(QString &labelName, QSet<int>& attrdata, SetType type);
+	void addNodeLabelToUI(QString &labelName, QSet<int>& attrdata);
+	void addElemLabelToUI(QString &labelName, QSet<int>& attrdata);
+
+	void addLabelToData(QString &labelName, QSet<int>& attrdata, SetType type);
+	void addNodeLabelToData(QString &labelName, QSet<int>& attrdata);
+	void addElemLabelToData(QString &labelName, QSet<int>& attrdata);
+
+
+	void addObjectToUI()
+	{
+
+	}
+
 public slots:
-	void onAddBtn();
-	void onAddBtn2();
+	void onAddNodeLabelBtn();
+	void onAddElemLabelBtn();
 	void onRemoveBtn();
 	void onSelectPointBtn();
 	void onSelectCellBtn();
 
-	void add(SETTYPE labelType);
-
-	void addLabelToUI(QString &labelName, QSet<int>& attrdata, SETTYPE type);
-	void addNodeLabelToUI(QString &labelName, QSet<int>& attrdata);
-	void addElemLabelToUI(QString &labelName, QSet<int>& attrdata);
-
-	void addLabelToData(QString &labelName, QSet<int>& attrdata, SETTYPE type);
-	void addNodeLabelToData(QString &labelName, QSet<int>& attrdata);
-	void addElemLabelToData(QString &labelName, QSet<int>& attrdata);
-
+	void add(SetType labelType);
 	void onLabelItemPressed(QTreeWidgetItem * item, int column);
 signals:
 	void showNodeLabel(QTreeWidgetItem* item);
@@ -40,7 +49,7 @@ signals:
 	void showElemLabel(QTreeWidgetItem* item);
 	void hideElemLabel(QTreeWidgetItem* item);
 
-	void selectStatus(Select_Type);
+	void selectStatus(SelectType);
 
 	void resetActor();
 private:

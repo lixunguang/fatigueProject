@@ -1,28 +1,41 @@
-#ifndef typedef___
-#define typedef___
+#ifndef _typedef___
+#define _typedef___
 
-
-enum OBJECTTYPE
-{//2种输入，edit,comb
-	type_NONE,
-	type_edit,
-	type_combo,
-	type_text,
+#include <QString>
+enum ObjType
+{//3种输入，edit,comb,text
+	ObjType_NONE,
+	ObjType_edit,
+	ObjType_combo,
+	ObjType_text,
 };
 
-enum Select_Type
+enum SelectType
 {
-	Select_Type_None,
-	Select_Type_Point,
-	Select_Type_Cell,
+	SelectType_None,
+	SelectType_Point,
+	SelectType_Cell,
 };
 
-enum SETTYPE
+enum SetType
 {
-	SETTYPE_NONE,
-	SETTYPE_NODE,
-	SETTYPE_ELEM,
-	SETTYPE_FACE,
+	SetType_NONE,
+	SetType_NODE,
+	SetType_ELEM,
+	SetType_FACE,
 };
 
+ struct LabelItemInfo//定义标签节点
+ {
+ 	QString objName;
+ 	QString text;
+ 
+ };
+ 
+ struct SolverItemInfo//定义求解设置节点
+ {
+ 	QString objName;
+ 	ObjType type;
+ 	QString text;
+ };
 #endif

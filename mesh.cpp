@@ -698,26 +698,26 @@ void Mesh::CloseVKISupportFile(vdm_DataFun *datafun)
 }
 
 
-SETTYPE Mesh::getDatasetType(char *datasetName)
+SetType Mesh::getDatasetType(char *datasetName)
 {
-	SETTYPE type;
+	SetType type;
 	std::string str = datasetName;
 	if (str.find("SET.ELEM.T") != -1 )
 	{
-		type = SETTYPE_ELEM;
+		type = SetType_ELEM;
 	}
 	else if(str.find("SET.NODE.T") != -1)
 	{
-		type = SETTYPE_NODE;
+		type = SetType_NODE;
 	}
 	else if(str.find("SET.ELEM.FACE.T") != -1)
 	{
-		type = SETTYPE_FACE;
+		type = SetType_FACE;
 	}
 	return type;
 }
 
-vdm_Dataset *Mesh::getDataset(char *attrVal,SETTYPE setType)
+vdm_Dataset *Mesh::getDataset(char *attrVal,SetType setType)
 {
 
 	vdm_Dataset *res = NULL;
@@ -746,7 +746,7 @@ vdm_Dataset *Mesh::getDataset(char *attrVal,SETTYPE setType)
 				vdm_AttributeValueString(attr,attrVlue);
 				if (strcmp(attrVal,attrVlue)== 0 )
 				{
-					SETTYPE sType = SETTYPE_NONE;
+					SetType sType = SetType_NONE;
 					sType = getDatasetType(datasetName);
 					if (sType == setType)
 					{

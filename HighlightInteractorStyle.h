@@ -34,7 +34,7 @@ public:
 	void SetData(vtkUnstructuredGrid* data);
 	vtkUnstructuredGrid* GetData();
 
-	void setSelect(Select_Type type);
+	void setSelect(SelectType type);
 
 	QSet<int>& getCurrentSelectNodes();
 	QSet<int>& getCurrentSelectElems();
@@ -62,7 +62,7 @@ public:
 	QSet<int> currentSelectElems;
 	QMap<int, int> nodeIdMap;
 
-	Select_Type selectType;
+	SelectType selectType;
 
 	MeshViewer *meshViewer;
 };

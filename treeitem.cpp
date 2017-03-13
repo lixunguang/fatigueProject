@@ -23,7 +23,7 @@ QSet<int> & TreeItem::getAttrData()
 	return attrData;
 }
 
-void TreeItem::setType(SETTYPE	t)
+void TreeItem::setType(SetType	t)
 {
 	this->type = t;
 }
