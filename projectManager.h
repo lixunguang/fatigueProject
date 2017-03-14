@@ -45,10 +45,10 @@ public slots:
 	void xmlElemFromModelConfig(QDomElement &e);
 	void xmlElemFromOutputConfig(QDomElement &e);
 
-	QMap<QString, QString>& getSolverData();
 	QMap<QString, QString>& getProjectData();
 	QMap<QString, QString>& getModelData();
- 
+	QMap<QString, QString>& getSolverData();
+
 private:
  	//存放xml格式的工程文件数据,内部数据
 	//key name：sectionName_name_type_val，名字中含有xml的数据结构，这也是把树形的xml转为map的关键

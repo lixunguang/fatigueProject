@@ -20,19 +20,14 @@ public:
 	void updateUi(ProjectManager &projectManager);
 	void reset();
 public:
-	void addLabelToUI(QString &labelName, QSet<int>& attrdata, SetType type);
-	void addNodeLabelToUI(QString &labelName, QSet<int>& attrdata);
-	void addElemLabelToUI(QString &labelName, QSet<int>& attrdata);
-
 	void addLabelToData(QString &labelName, QSet<int>& attrdata, SetType type);
 	void addNodeLabelToData(QString &labelName, QSet<int>& attrdata);
 	void addElemLabelToData(QString &labelName, QSet<int>& attrdata);
 
+	void updateUiLabel(QMap<QString, QString> &modelData);
+ 	void updateUiOperator(QMap<QString, QString>& solverData);
 
-	void addObjectToUI()
-	{
-
-	}
+	void addObjectToUI(QString &labelName, QMap<QString, QString>& attrData, SetType type);
 
 public slots:
 	void onAddNodeLabelBtn();

@@ -13,14 +13,16 @@ TreeItem::~TreeItem()
 
 }
 
-void TreeItem::setAttrData(QSet<int>& data)
+void TreeItem::setAttrData(QMap<QString, QString>& data)
 {
-	attrData = data;
+	attrData2 = data;
 }
 
-QSet<int> & TreeItem::getAttrData()
+
+
+QMap<QString, QString>& TreeItem::getAttrData()
 {
-	return attrData;
+	return attrData2;
 }
 
 void TreeItem::setType(SetType	t)

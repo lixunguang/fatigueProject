@@ -431,4 +431,5 @@ QMap<QString, QString>& ProjectManager::getModelData()
 {
 	return modelConfigMapData;
 }
+
 #pragma endregion project func

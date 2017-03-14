@@ -406,7 +406,14 @@ void MeshViewer::showNodeLabel(QTreeWidgetItem *item)
 	setSelectType(SelectType_Point);
 
 	TreeItem *treeItem = (TreeItem*) item;
-	currentNodes += treeItem->getAttrData();
+	QString str = treeItem->getAttrData()[item->text(1)];
+	QStringList strList = str.split(" ");
+	QSet<int> set;
+	for each (QString var in strList)
+	{
+		set.insert(var.toInt());
+	}
+	currentNodes += set;
 
 	vtkSmartPointer<vtkActor> actor = vtkSmartPointer<vtkActor>::New();
 	double color[3];
@@ -449,7 +456,15 @@ void MeshViewer::showElemLabel(QTreeWidgetItem *item)
 	setSelectType(SelectType_Point);
 
 	TreeItem *treeItem = (TreeItem*) item;
-	currentElems += treeItem->getAttrData();
+	QString str = treeItem->getAttrData()[item->text(1)];
+	QStringList strList = str.split(" ");
+	QSet<int> set;
+	for each (QString var in strList)
+	{
+		set.insert(var.toInt());
+	}
+
+	currentElems += set;
 
 	vtkSmartPointer<vtkActor> actor = vtkSmartPointer<vtkActor>::New();
 	double color[3];
@@ -487,7 +502,14 @@ void MeshViewer::showElemLabel(QTreeWidgetItem *item)
 void MeshViewer::hideNodeLabel(QTreeWidgetItem *item)
 {
 	TreeItem *treeItem = (TreeItem*) item;
-	currentNodes -= treeItem->getAttrData();
+	QString str = treeItem->getAttrData()[item->text(1)];
+	QStringList strList = str.split(" ");
+	QSet<int> set;
+	for each (QString var in strList)
+	{
+		set.insert(var.toInt());
+	}
+	currentNodes -= set;
  
 	vtkRenderWindow * renderWindow = this->GetRenderWindow();
 	vtkRenderer * renderer = renderWindow->GetRenderers()->GetFirstRenderer();
@@ -499,7 +521,14 @@ void MeshViewer::hideNodeLabel(QTreeWidgetItem *item)
 void MeshViewer::hideElemLabel(QTreeWidgetItem *item)
 {
 	TreeItem *treeItem = (TreeItem*) item;
-	currentElems -= treeItem->getAttrData();
+	QString str = treeItem->getAttrData()[item->text(1)];
+	QStringList strList = str.split(" ");
+	QSet<int> set;
+	for each (QString var in strList)
+	{
+		set.insert(var.toInt());
+	}
+	currentElems -= set;
 
 	vtkRenderWindow * renderWindow = this->GetRenderWindow();
 	vtkRenderer * renderer = renderWindow->GetRenderers()->GetFirstRenderer();

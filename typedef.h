@@ -2,12 +2,12 @@
 #define _typedef___
 
 #include <QString>
-enum ObjType
-{//3种输入，edit,comb,text
-	ObjType_NONE,
-	ObjType_edit,
-	ObjType_combo,
-	ObjType_text,
+enum InputObjType
+{//3种输入类型，edit,comb,text
+	InputObjType_NONE,
+	InputObjType_edit,
+	InputObjType_combo,
+	InputObjType_text,
 };
 
 enum SelectType
@@ -23,6 +23,7 @@ enum SetType
 	SetType_NODE,
 	SetType_ELEM,
 	SetType_FACE,
+	SetType_OPER,//Operator
 };
 
  struct LabelItemInfo//定义标签节点
@@ -35,7 +36,7 @@ enum SetType
  struct SolverItemInfo//定义求解设置节点
  {
  	QString objName;
- 	ObjType type;
+ 	//ObjType type;
  	QString text;
  };
 #endif

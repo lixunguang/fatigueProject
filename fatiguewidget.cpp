@@ -56,7 +56,7 @@ void FatigueWidget::updateUi(QMap<QString,QString> &mapData)
 		QStringList valList = mapData[key].split("@");
 
 		QString val;
-		ObjType type = ObjType_NONE;
+		InputObjType type = InputObjType_NONE;
 
 		for (int j = 1; j < keyList.size(); j++)
 		{
@@ -69,15 +69,15 @@ void FatigueWidget::updateUi(QMap<QString,QString> &mapData)
 			{
 				if (valList[j-1].toInt() == 1)
 				{
-					type = ObjType_edit;
+					type = InputObjType_edit;
 				}
 				else if (valList[j-1].toInt() == 2)
 				{
-					type = ObjType_combo;
+					type = InputObjType_combo;
 				}
 				else if (valList[j - 1].toInt() == 3)
 				{
-					type = ObjType_text;
+					type = InputObjType_text;
 				}
 				else
 				{
@@ -86,7 +86,7 @@ void FatigueWidget::updateUi(QMap<QString,QString> &mapData)
 			}
 		}
 
-		if (type == ObjType_edit)
+		if (type == InputObjType_edit)
 		{
 			QLineEdit *obj = this->findChild<QLineEdit *>(val);
 			if (!obj)
@@ -95,7 +95,7 @@ void FatigueWidget::updateUi(QMap<QString,QString> &mapData)
 			}
 			obj->setText(valList[valList.size()-1]);
 		}
-		if (type == ObjType_text)
+		if (type == InputObjType_text)
 		{
 			QTextEdit *obj = this->findChild<QTextEdit *>(val);
 			if (!obj)
@@ -104,7 +104,7 @@ void FatigueWidget::updateUi(QMap<QString,QString> &mapData)
 			}
 			obj->setText(valList[valList.size() - 1]);
 		}
-		else if (type == ObjType_combo)
+		else if (type == InputObjType_combo)
 		{
 			QComboBox *obj = this->findChild<QComboBox *>(val);
 			if (!obj)

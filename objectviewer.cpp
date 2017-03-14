@@ -13,7 +13,7 @@
 #include "meshviewer.h"
 
 ObjectViewer::ObjectViewer(QWidget *parent)
-:QDockWidget(parent)
+	:QDockWidget(parent)
 {
 	QVBoxLayout *vLayout = new QVBoxLayout();
 	QWidget *labelBrowser = new QWidget();
@@ -106,15 +106,24 @@ void ObjectViewer::reset()
 
 void ObjectViewer::updateUi(ProjectManager &projectManager)
 {
+	QMap<QString, QString> modelData = projectManager.getModelData();
+	updateUiLabel(modelData);
+
+	// update solve config
+	QMap<QString, QString> solverData = projectManager.getSolverData();
+	qDebug() << "solverData: " << solverData;
+	updateUiOperator(solverData);
+}
+
+void ObjectViewer::updateUiLabel(QMap<QString, QString> &modelData)
+{
 	QMap<QString, QString> NodeLabel;
 	QMap<QString, QString> ElementLabel;
 
-	//get model data
-	QMap<QString, QString> labelData = projectManager.getModelData();
-	for each (QString key in labelData.keys())
+	for each (QString key in modelData.keys())
 	{
 		QStringList keyList = key.split("@");
-		QStringList valList = labelData[key].split("@");
+		QStringList valList = modelData[key].split("@");
 
 		if (keyList[0] == "NodeLabel")
 		{
@@ -129,33 +138,42 @@ void ObjectViewer::updateUi(ProjectManager &projectManager)
 	// update label
 	for each (QString labelName in NodeLabel.keys())
 	{
-		QSet<int> nodes;
-		QString nodesStr = NodeLabel[labelName];
-		QStringList sl = nodesStr.split(" ");
-		for each (QString var in sl)
-		{
-			nodes.insert(var.toInt());
-		}
-		this->addNodeLabelToUI(labelName, nodes);
+		addObjectToUI(labelName, NodeLabel, SetType_NODE);
 	}
 
 	for each (QString labelName in ElementLabel.keys())
 	{
-		QSet<int> elems;
-		QString elemStr = ElementLabel[labelName];
-		QStringList sl = elemStr.split(" ");
-		for each (QString var in sl)
-		{
-			elems.insert(var.toInt());
-		}
-		this->addElemLabelToUI(labelName, elems);
+		addObjectToUI(labelName, ElementLabel, SetType_ELEM);
 	}
 
-	//update solve config
-	QMap<QString, QString> solverData = projectManager.getSolverData();
 }
 
+void ObjectViewer::updateUiOperator(QMap<QString, QString>& solverData)
+{
+	addObjectToUI(QString("operxxx"),solverData,SetType_OPER);
+}
 
+void ObjectViewer::addObjectToUI(QString &labelName, QMap<QString, QString>& attrData, SetType type)
+{
+	//界面上增加
+	QIcon icon;
+	icon.addPixmap(QPixmap(":/res/label/label_visibility_off.png"));
+
+	TreeItem *item = new TreeItem();
+	item->setShow(false);
+	item->setIcon(0, icon);
+	item->setText(1, labelName);
+	item->setAttrData(attrData);
+	item->setType(type);
+
+	QTreeWidgetItem *parent = labelItem;
+	if (type == SetType_OPER)
+	{
+		parent = OperationItem;
+	}
+
+	parent->addChild(item);
+}
 
 void ObjectViewer::onLabelItemPressed(QTreeWidgetItem *item, int column)
 {//点击标签项
@@ -164,7 +182,7 @@ void ObjectViewer::onLabelItemPressed(QTreeWidgetItem *item, int column)
 		return;
 	}
 
-	TreeItem *_item = (TreeItem*)item;
+	TreeItem *_item = (TreeItem*) item;
 	QIcon icon = _item->icon(0);
 	bool show = _item->show();
 
@@ -181,7 +199,7 @@ void ObjectViewer::onLabelItemPressed(QTreeWidgetItem *item, int column)
 			int cnt = _item->childCount();
 			while (cnt--)
 			{
-				TreeItem *childItem = (TreeItem *)_item->child(cnt);
+				TreeItem *childItem = (TreeItem *) _item->child(cnt);
 				childItem->setShow(false);
 				if (childItem->type == SetType_NODE)
 				{
@@ -220,7 +238,7 @@ void ObjectViewer::onLabelItemPressed(QTreeWidgetItem *item, int column)
 			int cnt = _item->childCount();
 			while (cnt--)
 			{
-				TreeItem *childItem = (TreeItem *)_item->child(cnt);
+				TreeItem *childItem = (TreeItem *) _item->child(cnt);
 				childItem->setShow(true);
 				if (childItem->type == SetType_NODE)
 				{
@@ -251,32 +269,10 @@ void ObjectViewer::onLabelItemPressed(QTreeWidgetItem *item, int column)
 	item->setIcon(0, icon);
 }
 
-void ObjectViewer::addNodeLabelToUI(QString &labelName, QSet<int>& attrdata)
-{
-	addLabelToUI(labelName, attrdata, SetType_NODE);
-}
-
-void ObjectViewer::addElemLabelToUI(QString &labelName, QSet<int>& attrdata)
-{
-	addLabelToUI(labelName, attrdata, SetType_ELEM);
-}
 
 
-void ObjectViewer::addLabelToUI(QString &labelName, QSet<int>& attrdata, SetType type)
-{
-	//界面上增加
-	QIcon icon;
-	icon.addPixmap(QPixmap(":/res/label/label_visibility_off.png"));
 
-	TreeItem *item = new TreeItem();
-	item->setShow(false);
-	item->setIcon(0, icon);
-	item->setText(1, labelName);
-	item->setAttrData(attrdata);
-	item->setType(type);
 
-	labelItem->addChild(item);
-}
 
 void ObjectViewer::addNodeLabelToData(QString &labelName, QSet<int>& attrdata)
 {
@@ -326,24 +322,40 @@ void ObjectViewer::add(SetType labelType)
 
 		if (labelType == SetType_NODE)
 		{
+			QMap<QString, QString> attrdata;
 			QSet<int> nodes = mw->getMeshViewer()->getSelectNodes();
 			if (nodes.empty())
 			{
 				QMessageBox::warning(mw, "empty", "please select nodes first!");
 				return;
 			}
-			addNodeLabelToUI(text, nodes);
+			QString nodeStr;
+			for each (int var in nodes)
+			{
+				nodeStr += QString("%1 ").arg(var);
+
+			}
+		 
+			attrdata[text] = nodeStr;
+			addObjectToUI(text, attrdata,SetType_NODE);
 			addLabelToData(text, nodes, SetType_NODE);
 		}
 		else if (labelType == SetType_ELEM)
 		{
+			QMap<QString, QString> attrdata;
 			QSet<int> elems = mw->getMeshViewer()->getSelectElems();
 			if (elems.empty())
 			{
 				QMessageBox::warning(mw, "empty", "please select elements first!");
 				return;
 			}
-			addElemLabelToUI(text, elems);
+			QString elemStr;
+			for each (int var in elems)
+			{
+				elemStr += QString("%1 ").arg(var);
+			}
+			attrdata[text] = elemStr;
+			addObjectToUI(text, attrdata, SetType_ELEM);
 			addLabelToData(text, elems, SetType_ELEM);
 		}
 	}
@@ -376,7 +388,7 @@ void ObjectViewer::onSelectPointBtn()
 		selectPointBtn->setChecked(false);
 		emit selectStatus(SelectType_None);
 	}
-	
+
 }
 
 void ObjectViewer::onSelectCellBtn()
