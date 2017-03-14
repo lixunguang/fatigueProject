@@ -88,6 +88,10 @@ void Table::onRemove(int idx)
 void Table::onUpClicked()
 {
 	QModelIndex midx = table->currentIndex();
+	if (!midx.isValid())
+	{
+		return;
+	}
 	int r = midx.row();
 
 	int r1 = 0;
@@ -106,8 +110,11 @@ void Table::onUpClicked()
 
 void Table::onDownClicked()
 {
-
 	QModelIndex midx = table->currentIndex();
+	if (!midx.isValid())
+	{
+		return;
+	}
 	int r = midx.row();
 
 	int cnt = model->modelData_().size();
